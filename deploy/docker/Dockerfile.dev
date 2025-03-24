@@ -1,7 +1,7 @@
 FROM golang:1.24-alpine@sha256:43c094ad24b6ac0546c62193baeb3e6e49ce14d3250845d166c77c25f64b0386
 
 # Set working directory
-WORKDIR /home/enso/app
+WORKDIR /home/enso/enso-homelab
 
 # Install required packages
 RUN apk add --no-cache \
@@ -20,7 +20,8 @@ RUN apk add --no-cache \
     tzdata \
     libc6-compat \
     less \
-    vim
+    vim \
+    zsh
 
 # Install Terraform manually from HashiCorp
 ENV TERRAFORM_VERSION=1.7.4
@@ -33,9 +34,17 @@ RUN curl -fsSL https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/ter
 RUN adduser -D enso && echo "enso ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/enso
 
 # Ensure working directory exists and is owned by "enso"
-RUN mkdir -p $GOPATH /home/enso/app && chown -R enso:enso $GOPATH /home/enso/app
+RUN mkdir -p $GOPATH /home/enso/enso-homelab && chown -R enso:enso $GOPATH /home/enso/enso-homelab
+
+# Set up zsh as default shell
+RUN sed -i 's#/bin/sh#/bin/zsh#g' /etc/passwd
 
 USER enso
+
+RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /home/enso/.oh-my-zsh/custom/themes/powerlevel10k && \
+    git clone https://github.com/zsh-users/zsh-autosuggestions /home/enso/.oh-my-zsh/custom/plugins/zsh-autosuggestions && \
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting /home/enso/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
 
 # Set GOPATH and update PATH
 ENV HOME="/home/enso"

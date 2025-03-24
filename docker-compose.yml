@@ -9,9 +9,11 @@ services:
     networks:
       - enso-homelab-network
     volumes:
-      - ${HOME}/.config/gh:/home/vscode/.config/gh
-      - ${HOME}/.ssh:/home/vscode/.ssh
-      - ${HOME}/.zhistory:/home/vscode/.zhistory
+      - ${HOME}/.config/gh:/home/enso/.config/gh
+      - ${HOME}/.ssh:/home/enso/.ssh
+      - ${HOME}/.zhistory:/home/enso/.zhistory
+      #- ${HOME}/.zshrc:/home/enso/.zshrc
+      - ./:/home/enso/enso-homelab
 
 networks:
   enso-homelab-network:
