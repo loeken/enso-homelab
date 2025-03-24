@@ -4,3 +4,4 @@ src/__pycache__/**
 renovate.log
 k3sup
 .terraform
+data/credentials

@@ -18,16 +18,6 @@ variable "external_ip" {
     default = "1.2.3.4"
     description = "sets the external ip address, a script to update ips and restart k3s is also uploaded to the vm"
 }
-variable "ssh_password" {
-  type = string
-  default = "demotime"
-  description = "The password to use when connecting to the server via SSH."
-}
-variable "ssh_public_key" {
-  type = string
-  default = "~/.ssh/id_ed25519.pub"
-  description = "The path to the public key to use when connecting to the server via SSH."
-}
 variable "ssh_server_address" {
   type = string
   default = "localhost"

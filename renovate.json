@@ -5,10 +5,16 @@
   "prHourlyLimit": 0,
   "pinDigests": true,
   "packageRules": [
+    { "matchUpdateTypes": ["minor", "patch", "pin", "digest"], "automerge": true },
     {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-      "automerge": true
+      "matchManagers": ["terraform-version"],
+      "pinDigests": false
     }
   ],
-  "enabledManagers": ["terraform-version", "docker-compose", "dockerfile", "github-actions"]
+  "enabledManagers": [
+    "terraform-version",
+    "docker-compose",
+    "dockerfile",
+    "github-actions"
+  ]
 }

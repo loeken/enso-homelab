@@ -10,6 +10,7 @@ resource null_resource bootstrap-k3s {
       --cluster \
       --k3s-version ${var.kubernetes_version} \
       --k3s-extra-args '--disable=traefik --node-external-ip=${var.external_ip} --advertise-address=${var.ssh_server_address} --node-ip=${var.ssh_server_address}'
+    mv kubeconfig ../../../data/credentials
     EOT
   }
 }
