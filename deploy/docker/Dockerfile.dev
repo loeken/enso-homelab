@@ -54,5 +54,8 @@ ENV HOME="/home/enso"
 ENV GOPATH="$HOME/go"
 ENV PATH="$GOPATH/bin:$PATH"
 
+# copy default .zshrc to load plugins installed above
+COPY deploy/docker/.zshrc /home/vscode/.zshrc
+
 # Default command for devcontainer to stay alive
 CMD ["tail", "-f", "/dev/null"]
