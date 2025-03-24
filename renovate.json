@@ -9,5 +9,14 @@
       "automerge": true
     }
   ],
-  "pinDigests": true
+  "pinDigests": true,
+  "regexManagers": [
+    {
+      "fileMatch": [
+        "(^|/)\\.terraform-version$"
+      ],
+      "versioning": "hashicorp",
+      "extractVersion": "^v(?<version>.*)$"
+    }
+  ]
 }
