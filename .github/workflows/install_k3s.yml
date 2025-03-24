@@ -52,7 +52,7 @@ jobs:
 
       - name: Terraform Plan
         if: github.event_name == 'pull_request'
-        working-directory: terraform/k3s
+        working-directory: deploy/terraform/k3s
         run: |
           terraform plan -input=false \
           -var "ssh_username=$SSH_USERNAME" \
@@ -64,7 +64,7 @@ jobs:
 
       - name: Terraform Apply
         if: github.event_name == 'push'
-        working-directory: terraform/k3s
+        working-directory: deploy/terraform/k3s
         run: |
           terraform apply -auto-approve -input=false \
           -var "ssh_username=$SSH_USERNAME" \
