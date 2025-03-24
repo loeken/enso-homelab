@@ -1,0 +1,75 @@
+name: Terraform Infrastructure
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'deploy/terraform/**'
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'deploy/terraform/**'
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    env:
+      SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+      SSH_SERVER_ADDRESS: ${{ secrets.SSH_SERVER_ADDRESS }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      KUBERNETES_VERSION: "v1.26.4+k3s1"
+      STORAGE: "local-path"
+      TF_ORGANIZATION: ${{ secrets.TF_ORGANIZATION }}
+      TF_WORKSPACE: ${{ secrets.TF_WORKSPACE }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      - name: Retrieve external IP
+        id: external_ip
+        run: echo "EXTERNAL_IP=$(curl -s ifconfig.co -4)" >> "$GITHUB_ENV"
+
+      - name: Terraform Init
+        working-directory: terraform/k3s
+        run: |
+          terraform init -input=false \
+            -backend-config="hostname=app.terraform.io" \
+            -backend-config="organization=$TF_ORGANIZATION" \
+            -backend-config="workspaces.name=$TF_WORKSPACE"
+
+      - name: Terraform Plan
+        if: github.event_name == 'pull_request'
+        working-directory: terraform/k3s
+        run: |
+          terraform plan -input=false \
+          -var "ssh_username=$SSH_USERNAME" \
+          -var "ssh_server_address=$SSH_SERVER_ADDRESS" \
+          -var "ssh_private_key=$SSH_PRIVATE_KEY" \
+          -var "external_ip=$EXTERNAL_IP" \
+          -var "kubernetes_version=$KUBERNETES_VERSION" \
+          -var "storage=$STORAGE"
+
+      - name: Terraform Apply
+        if: github.event_name == 'push'
+        working-directory: terraform/k3s
+        run: |
+          terraform apply -auto-approve -input=false \
+          -var "ssh_username=$SSH_USERNAME" \
+          -var "ssh_server_address=$SSH_SERVER_ADDRESS" \
+          -var "ssh_private_key=$SSH_PRIVATE_KEY" \
+          -var "external_ip=$EXTERNAL_IP" \
+          -var "kubernetes_version=$KUBERNETES_VERSION" \
+          -var "storage=$STORAGE"
