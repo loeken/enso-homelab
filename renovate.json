@@ -10,7 +10,14 @@
     }
   ],
   "pinDigests": true,
-  "terraform": {
-    "enabled": true
-  }
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["(^|/)\\.terraform-version$"],
+      "matchStrings": ["^(?<currentValue>\\d+\\.\\d+\\.\\d+)$"],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "hashicorp/terraform",
+      "versioningTemplate": "hashicorp"
+    }
+  ]
 }
