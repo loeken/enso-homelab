@@ -1,0 +1,46 @@
+FROM golang:1.22-alpine
+
+# Set working directory
+WORKDIR /home/enso/app
+
+# Install required packages
+RUN apk add --no-cache \
+    bash \
+    sudo \
+    curl \
+    git \
+    openssh \
+    py3-pip \
+    python3 \
+    ansible \
+    jq \
+    make \
+    docker-cli \
+    coreutils \
+    tzdata \
+    libc6-compat \
+    less \
+    vim
+
+# Install Terraform manually from HashiCorp
+ENV TERRAFORM_VERSION=1.7.4
+RUN curl -fsSL https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o terraform.zip \
+ && unzip terraform.zip \
+ && mv terraform /usr/local/bin/terraform \
+ && rm terraform.zip
+
+# Create non-root user "enso" with passwordless sudo
+RUN adduser -D enso && echo "enso ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/enso
+
+# Ensure working directory exists and is owned by "enso"
+RUN mkdir -p $GOPATH /home/enso/app && chown -R enso:enso $GOPATH /home/enso/app
+
+USER enso
+
+# Set GOPATH and update PATH
+ENV HOME="/home/enso"
+ENV GOPATH="$HOME/go"
+ENV PATH="$GOPATH/bin:$PATH"
+
+# Default command for devcontainer to stay alive
+CMD ["tail", "-f", "/dev/null"]

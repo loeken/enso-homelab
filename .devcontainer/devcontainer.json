@@ -1,0 +1,14 @@
+{
+    "name": "enso-homelab",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "enso-homelab",
+    "workspaceFolder": "/app",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "oderwat.indent-rainbow",
+                "ms-azuretools.vscode-docker"
+            ]
+        }
+    }
+}

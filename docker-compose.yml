@@ -1,0 +1,18 @@
+services:
+  enso-homelab:
+    container_name: enso-homelab
+    build:
+      context: .
+      dockerfile: ./deploy/docker/Dockerfile.dev
+    restart: "no"
+    env_file: .env
+    networks:
+      - enso-homelab-network
+    volumes:
+      - ${HOME}/.config/gh:/home/vscode/.config/gh
+      - ${HOME}/.ssh:/home/vscode/.ssh
+      - ${HOME}/.zhistory:/home/vscode/.zhistory
+
+networks:
+  enso-homelab-network:
+    driver: bridge
