@@ -27,7 +27,10 @@ RUN apk add --no-cache \
     nano
 
 # Install k3sup
-RUN cd /tmp && curl -sLS https://get.k3sup.dev | sh 
+RUN cd /tmp && curl -sLS https://get.k3sup.dev | sh
+
+# Install act
+RUN curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
 
 # Create non-root user "enso" with passwordless sudo
 RUN adduser -D enso && echo "enso ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/enso
