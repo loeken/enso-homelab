@@ -10,13 +10,16 @@
       "automerge": true
     }
   ],
-  "regexManagers": [
+  "customManagers": [
     {
-      "fileMatch": ["(^|/)\\.terraform-version$"],
-      "matchStrings": ["^(?<currentValue>\\d+\\.\\d+\\.\\d+)$"],
+      "customType": "regex",
+      "fileMatch": ["^\\.terraform-version$"],
+      "matchStrings": [
+        "^(?<currentValue>\\d+\\.\\d+\\.\\d+)$"
+      ],
       "depNameTemplate": "hashicorp/terraform",
       "datasourceTemplate": "github-releases",
-      "versioningTemplate": "hashicorp"
+      "versioningTemplate": "semver"
     }
   ]
 }
