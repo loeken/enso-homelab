@@ -43,12 +43,12 @@ jobs:
         run: echo "EXTERNAL_IP=$(curl -s ifconfig.co -4)" >> "$GITHUB_ENV"
 
       - name: Terraform Init
-        working-directory: terraform/k3s
+        working-directory: deploy/terraform/k3s
         run: |
           terraform init -input=false \
             -backend-config="hostname=app.terraform.io" \
             -backend-config="organization=$TF_ORGANIZATION" \
-            -backend-config="workspaces.name=$TF_WORKSPACE"
+            -backend-config="workspace=$TF_WORKSPACE"
 
       - name: Terraform Plan
         if: github.event_name == 'pull_request'
