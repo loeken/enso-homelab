@@ -10,13 +10,7 @@
     }
   ],
   "pinDigests": true,
-  "regexManagers": [
-    {
-      "fileMatch": [
-        "(^|/)\\.terraform-version$"
-      ],
-      "versioning": "hashicorp",
-      "extractVersion": "^v(?<version>.*)$"
-    }
-  ]
+  "terraform": {
+    "enabled": true
+  }
 }
