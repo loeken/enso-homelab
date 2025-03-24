@@ -21,7 +21,9 @@ RUN apk add --no-cache \
     libc6-compat \
     less \
     vim \
-    zsh
+    zsh \
+    nodejs \
+    npm
 
 # Install Terraform manually from HashiCorp
 ENV TERRAFORM_VERSION=1.7.4
@@ -38,6 +40,9 @@ RUN mkdir -p $GOPATH /home/enso/enso-homelab && chown -R enso:enso $GOPATH /home
 
 # Set up zsh as default shell
 RUN sed -i 's#/bin/sh#/bin/zsh#g' /etc/passwd
+
+# Install Renovate globally via npm
+RUN npm install -g renovate
 
 USER enso
 
