@@ -21,13 +21,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
-      SSH_SERVER_ADDRESS: ${{ secrets.SSH_SERVER_ADDRESS }}
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      KUBERNETES_VERSION: "v1.26.4+k3s1"
-      STORAGE: "local-path"
-      TF_ORGANIZATION: ${{ secrets.TF_ORGANIZATION }}
-      TF_WORKSPACE: ${{ secrets.TF_WORKSPACE }}
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_app_terraform_io }}
 
     steps:
       - name: Checkout Repository
@@ -38,38 +32,34 @@ jobs:
         with:
           terraform_version: latest
 
+      - name: Install k3sup
+        run: curl -sLS https://get.k3sup.dev | sh
+
       - name: Retrieve external IP
-        id: external_ip
         run: echo "EXTERNAL_IP=$(curl -s ifconfig.co -4)" >> "$GITHUB_ENV"
+
+      - name: Generate auto.tfvars from secrets
+        working-directory: deploy/terraform/k3s
+        run: |
+          cat <<EOF > github.auto.tfvars
+          ssh_username        = "${{ secrets.SSH_USERNAME }}"
+          ssh_server_address  = "${{ secrets.SSH_SERVER_ADDRESS }}"
+          ssh_private_key     = "${{ secrets.SSH_PRIVATE_KEY }}"
+          external_ip         = "${{ env.EXTERNAL_IP }}"
+          kubernetes_version  = "v1.26.4+k3s1"
+          storage             = "local-path"
+          EOF
 
       - name: Terraform Init
         working-directory: deploy/terraform/k3s
-        run: |
-          terraform init -input=false \
-            -backend-config="hostname=app.terraform.io" \
-            -backend-config="organization=$TF_ORGANIZATION" \
-            -backend-config="workspace=$TF_WORKSPACE"
+        run: terraform init -input=false
 
       - name: Terraform Plan
         if: github.event_name == 'pull_request'
         working-directory: deploy/terraform/k3s
-        run: |
-          terraform plan -input=false \
-          -var "ssh_username=$SSH_USERNAME" \
-          -var "ssh_server_address=$SSH_SERVER_ADDRESS" \
-          -var "ssh_private_key=$SSH_PRIVATE_KEY" \
-          -var "external_ip=$EXTERNAL_IP" \
-          -var "kubernetes_version=$KUBERNETES_VERSION" \
-          -var "storage=$STORAGE"
+        run: terraform plan -input=false
 
       - name: Terraform Apply
         if: github.event_name == 'push'
         working-directory: deploy/terraform/k3s
-        run: |
-          terraform apply -auto-approve -input=false \
-          -var "ssh_username=$SSH_USERNAME" \
-          -var "ssh_server_address=$SSH_SERVER_ADDRESS" \
-          -var "ssh_private_key=$SSH_PRIVATE_KEY" \
-          -var "external_ip=$EXTERNAL_IP" \
-          -var "kubernetes_version=$KUBERNETES_VERSION" \
-          -var "storage=$STORAGE"
+        run: terraform apply -auto-approve -input=false

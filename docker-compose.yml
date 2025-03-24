@@ -15,6 +15,7 @@ services:
       #- ${HOME}/.zshrc:/home/enso/.zshrc
       - ./:/home/enso/enso-homelab
       - /var/run/docker.sock:/var/run/docker.sock
+      - /home/loeken/.terraform.d/:/home/enso/.terraform.d/
 
 networks:
   enso-homelab-network:

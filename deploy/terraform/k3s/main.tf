@@ -3,7 +3,7 @@ provider "null" { }
 resource null_resource bootstrap-k3s {
   provisioner "local-exec" {
     command = <<EOT
-    k3sup install \
+    /usr/local/bin/k3sup install \
       --ip ${var.ssh_server_address} \
       --user ${var.ssh_username} \
       --ssh-key ${var.ssh_private_key} \

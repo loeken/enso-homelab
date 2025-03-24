@@ -1,7 +1,7 @@
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "enso-backend"
+    organization = "ime"
 
     workspaces {
       name = "enso-backend"
