@@ -124,7 +124,7 @@ SAVEHIST=10000        # Number of commands to save to the file
 
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 autoload -Uz compinit && compinit
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /home/enso/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /home/enso/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
 alias k=kubectl
