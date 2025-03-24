@@ -1,5 +1,5 @@
 terraform {
-  backend "remote" {
+  cloud {
     hostname     = "app.terraform.io"
     organization = "ime"
 
