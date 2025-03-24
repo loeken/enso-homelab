@@ -1,23 +1,17 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "prConcurrentLimit": 0,
+  "repositories": ["loeken/enso-homelab"],
   "branchConcurrentLimit": 0,
   "prHourlyLimit": 0,
+  "pinDigests": true,
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
     }
   ],
-  "pinDigests": true,
-  "customManagers": [
-    {
-      "customType": "regex",
-      "fileMatch": ["(^|/)\\.terraform-version$"],
-      "matchStrings": ["^(?<currentValue>\\d+\\.\\d+\\.\\d+)$"],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "hashicorp/terraform",
-      "versioningTemplate": "hashicorp"
-    }
-  ]
+  "terraform": {
+    "fileMatch": ["\\.tf$", "(^|/)\\.terraform-version$"]
+  }
 }
