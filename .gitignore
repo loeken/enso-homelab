@@ -1,3 +1,4 @@
 .secrets
 .env
 src/__pycache__/**
+renovate.log
