@@ -26,10 +26,8 @@ RUN apk add --no-cache \
     npm \
     nano
 
-# Install Terraform manually from HashiCorp
-RUN git clone https://github.com/tfutils/tfenv.git ~/.tfenv \
- && ln -s ~/.tfenv/bin/* /usr/local/bin \
- && tfenv install
+# Install k3sup
+RUN cd /tmp && curl -sLS https://get.k3sup.dev | sh 
 
 # Create non-root user "enso" with passwordless sudo
 RUN adduser -D enso && echo "enso ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/enso
@@ -49,6 +47,11 @@ RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/inst
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /home/enso/.oh-my-zsh/custom/themes/powerlevel10k && \
     git clone https://github.com/zsh-users/zsh-autosuggestions /home/enso/.oh-my-zsh/custom/plugins/zsh-autosuggestions && \
     git clone https://github.com/zsh-users/zsh-syntax-highlighting /home/enso/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+
+# Install Terraform manually from HashiCorp
+RUN git clone https://github.com/tfutils/tfenv.git ~/.tfenv \
+ && sudo ln -s ~/.tfenv/bin/* /usr/local/bin \
+ && sudo tfenv install
 
 # Set GOPATH and update PATH
 ENV HOME="/home/enso"
