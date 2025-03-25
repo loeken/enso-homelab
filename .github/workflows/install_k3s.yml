@@ -92,4 +92,6 @@ jobs:
       - name: Terraform Apply
         if: github.event_name == 'push'
         working-directory: deploy/terraform/k3s
-        run: terraform apply -auto-approve -input=false
+        run: |
+          cat main.tf
+          terraform destroy -auto-approve -input=false

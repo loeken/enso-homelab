@@ -1,16 +1,20 @@
-provider "null" { }
+provider "null" {}
 
-resource null_resource bootstrap-k3s {
+resource "null_resource" "bootstrap-k3s" {
   provisioner "local-exec" {
     command = <<EOT
+    echo '${var.ssh_private_key}' | base64 -d > /tmp/id_ed25519
+    chmod 600 /tmp/id_ed25519
+
     /usr/local/bin/k3sup install \
       --ip ${var.ssh_server_address} \
       --user ${var.ssh_username} \
-      --ssh-key ${var.ssh_private_key} \
+      --ssh-key /tmp/id_ed25519 \
       --cluster \
       --k3s-version ${var.kubernetes_version} \
       --k3s-extra-args '--disable=traefik --node-external-ip=${var.external_ip} --advertise-address=${var.ssh_server_address} --node-ip=${var.ssh_server_address}'
-    
+
+    rm -f /tmp/id_ed25519
     EOT
   }
 }
