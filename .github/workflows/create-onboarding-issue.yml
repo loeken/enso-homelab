@@ -2,11 +2,7 @@
 name: Create Onboarding Issue
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/template.yml  # triggers only in newly created template repos
+  workflow_dispatch:
 
 jobs:
   create-issue:
