@@ -17,41 +17,40 @@ jobs:
             github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: "🧪 Welcome! Let's deploy your homelab 🚀",
-              body: `
-👋 Welcome to your new **ensō-homelab**!
+              title: "📝 Welcome! Let's deploy your homelab 🚀",
+              body: `👋 Welcome to your new **ensō-homelab**!
 
-### ✅ Next Steps
+      ### ✅ Next Steps
 
-1. **Configure Secrets**
+      1. **Configure Secrets**
 
-To deploy your homelab, you'll need to set these repository secrets:
+      To deploy your homelab, you'll need to set these repository secrets:
 
-| Secret | Description |
-|--------|-------------|
-| \`SSH_USERNAME\` | SSH user for your K3s server |
-| \`SSH_SERVER_ADDRESS\` | IP or hostname of the K3s server |
-| \`SSH_PRIVATE_KEY\` | Base64-encoded private key (or plain PEM) |
-| \`TF_TOKEN_app_terraform_io\` | Terraform Cloud API token |
+      | Secret | Description |
+      |--------|-------------|
+      | \`SSH_USERNAME\` | SSH user for your K3s server |
+      | \`SSH_SERVER_ADDRESS\` | IP or hostname of the K3s server |
+      | \`SSH_PRIVATE_KEY\` | Base64-encoded private key (or plain PEM) |
+      | \`TF_TOKEN_app_terraform_io\` | Terraform Cloud API token |
 
-_You can also create a \`.secrets` file to run locally with \`act\`._
+      _You can also create a \`.secrets\` file to run locally with \`act\`._
 
----
+      ---
 
-2. **Run the Setup Workflow**
+      2. **Run the Setup Workflow**
 
-You can:
-- Trigger it manually below 👇
-- Or [run it locally with \`act\`](https://github.com/nektos/act)
+      You can:
+      - Trigger it manually below 👇
+      - Or run it locally with \`act\`
 
----
+      ---
 
-### ▶️ Start the Install
+      ### ▶️ Start the Install
 
-To kick off the install process, comment with:
+      To kick off the install process, comment with:
 
-\`/install-k3s\`
+      \`/install-k3s\`
 
-This will apply the Terraform stack and set up K3s + ArgoCD.
-              `
+      This will apply the Terraform stack and set up K3s + ArgoCD.
+      `
             });
