@@ -1,0 +1,32 @@
+name: Manual K3s Install Trigger
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  run-install:
+    if: github.event.comment.body == '/install-k3s'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Acknowledge command
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "🚀 Starting K3s install via GitHub Actions..."
+            });
+
+      - name: Trigger install workflow
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: run-k3s-install

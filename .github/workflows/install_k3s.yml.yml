@@ -13,6 +13,9 @@ on:
     paths:
       - 'deploy/terraform/**'
 
+  repository_dispatch:
+    types: [run-k3s-install]
+
 permissions:
   contents: read
 
