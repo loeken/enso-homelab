@@ -1,0 +1,100 @@
+name: Terraform Infrastructure
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'deploy/terraform/**'
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'deploy/terraform/**'
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_app_terraform_io }}
+      TF_CLI_CONFIG_FILE: ${{ github.workspace }}/.terraformrc
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      - name: Install k3sup
+        run: curl -sLS https://get.k3sup.dev | sh
+
+      - name: Retrieve external IP
+        run: echo "EXTERNAL_IP=$(curl -s ifconfig.co -4)" >> "$GITHUB_ENV"
+
+      - name: Configure Terraform local execution
+        working-directory: deploy/terraform/k3s
+        run: |
+          cat <<EOF > ${{ github.workspace }}/.terraformrc
+          credentials "app.terraform.io" {
+            token = "${TF_TOKEN_app_terraform_io}"
+          }
+          EOF
+
+      - name: Generate auto.tfvars from secrets
+        working-directory: deploy/terraform/k3s
+        run: |
+          cat <<EOF > github.auto.tfvars
+          ssh_username        = "${{ secrets.SSH_USERNAME }}"
+          ssh_server_address  = "${{ secrets.SSH_SERVER_ADDRESS }}"
+          ssh_private_key     = "${{ secrets.SSH_PRIVATE_KEY }}"
+          external_ip         = "${{ env.EXTERNAL_IP }}"
+          kubernetes_version  = "v1.26.4+k3s1"
+          storage             = "local-path"
+          EOF
+
+      - name: Configure Terraform local execution
+        run: |
+          cat <<EOF > ${{ github.workspace }}/.terraformrc
+          credentials "app.terraform.io" {
+            token = "${TF_TOKEN_app_terraform_io}"
+          }
+
+          cloud {
+            hostname     = "app.terraform.io"
+            organization = "ime"
+            workspaces {
+              name = "enso-backend"
+            }
+
+            operations {
+              execution_mode = "local"
+            }
+          }
+          EOF
+
+      - name: Terraform Init
+        working-directory: deploy/terraform/k3s
+        run: terraform init -input=false
+
+      - name: Terraform Plan
+        if: github.event_name == 'pull_request'
+        working-directory: deploy/terraform/k3s
+        run: terraform plan -input=false
+
+      - name: Terraform Apply
+        if: github.event_name == 'push'
+        working-directory: deploy/terraform/k3s
+        run: |
+          terraform apply -auto-approve -input=false
+
+      - name: Copy kubeconfig to host
+        if: github.event_name == 'push'
+        run: cp deploy/terraform/k3s/kubeconfig /output/kubeconfig
