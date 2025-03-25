@@ -1,9 +1,12 @@
+---
 name: Create Onboarding Issue
 
 on:
   push:
-    branches: [main]
-    paths: [.github/template.yml] # this file only exists in template repos
+    branches:
+      - main
+    paths:
+      - .github/template.yml  # triggers only in newly created template repos
 
 jobs:
   create-issue:
@@ -13,44 +16,10 @@ jobs:
       - name: Create onboarding issue
         uses: actions/github-script@v7
         with:
-          script: |
+          script: >
             github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: "📝 Welcome! Let's deploy your homelab 🚀",
-              body: `👋 Welcome to your new **ensō-homelab**!
-
-      ### ✅ Next Steps
-
-      1. **Configure Secrets**
-
-      To deploy your homelab, you'll need to set these repository secrets:
-
-      | Secret | Description |
-      |--------|-------------|
-      | \`SSH_USERNAME\` | SSH user for your K3s server |
-      | \`SSH_SERVER_ADDRESS\` | IP or hostname of the K3s server |
-      | \`SSH_PRIVATE_KEY\` | Base64-encoded private key (or plain PEM) |
-      | \`TF_TOKEN_app_terraform_io\` | Terraform Cloud API token |
-
-      _You can also create a \`.secrets\` file to run locally with \`act\`._
-
-      ---
-
-      2. **Run the Setup Workflow**
-
-      You can:
-      - Trigger it manually below 👇
-      - Or run it locally with \`act\`
-
-      ---
-
-      ### ▶️ Start the Install
-
-      To kick off the install process, comment with:
-
-      \`/install-k3s\`
-
-      This will apply the Terraform stack and set up K3s + ArgoCD.
-      `
+              body: "👋 Welcome to your new **ensō-homelab**!\n\n### ✅ Next Steps\n\n1. **Configure Secrets**\n\nTo deploy your homelab, you'll need to set these repository secrets:\n\n| Secret | Description |\n|--------|-------------|\n| `SSH_USERNAME` | SSH user for your K3s server |\n| `SSH_SERVER_ADDRESS` | IP or hostname of the K3s server |\n| `SSH_PRIVATE_KEY` | Base64-encoded private key (or plain PEM) |\n| `TF_TOKEN_app_terraform_io` | Terraform Cloud API token |\n\n_You can also create a `.secrets` file to run locally with `act`._\n\n---\n\n2. **Run the Setup Workflow**\n\nYou can:\n- Trigger it manually below 👇\n- Or run it locally with `act`\n\n---\n\n### ▶️ Start the Install\n\nTo kick off the install process, comment with:\n\n`/install-k3s`\n\nThis will apply the Terraform stack and set up K3s + ArgoCD."
             });
