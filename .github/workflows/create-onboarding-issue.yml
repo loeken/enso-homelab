@@ -1,3 +1,5 @@
+name: Create Onboarding Issue
+
 permissions:
   issues: write
   contents: read
