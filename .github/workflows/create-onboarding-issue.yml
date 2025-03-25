@@ -1,12 +1,9 @@
----
-name: Create Onboarding Issue
-
-on:
-  workflow_dispatch:
-
 permissions:
   issues: write
   contents: read
+
+on:
+  workflow_dispatch:
 
 jobs:
   create-issue:
@@ -21,5 +18,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: "📝 Welcome! Let's deploy your homelab 🚀",
-              body: "👋 Welcome to your new **ensō-homelab**!\n\n### ✅ Next Steps\n\n1. **Configure Secrets**\n\nTo deploy your homelab, you'll need to set these repository secrets:\n\n| Secret | Description |\n|--------|-------------|\n| `SSH_USERNAME` | SSH user for your K3s server |\n| `SSH_SERVER_ADDRESS` | IP or hostname of the K3s server |\n| `SSH_PRIVATE_KEY` | Base64-encoded private key (or plain PEM) |\n| `TF_TOKEN_app_terraform_io` | Terraform Cloud API token |\n\n_You can also create a `.secrets` file to run locally with `act`._\n\n---\n\n2. **Run the Setup Workflow**\n\nYou can:\n- Trigger it manually below 👇\n- Or run it locally with `act`\n\n---\n\n### ▶️ Start the Install\n\nTo kick off the install process, comment with:\n\n`/install-k3s`\n\nThis will apply the Terraform stack and set up K3s + ArgoCD."
+              body: "👋 Welcome to your new **ensō-homelab**!\n\n### ✅ Next Steps\n\n1. **Configure Secrets**  ([docs](./docs/secrets/README.md))\n\nTo deploy your homelab, you'll need to set these repository secrets:\n\n| Secret | Description |\n|--------|-------------|\n| `SSH_USERNAME` | SSH user for your VM/server |\n| `SSH_SERVER_ADDRESS` | IP or hostname of the VM/server |\n| `SSH_PRIVATE_KEY` | Base64-encoded private key (or plain PEM) |\n| `TF_TOKEN_app_terraform_io` | Terraform Cloud API token |\n\n_You can also create a `.secrets` file to run locally with `act`._\n\n---\n\n2. **Run the Setup Workflow**  ([K3s install docs](./docs/install/k3s) · [Proxmox guide](./docs/install/proxmox))\n\nYou can:\n- Trigger it manually below 👇\n- Or run it locally with [`act`](https://github.com/nektos/act)\n\n---\n\n### ▶️ Start the Install\n\nTo kick off the install process, comment with one of the following:\n\n- `/install-k3s` → Install K3s using Terraform + k3sup\n- `/install-proxmox` → Set up Proxmox on a Debian host and create a VM for K3s _(WIP)_\n\nThis will apply the Terraform stack and set up your homelab infrastructure."
             });
