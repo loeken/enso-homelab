@@ -93,5 +93,8 @@ jobs:
         if: github.event_name == 'push'
         working-directory: deploy/terraform/k3s
         run: |
-          cat main.tf
-          terraform destroy -auto-approve -input=false
+          terraform apply -auto-approve -input=false
+
+      - name: Copy kubeconfig to host
+        if: github.event_name == 'push'
+        run: cp deploy/terraform/k3s/kubeconfig /output/kubeconfig
