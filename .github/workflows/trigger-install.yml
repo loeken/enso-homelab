@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Acknowledge command
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
         with:
           script: |
             github.rest.issues.createComment({
@@ -26,7 +26,7 @@ jobs:
             });
 
       - name: Trigger install workflow
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           event-type: run-k3s-install
