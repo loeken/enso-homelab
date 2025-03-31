@@ -10,6 +10,7 @@ on:
 permissions:
   issues: write
   contents: write
+  workflows: write
 
 jobs:
   create-issue:
@@ -74,14 +75,11 @@ jobs:
                 "This will apply the Terraform stack and set up your homelab infrastructure."
             });
 
-      - name: Rename install_k3s.yml.disabled to install_k3s.yml
-        run: |
-          mv .github/workflows/install_k3s.yml.disabled .github/workflows/install_k3s.yml
-
       - name: Rename this workflow to prevent re-triggering
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git mv .github/workflows/create-onboarding-issue.yml .github/workflows/create-onboarding-issue.yml.disabled
+          git mv .github/workflows/install_k3s.yml.disabled .github/workflows/install_k3s.yml
           git commit -m "chore: disable onboarding workflow after first run"
           git push
