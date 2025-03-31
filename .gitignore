@@ -5,3 +5,4 @@ renovate.log
 k3sup
 .terraform
 data/credentials
+create_secrets.sh
