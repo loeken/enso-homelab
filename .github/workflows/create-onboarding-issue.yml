@@ -1,12 +1,15 @@
----
 name: Create Onboarding Issue
 
 on:
-  "workflow_dispatch":
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/onboarding.yml
 
 permissions:
   issues: write
-  contents: read
+  contents: write
 
 jobs:
   create-issue:
@@ -14,13 +17,13 @@ jobs:
 
     steps:
       - name: Create onboarding issue
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
+        uses: actions/github-script@v7
         with:
-          script: >
+          script: |
             const repo = context.repo.repo;
             const owner = context.repo.owner;
             const base = `https://github.com/${owner}/${repo}/blob/main`;
-            github.rest.issues.create({
+            await github.rest.issues.create({
               owner,
               repo,
               title: "📝 Welcome! Let's deploy your homelab 🚀",
@@ -31,16 +34,26 @@ jobs:
                 "To deploy your homelab, you'll need to set these repository secrets:\n\n" +
                 "| Secret | Description |\n" +
                 "|--------|-------------|\n" +
-                "| `SSH_USERNAME` | SSH user for your VM/server |\n" +
-                "| `SSH_SERVER_ADDRESS` | IP or hostname of the VM/server |\n" +
-                "| `SSH_PRIVATE_KEY` | Base64-encoded private key|\n" +
-                "| `TF_TOKEN_app_terraform_io` | Terraform Cloud API token |\n\n" +
+                "| `SSH_USERNAME`         | SSH user for your VM/server |\n" +
+                "| `SSH_SERVER_ADDRESS`   | Public IP or hostname of the VM/server |\n" +
+                "| `SSH_INTERNAL_ADDRESS` | Internal (private) IP for advertising k3s nodes |\n" +
+                "| `SSH_SERVER_PORT`      | Custom SSH port (e.g. 60023) |\n" +
+                "| `SSH_PRIVATE_KEY`      | Base64-encoded private key for SSH access |\n" +
+                "| `TF_TOKEN_app_terraform_io` | Terraform Cloud API token |\n" +
+                "| `HOSTNAME`             | Expected hostname of the target node |\n" +
+                "| `GITHUB_TOKEN`         | GitHub token for dispatching workflows (optional override) |\n" +
+                "| `RENOVATE_TOKEN`       | Token for Renovate bot (if enabled) |\n\n" +
                 "<details>\n<summary>💡 Add secrets via CLI</summary>\n\n" +
                 "```bash\n" +
-                "gh secret set SSH_USERNAME --body \"ubuntu\"\n" +
-                "gh secret set SSH_SERVER_ADDRESS --body \"192.168.1.100\"\n" +
-                "gh secret set SSH_PRIVATE_KEY --body \"$(cat ~/.ssh/id_rsa | base64)\"\n" +
-                "gh secret set TF_TOKEN_app_terraform_io --body \"your-terraform-cloud-token\"\n" +
+                "gh secret set SSH_USERNAME --body \"loeken\"\n" +
+                "gh secret set SSH_SERVER_ADDRESS --body \"94.134.58.166\"\n" +
+                "gh secret set SSH_INTERNAL_ADDRESS --body \"192.168.1.185\"\n" +
+                "gh secret set SSH_SERVER_PORT --body \"60023\"\n" +
+                "gh secret set HOSTNAME --body \"homelab\"\n" +
+                "gh secret set SSH_PRIVATE_KEY --body \"\$(cat ~/.ssh/id_ed25519 | base64)\"\n" +
+                "gh secret set TF_TOKEN_app_terraform_io --body \"your-tf-cloud-token\"\n" +
+                "gh secret set GITHUB_TOKEN --body \"\$(gh auth token)\"\n" +
+                "gh secret set RENOVATE_TOKEN --body \"your-renovate-token\"\n" +
                 "```\n\n</details>\n\n" +
                 "_Or create a `.secrets` file to run locally with `act`._\n\n" +
                 "---\n\n" +
@@ -55,4 +68,32 @@ jobs:
                 "- `/install-k3s` → Install K3s using Terraform + k3sup\n" +
                 "- `/install-proxmox` → Set up Proxmox on a Debian host and create a VM _(WIP)_\n\n" +
                 "This will apply the Terraform stack and set up your homelab infrastructure."
+            });
+
+      - name: Delete this workflow so it runs only once
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const path = '.github/workflows/create-onboarding-issue.yml';
+            const { data } = await github.rest.repos.getContent({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path
+            });
+
+            await github.rest.repos.deleteFile({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path,
+              message: 'chore: remove onboarding workflow after initial run',
+              sha: data.sha,
+              branch: 'main',
+              committer: {
+                name: 'github-actions',
+                email: 'github-actions@github.com'
+              },
+              author: {
+                name: 'github-actions',
+                email: 'github-actions@github.com'
+              }
             });
