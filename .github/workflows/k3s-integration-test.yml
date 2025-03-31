@@ -1,0 +1,56 @@
+name: K3s Integration Test
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-k3s:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install k3d
+        run: |
+          curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+
+      - name: Create k3d cluster (pinned K3s version)
+        run: |
+          k3d cluster create ensotest \
+            --image rancher/k3s:v1.32.3+k3s1 \
+            --wait
+          kubectl get nodes
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.13.3
+
+      - name: Add ArgoCD Helm repo
+        run: |
+          helm repo add argo https://argoproj.github.io/argo-helm
+          helm repo update
+
+      - name: Install ArgoCD via Helm (pinned)
+        run: |
+          helm upgrade --install argocd argo/argo-cd \
+            --namespace argocd \
+            --create-namespace \
+            --version 5.51.6 \
+            --values .github/test/values-argocd.yaml
+
+      - name: Wait for ArgoCD to be ready
+        run: |
+          kubectl wait --for=condition=available --timeout=120s -n argocd deployment/argocd-server
+          kubectl get pods -n argocd
+          echo "done for now"
