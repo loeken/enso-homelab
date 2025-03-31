@@ -45,14 +45,17 @@ jobs:
           HOSTNAME: ${{ secrets.HOSTNAME }}
 
       - name: Setup Terraform
+        if: env.SKIP_WORKFLOW != 'true'
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
         with:
           terraform_version: latest
 
       - name: Install k3sup
+        if: env.SKIP_WORKFLOW != 'true'
         run: curl -sLS https://get.k3sup.dev | sh
 
       - name: Set external IP
+        if: env.SKIP_WORKFLOW != 'true'
         run: |
           if [ "${ACT}" = "true" ]; then
             echo "EXTERNAL_IP=$(curl -s ifconfig.co -4)" >> "$GITHUB_ENV"
@@ -63,6 +66,7 @@ jobs:
           fi
 
       - name: Configure Terraform local execution
+        if: env.SKIP_WORKFLOW != 'true'
         working-directory: deploy/terraform/k3s
         run: |
           cat <<EOF > ${{ github.workspace }}/.terraformrc
@@ -72,6 +76,7 @@ jobs:
           EOF
 
       - name: Generate auto.tfvars from secrets
+        if: env.SKIP_WORKFLOW != 'true'
         working-directory: deploy/terraform/k3s
         run: |
           cat <<EOF > github.auto.tfvars
@@ -87,6 +92,7 @@ jobs:
           EOF
 
       - name: Configure Terraform local execution (cloud block)
+        if: env.SKIP_WORKFLOW != 'true'
         run: |
           cat <<EOF > ${{ github.workspace }}/.terraformrc
           credentials "app.terraform.io" {
@@ -105,21 +111,22 @@ jobs:
           EOF
 
       - name: Terraform Init
+        if: env.SKIP_WORKFLOW != 'true'
         working-directory: deploy/terraform/k3s
         run: terraform init -input=false
 
       - name: Terraform Plan
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && env.SKIP_WORKFLOW != 'true'
         working-directory: deploy/terraform/k3s
         run: terraform plan -input=false
 
       - name: Terraform Apply
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && env.SKIP_WORKFLOW != 'true'
         working-directory: deploy/terraform/k3s
         run: terraform apply -auto-approve -input=false
 
       - name: Copy kubeconfig to host or upload as artifact
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && env.SKIP_WORKFLOW != 'true'
         run: |
           if [ "${ACT}" = "true" ]; then
             cp deploy/terraform/k3s/kubeconfig /output/kubeconfig
@@ -128,7 +135,7 @@ jobs:
           fi
 
       - name: Upload kubeconfig artifact (only in GitHub Actions)
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' && env.ACT != 'true'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && env.SKIP_WORKFLOW != 'true' && env.ACT != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: kubeconfig

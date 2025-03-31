@@ -22,8 +22,10 @@ for secret in "${REQUIRED_SECRETS[@]}"; do
 done
 
 if [ "$MISSING" -eq 1 ]; then
-  echo "🚫 One or more required secrets are missing. Skipping execution."
+  echo "🚫 One or more required secrets are missing."
+  echo "Setting SKIP_WORKFLOW=true to prevent further steps..."
+  echo "SKIP_WORKFLOW=true" >> "$GITHUB_ENV"
   exit 0
-else
-  echo "✅ All required secrets are set."
 fi
+
+echo "✅ All required secrets are set."
