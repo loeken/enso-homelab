@@ -30,32 +30,16 @@ jobs:
 
     steps:
       - name: Validate required secrets
-        run: |
-          REQUIRED_SECRETS=(
-            "SSH_USERNAME"
-            "SSH_SERVER_ADDRESS"
-            "SSH_INTERNAL_ADDRESS"
-            "SSH_SERVER_PORT"
-            "SSH_PRIVATE_KEY"
-            "TF_TOKEN_app_terraform_io"
-            "HOSTNAME"
-          )
-
-          MISSING=0
-          echo "🔍 Checking for required secrets..."
-
-          for secret in "${REQUIRED_SECRETS[@]}"; do
-            if [ -z "${{ secrets[${secret}] }}" ]; then
-              echo "❌ Missing secret: $secret"
-              echo "➡️  To set it: gh secret set $secret --body \"...\""
-              MISSING=1
-            fi
-          done
-
-          if [ "$MISSING" -eq 1 ]; then
-            echo "🚫 One or more required secrets are missing. Skipping execution."
-            exit 0
-          fi
+        run: .github/scripts/validate-secrets.sh
+        shell: bash
+        env:
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_SERVER_ADDRESS: ${{ secrets.SSH_SERVER_ADDRESS }}
+          SSH_INTERNAL_ADDRESS: ${{ secrets.SSH_INTERNAL_ADDRESS }}
+          SSH_SERVER_PORT: ${{ secrets.SSH_SERVER_PORT }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_app_terraform_io }}
+          HOSTNAME: ${{ secrets.HOSTNAME }}
 
       - name: Checkout Repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
