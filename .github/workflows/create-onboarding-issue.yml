@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/onboarding.yml
+      - .github/workflows/create-onboarding-issue.yml
 
 permissions:
   issues: write
@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Create onboarding issue
         uses: actions/github-script@v7
         with:
@@ -69,6 +72,10 @@ jobs:
                 "- `/install-proxmox` → Set up Proxmox on a Debian host and create a VM _(WIP)_\n\n" +
                 "This will apply the Terraform stack and set up your homelab infrastructure."
             });
+
+      - name: Rename install_k3s.yml.disabled to install_k3s.yml
+        run: |
+          mv .github/workflows/install_k3s.yml.disabled .github/workflows/install_k3s.yml
 
       - name: Delete this workflow so it runs only once
         uses: actions/github-script@v7
