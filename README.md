@@ -76,7 +76,7 @@ The following repository secrets must be set:
 | `SSH_PRIVATE_KEY`      | Base64-encoded private key for SSH access |
 | `TF_TOKEN_app_terraform_io` | Terraform Cloud API token |
 | `HOSTNAME`             | Expected hostname of the target node |
-| `GITHUB_TOKEN`         | GitHub token (optional override) |
+| `PAT_GITHUB_TOKEN`         | GitHub token (optional override) |
 | `RENOVATE_TOKEN`       | Token for Renovate bot (optional) |
 
 To set secrets quickly:
@@ -89,7 +89,7 @@ gh secret set SSH_SERVER_PORT --body "60023"
 gh secret set HOSTNAME --body "homelab"
 gh secret set SSH_PRIVATE_KEY --body "$(cat ~/.ssh/id_ed25519 | base64)"
 gh secret set TF_TOKEN_app_terraform_io --body "your-tf-cloud-token"
-gh secret set GITHUB_TOKEN --body "$(gh auth token)"
+gh secret set PAT_GITHUB_TOKEN --body "$(gh auth token)"
 gh secret set RENOVATE_TOKEN --body "your-renovate-token"
 gh secret set TF_WORKSPACE --body "prod"
 gh secret set TF_CLOUD_ORGANIZATION --body "ime"

@@ -57,7 +57,7 @@ jobs:
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
 
   build-and-push-staging:
     name: Build and Push Staging Image
