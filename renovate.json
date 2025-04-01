@@ -40,9 +40,10 @@
       "versioningTemplate": "loose"
     },
     {
+      "customType": "regex",
       "fileMatch": [".github/workflows/k3s-integration-test.yml"],
       "matchStrings": [
-        "--image\\s+rancher/k3s:(?<currentValue>v\\d+\\.\\d+\\.\\d+\\+k3s\\d+)"
+        "--image\\s+rancher/k3s:(?<currentValue>v\\d+\\.\\d+\\.\\d+-k3s\\d+)"
       ],
       "depNameTemplate": "k3s-docker",
       "datasourceTemplate": "docker",
