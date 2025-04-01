@@ -28,13 +28,13 @@
     {
       "fileMatch": [".github/workflows/k3s-integration-test.yml"],
       "matchStrings": [
-        "--image\\s+\"rancher/k3s:(?<currentValue>v\\d+\\.\\d+\\.\\d+-k3s\\d+)\""
+        "--image\\s+rancher/k3s:(?<currentValue>v\\d+\\.\\d+\\.\\d+-k3s\\d+)"
       ],
       "depNameTemplate": "k3s",
       "datasourceTemplate": "github-releases",
       "packageNameTemplate": "k3s-io/k3s",
       "versioningTemplate": "loose"
-    }
+    }    
   ],
   "enabledManagers": [
     "regex",
