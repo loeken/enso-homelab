@@ -12,6 +12,7 @@ permissions:
 jobs:
   test-k3s:
     runs-on: ubuntu-latest
+    environment: test
     if: github.repository == 'loeken/enso-homelab'
     steps:
       - name: Checkout code
