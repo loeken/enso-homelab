@@ -44,11 +44,23 @@ jobs:
                 "| `SSH_PRIVATE_KEY`      | Base64-encoded private key for SSH access | Yes |\n" +
                 "| `TF_TOKEN_app_terraform_io` | Terraform Cloud API token | Yes |\n" +
                 "| `HOSTNAME`             | Expected hostname of the target node | Yes |\n" +
-                "| `PAT_GITHUB_TOKEN`         | GitHub token for dispatching workflows (optional override) | Yes |\n" +
+                "| `PAT_GITHUB_TOKEN`         | GitHub token for dispatching workflows | Yes |\n" +
                 "| `RENOVATE_TOKEN`       | Token for Renovate bot (if enabled) | Yes |\n" +
                 "| `ARGOCD_DEPLOY_PRIVATE_KEY` | Private key for ArgoCD deployments | Optional |\n" +
                 "| `ARGOCD_DEPLOY_PUBLIC_KEY`  | Public key for ArgoCD deployments | Optional |\n\n" +
-                "<details>\n<summary>💡 Add secrets via CLI</summary>\n\n" +
+                "### 🔑 How to Create `PAT_GITHUB_TOKEN`\n\n" +
+                "To create the `PAT_GITHUB_TOKEN` with the required permissions:\n\n" +
+                "1. Go to [GitHub Developer Settings](https://github.com/settings/tokens).\n" +
+                "2. Click **Generate new token** (classic).\n" +
+                "3. Provide a **note** to identify the token (e.g., `PAT for GitHub Actions`).\n" +
+                "4. Set the **expiration** (e.g., 90 days or no expiration).\n" +
+                "5. Select the following **scopes**:\n" +
+                "   - `repo` (Full control of private repositories)\n" +
+                "   - `admin:repo_hook` (Manage repository hooks and secrets)\n" +
+                "6. Click **Generate token**.\n" +
+                "7. Copy the token and store it securely.\n\n" +
+                "### 💻 Set the Token via CLI\n\n" +
+                "Once you have the token, set it as a repository secret using the `gh` CLI:\n\n" +
                 "```bash\n" +
                 "gh secret set SSH_USERNAME --body \"loeken\"\n" +
                 "gh secret set SSH_SERVER_ADDRESS --body \"94.134.58.166\"\n" +
@@ -57,7 +69,7 @@ jobs:
                 "gh secret set HOSTNAME --body \"homelab\"\n" +
                 "gh secret set SSH_PRIVATE_KEY --body \"\$(cat ~/.ssh/id_ed25519 | base64)\"\n" +
                 "gh secret set TF_TOKEN_app_terraform_io --body \"your-tf-cloud-token\"\n" +
-                "gh secret set PAT_GITHUB_TOKEN --body \"\$(gh auth token)\"\n" +
+                "gh secret set PAT_GITHUB_TOKEN --body \"process-described-above"\n" +
                 "gh secret set RENOVATE_TOKEN --body \"your-renovate-token\"\n" +
                 "gh secret set ARGOCD_DEPLOY_PRIVATE_KEY --body \"your-private-key\" # Optional\n" +
                 "gh secret set ARGOCD_DEPLOY_PUBLIC_KEY --body \"your-public-key\"   # Optional\n" +
