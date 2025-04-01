@@ -35,8 +35,10 @@
       "datasourceTemplate": "docker",
       "packageNameTemplate": "rancher/k3s",
       "versioningTemplate": "loose",
-      "extractVersionTemplate": "{{{currentValue}}}"
-    }    
+      "extractVersionTemplate": "{{{currentValue}}}",
+      "matchDatasources": ["docker"],
+      "tagMatch": "^v\\d+\\.\\d+\\.\\d+-k3s\\d+$"
+    }
   ],
   "enabledManagers": [
     "regex",
