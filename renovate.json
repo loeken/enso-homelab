@@ -14,29 +14,20 @@
       "pinDigests": false
     }
   ],
-  "customManagers": [
+  "regexManagers": [
     {
-      "customType": "regex",
-      "fileMatch": ["^.*\\.tf$"],
+      "fileMatch": ["^deploy/terraform/k3s/variables.tf$"],
       "matchStrings": [
         "default\\s*=\\s*\"(?<currentValue>v\\d+\\.\\d+\\.\\d+\\+k3s\\d+)\""
       ],
       "depNameTemplate": "k3s",
       "datasourceTemplate": "github-releases",
       "packageNameTemplate": "k3s-io/k3s",
-      "versioning": "k3s-version"
-    }
-  ],
-  "regexManagers": [
-    {
-      "versioning": "k3s-version",
-      "versioningTemplate": {
-        "type": "regex",
-        "regex": "v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\+k3s(?<build>\\d+)"
-      }
+      "versioningTemplate": "loose"
     }
   ],
   "enabledManagers": [
+    "regex",
     "terraform-version",
     "docker-compose",
     "dockerfile",
