@@ -12,10 +12,18 @@
     {
       "matchManagers": ["terraform-version"],
       "pinDigests": false
+    },
+    {
+      "matchPackageNames": ["k3s"],
+      "matchDatasources": ["docker"],
+      "matchManagers": ["custom.regex"],
+      "extractVersion": "^v\\d+\\.\\d+\\.\\d+-k3s\\d+$",
+      "versioning": "loose"
     }
   ],
-  "regexManagers": [
+  "customManagers": [
     {
+      "customType": "regex",
       "fileMatch": ["^deploy/terraform/k3s/variables.tf$"],
       "matchStrings": [
         "default\\s*=\\s*\"(?<currentValue>v\\d+\\.\\d+\\.\\d+\\+k3s\\d+)\""
@@ -35,13 +43,11 @@
       "datasourceTemplate": "docker",
       "packageNameTemplate": "rancher/k3s",
       "versioningTemplate": "loose",
-      "extractVersionTemplate": "{{{currentValue}}}",
-      "matchDatasources": ["docker"],
-      "tagMatch": "^v\\d+\\.\\d+\\.\\d+-k3s\\d+$"
+      "extractVersionTemplate": "{{{currentValue}}}"
     }
   ],
   "enabledManagers": [
-    "regex",
+    "custom.regex",
     "terraform-version",
     "docker-compose",
     "dockerfile",
