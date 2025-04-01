@@ -5,14 +5,18 @@
   "prHourlyLimit": 0,
   "pinDigests": true,
   "packageRules": [
-    { "matchUpdateTypes": ["minor", "patch", "pin", "digest"], "automerge": true },
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
     {
       "matchManagers": ["terraform-version"],
       "pinDigests": false
     }
   ],
-  "regexManagers": [
+  "customManagers": [
     {
+      "customType": "regex",
       "fileMatch": ["^.*\\.tf$"],
       "matchStrings": [
         "default\\s*=\\s*\"(?<currentValue>v\\d+\\.\\d+\\.\\d+\\+k3s\\d+)\""
