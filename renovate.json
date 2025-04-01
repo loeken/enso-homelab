@@ -15,22 +15,21 @@
     },
     {
       "matchPackageNames": ["k3s-docker"],
-      "matchManagers": ["custom.regex"],
+      "matchManagers": ["regex"],
       "matchDatasources": ["docker"],
       "extractVersion": "^v\\d+\\.\\d+\\.\\d+-k3s\\d+$",
       "versioning": "loose"
     },
     {
       "matchPackageNames": ["k3s-github"],
-      "matchManagers": ["custom.regex"],
+      "matchManagers": ["regex"],
       "matchDatasources": ["github-releases"],
       "extractVersion": "^v\\d+\\.\\d+\\.\\d+\\+k3s\\d+$",
       "versioning": "loose"
     }
   ],
-  "customManagers": [
+  "regexManagers": [
     {
-      "customType": "regex",
       "fileMatch": ["^deploy/terraform/k3s/variables.tf$"],
       "matchStrings": [
         "default\\s*=\\s*\"(?<currentValue>v\\d+\\.\\d+\\.\\d+\\+k3s\\d+)\""
@@ -41,7 +40,6 @@
       "versioningTemplate": "loose"
     },
     {
-      "customType": "regex",
       "fileMatch": [".github/workflows/k3s-integration-test.yml"],
       "matchStrings": [
         "--image\\s+rancher/k3s:(?<currentValue>v\\d+\\.\\d+\\.\\d+-k3s\\d+)"
@@ -49,12 +47,11 @@
       "depNameTemplate": "k3s-docker",
       "datasourceTemplate": "docker",
       "packageNameTemplate": "rancher/k3s",
-      "versioningTemplate": "loose",
-      "extractVersionTemplate": "{{{currentValue}}}"
+      "versioningTemplate": "loose"
     }
   ],
   "enabledManagers": [
-    "custom.regex",
+    "regex",
     "terraform-version",
     "docker-compose",
     "dockerfile",
