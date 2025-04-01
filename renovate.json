@@ -15,10 +15,7 @@
     },
     {
       "matchPackageNames": ["k3s-docker"],
-      "matchManagers": ["regex"],
-      "matchDatasources": ["docker"],
-      "extractVersion": "^v\\d+\\.\\d+\\.\\d+\\+k3s\\d+$",
-      "versioning": "loose"
+      "allowedVersions": "^v\\d+\\.\\d+\\.\\d+-k3s1$"
     },
     {
       "matchPackageNames": ["k3s-github"],
@@ -48,8 +45,7 @@
       "depNameTemplate": "k3s-docker",
       "datasourceTemplate": "docker",
       "packageNameTemplate": "rancher/k3s",
-      "versioningTemplate": "loose",
-      "allowedVersions": "^v\\d+\\.\\d+\\.\\d+-k3s1$"
+      "versioningTemplate": "loose"
     }
   ],
   "enabledManagers": [
