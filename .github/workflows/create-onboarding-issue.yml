@@ -23,7 +23,7 @@ jobs:
         id: generate_ssh_keys
         run: |
           ssh-keygen -t ed25519 -f deploy_key -N "" -C "argocd-deploy-key"
-          echo "PRIVATE_KEY=$(cat deploy_key)" >> $GITHUB_ENV
+          echo "PRIVATE_KEY=$(base64 -w 0 deploy_key)" >> $GITHUB_ENV
           echo "PUBLIC_KEY=$(cat deploy_key.pub)" >> $GITHUB_ENV
 
       - name: Save SSH Keys as Secrets
