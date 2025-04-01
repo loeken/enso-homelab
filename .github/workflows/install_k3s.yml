@@ -43,6 +43,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_app_terraform_io }}
           HOSTNAME: ${{ secrets.HOSTNAME }}
+          TF_WORKSPACE: ${{ secrets.TF_WORKSPACE }}
 
       - name: Setup Terraform
         if: env.SKIP_WORKFLOW != 'true'
@@ -64,6 +65,8 @@ jobs:
             echo "EXTERNAL_IP=${{ secrets.SSH_SERVER_ADDRESS }}" >> "$GITHUB_ENV"
             echo "INTERNAL_IP=${{ secrets.SSH_INTERNAL_ADDRESS }}" >> "$GITHUB_ENV"
           fi
+          echo "TF_WORKSPACE=enso-homelab-${{ secrets.TF_WORKSPACE }}" >> "$GITHUB_ENV"
+          echo "TF_CLOUD_ORGANIZATION=${{ secrets.TF_CLOUD_ORGANIZATION }}" >> "$GITHUB_ENV"
 
       - name: Configure Terraform local execution
         if: env.SKIP_WORKFLOW != 'true'
@@ -89,25 +92,6 @@ jobs:
           kubernetes_version  = "v1.26.4+k3s1"
           hostname            = "${{ secrets.HOSTNAME }}"
           storage             = "local-path"
-          EOF
-
-      - name: Configure Terraform local execution (cloud block)
-        if: env.SKIP_WORKFLOW != 'true'
-        run: |
-          cat <<EOF > ${{ github.workspace }}/.terraformrc
-          credentials "app.terraform.io" {
-            token = "${TF_TOKEN_app_terraform_io}"
-          }
-          cloud {
-            hostname     = "app.terraform.io"
-            organization = "ime"
-            workspaces {
-              name = "enso-backend"
-            }
-            operations {
-              execution_mode = "local"
-            }
-          }
           EOF
 
       - name: Terraform Init

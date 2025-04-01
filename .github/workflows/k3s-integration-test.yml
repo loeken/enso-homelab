@@ -12,7 +12,7 @@ permissions:
 jobs:
   test-k3s:
     runs-on: ubuntu-latest
-
+    if: github.repository == 'loeken/enso-homelab'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,9 +26,7 @@ jobs:
 
       - name: Create k3d cluster (pinned K3s version)
         run: |
-          k3d cluster create ensotest \
-            --image rancher/k3s:v1.32.3+k3s1 \
-            --wait
+          k3d cluster create ensotest --image rancher/k3s:v1.26.4-k3s1 --wait
           kubectl get nodes
 
       - name: Install Helm
@@ -43,6 +41,8 @@ jobs:
 
       - name: Install ArgoCD via Helm (pinned)
         run: |
+          helm repo add argo https://argoproj.github.io/argo-helm
+          helm repo update
           helm upgrade --install argocd argo/argo-cd \
             --namespace argocd \
             --create-namespace \

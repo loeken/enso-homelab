@@ -1,0 +1,21 @@
+global:
+  image:
+    tag: v2.10.2 # renovate: datasource=docker depName=argoproj/argocd
+
+configs:
+  params:
+    server.insecure: true
+
+server:
+  service:
+    type: ClusterIP
+    port: 80
+
+controller:
+  replicas: 1
+
+repoServer:
+  replicas: 1
+
+applicationSet:
+  enabled: true
