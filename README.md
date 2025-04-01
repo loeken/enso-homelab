@@ -48,7 +48,7 @@ This assumes you're running on a small Linux machine (like an Intel NUC or KVM g
 
 - Debian-based Linux host (Debian 12 recommended)  
 - Public domain (e.g. via Cloudflare, optional)  
-- GitHub account with repo access  
+- GitHub account with a public repo ( or private if you have paid account ). Right now this repo expects "environments" for secrets to be available ( https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-deployments/managing-environments-for-deployment )
 
 ---
 
