@@ -18,7 +18,7 @@
       "matchManagers": ["custom.regex"],
       "matchDatasources": ["docker"],
       "allowedVersions": "^v\\d+\\.\\d+\\.\\d+-k3s\\d+$",
-      "versioning": "semver"
+      "versioning": "docker"
     },
     {
       "matchPackageNames": ["k3s-github"],
@@ -50,7 +50,7 @@
       "depNameTemplate": "k3s-docker",
       "datasourceTemplate": "docker",
       "packageNameTemplate": "rancher/k3s",
-      "versioningTemplate": "semver"
+      "versioningTemplate": "docker"
     }
   ],
   "enabledManagers": [
