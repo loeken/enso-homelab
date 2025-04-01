@@ -14,10 +14,17 @@
       "pinDigests": false
     },
     {
-      "matchPackageNames": ["k3s"],
-      "matchDatasources": ["docker"],
+      "matchPackageNames": ["k3s-docker"],
       "matchManagers": ["custom.regex"],
+      "matchDatasources": ["docker"],
       "extractVersion": "^v\\d+\\.\\d+\\.\\d+-k3s\\d+$",
+      "versioning": "loose"
+    },
+    {
+      "matchPackageNames": ["k3s-github"],
+      "matchManagers": ["custom.regex"],
+      "matchDatasources": ["github-releases"],
+      "extractVersion": "^v\\d+\\.\\d+\\.\\d+\\+k3s\\d+$",
       "versioning": "loose"
     }
   ],
@@ -28,7 +35,7 @@
       "matchStrings": [
         "default\\s*=\\s*\"(?<currentValue>v\\d+\\.\\d+\\.\\d+\\+k3s\\d+)\""
       ],
-      "depNameTemplate": "k3s",
+      "depNameTemplate": "k3s-github",
       "datasourceTemplate": "github-releases",
       "packageNameTemplate": "k3s-io/k3s",
       "versioningTemplate": "loose"
@@ -39,7 +46,7 @@
       "matchStrings": [
         "--image\\s+rancher/k3s:(?<currentValue>v\\d+\\.\\d+\\.\\d+-k3s\\d+)"
       ],
-      "depNameTemplate": "k3s",
+      "depNameTemplate": "k3s-docker",
       "datasourceTemplate": "docker",
       "packageNameTemplate": "rancher/k3s",
       "versioningTemplate": "loose",
