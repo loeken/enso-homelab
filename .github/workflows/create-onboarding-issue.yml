@@ -15,7 +15,7 @@ jobs:
   create-issue:
     if: github.repository != 'loeken/enso-homelab'
     runs-on: ubuntu-latest
-
+    environment: prod
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

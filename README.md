@@ -82,6 +82,10 @@ The following repository secrets must be set:
 To set secrets quickly:
 
 ```bash
+gh api \                                                                                                                                                                                                            ✔ 
+  --method PUT \
+  -H "Accept: application/vnd.github+json" \
+  /repos/loeken/enso-homelab-test/environments/prod
 gh secret set SSH_USERNAME --body "loeken" --env prod
 gh secret set SSH_SERVER_ADDRESS --body "94.134.58.166" --env prod
 gh secret set SSH_INTERNAL_ADDRESS --body "192.168.1.185" --env prod
