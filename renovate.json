@@ -24,13 +24,8 @@
       "depNameTemplate": "k3s",
       "datasourceTemplate": "github-releases",
       "packageNameTemplate": "k3s-io/k3s",
-      "versioningTemplate": "loose"
+      "versioningTemplate": "loose",
+      "extractVersionTemplate": "{{currentValue}}"
     }
-  ],
-  "enabledManagers": [
-    "terraform-version",
-    "docker-compose",
-    "dockerfile",
-    "github-actions"
   ]
 }
