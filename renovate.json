@@ -11,6 +11,17 @@
       "pinDigests": false
     }
   ],
+  "regexManagers": [
+    {
+      "fileMatch": ["^.*\\.tf$"],
+      "matchStrings": [
+        "default\\s*=\\s*\"(?<currentValue>v\\d+\\.\\d+\\.\\d+\\+k3s\\d+)\""
+      ],
+      "depNameTemplate": "k3s",
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "k3s-io/k3s"
+    }
+  ],
   "enabledManagers": [
     "terraform-version",
     "docker-compose",
