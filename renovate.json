@@ -15,7 +15,9 @@
     },
     {
       "matchPackageNames": ["k3s-docker"],
-      "allowedVersions": "^v\\d+\\.\\d+\\.\\d+-k3s1$"
+      "allowedVersions": "^v\\d+\\.\\d+\\.\\d+-k3s1$",
+      "matchCurrentValue": "^v\\d+\\.\\d+\\.\\d+-k3s1$",
+      "matchUpdateTypes": ["minor", "patch"]
     },
     {
       "matchPackageNames": ["k3s-github"],
