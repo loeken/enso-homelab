@@ -24,8 +24,22 @@
       "depNameTemplate": "k3s",
       "datasourceTemplate": "github-releases",
       "packageNameTemplate": "k3s-io/k3s",
-      "versioningTemplate": "loose",
-      "extractVersionTemplate": "{{currentValue}}"
+      "versioning": "k3s-version"
     }
+  ],
+  "regexManagers": [
+    {
+      "versioning": "k3s-version",
+      "versioningTemplate": {
+        "type": "regex",
+        "regex": "v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\+k3s(?<build>\\d+)"
+      }
+    }
+  ],
+  "enabledManagers": [
+    "terraform-version",
+    "docker-compose",
+    "dockerfile",
+    "github-actions"
   ]
 }
