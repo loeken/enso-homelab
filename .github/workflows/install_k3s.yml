@@ -163,7 +163,6 @@ jobs:
           ssh_private_key     = "${{ secrets.SSH_PRIVATE_KEY }}"
           internal_ip         = "${{ env.INTERNAL_IP }}"
           external_ip         = "${{ env.EXTERNAL_IP }}"
-          kubernetes_version  = "v1.26.4+k3s1"
           hostname            = "${{ secrets.HOSTNAME }}"
           storage             = "local-path"
           EOF
