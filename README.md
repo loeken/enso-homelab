@@ -82,21 +82,17 @@ The following repository secrets must be set:
 To set secrets quickly:
 
 ```bash
-gh api \                                                                                                                                                                                                            ✔ 
-  --method PUT \
-  -H "Accept: application/vnd.github+json" \
-  /repos/loeken/enso-homelab-test/environments/prod
-gh secret set SSH_USERNAME --body "loeken" --env prod
-gh secret set SSH_SERVER_ADDRESS --body "94.134.58.166" --env prod
-gh secret set SSH_INTERNAL_ADDRESS --body "192.168.1.185" --env prod
-gh secret set SSH_SERVER_PORT --body "60023" --env prod
-gh secret set HOSTNAME --body "homelab" --env prod
-gh secret set SSH_PRIVATE_KEY --body "$(cat ~/.ssh/id_ed25519 | base64)" --env prod
-gh secret set TF_TOKEN_app_terraform_io --body "your-tf-cloud-token" --env prod
-gh secret set GITHUB_TOKEN --body "$(gh auth token)" --env prod
-gh secret set RENOVATE_TOKEN --body "your-renovate-token" --env prod
-gh secret set TF_WORKSPACE --body "prod" --env prod
-gh secret set TF_CLOUD_ORGANIZATION --body "ime" --env prod
+gh secret set SSH_USERNAME --body "loeken"
+gh secret set SSH_SERVER_ADDRESS --body "94.134.58.166"
+gh secret set SSH_INTERNAL_ADDRESS --body "192.168.1.185"
+gh secret set SSH_SERVER_PORT --body "60023"
+gh secret set HOSTNAME --body "homelab"
+gh secret set SSH_PRIVATE_KEY --body "$(cat ~/.ssh/id_ed25519 | base64)"
+gh secret set TF_TOKEN_app_terraform_io --body "your-tf-cloud-token"
+gh secret set GITHUB_TOKEN --body "$(gh auth token)"
+gh secret set RENOVATE_TOKEN --body "your-renovate-token"
+gh secret set TF_WORKSPACE --body "prod"
+gh secret set TF_CLOUD_ORGANIZATION --body "ime"
 ```
 
 ---

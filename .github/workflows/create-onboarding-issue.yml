@@ -15,13 +15,26 @@ jobs:
   create-issue:
     if: github.repository != 'loeken/enso-homelab'
     runs-on: ubuntu-latest
-    environment: prod
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@v4
+
+      - name: Generate SSH Key Pair
+        id: generate_ssh_keys
+        run: |
+          ssh-keygen -t ed25519 -f deploy_key -N "" -C "argocd-deploy-key"
+          echo "PRIVATE_KEY=$(cat deploy_key)" >> $GITHUB_ENV
+          echo "PUBLIC_KEY=$(cat deploy_key.pub)" >> $GITHUB_ENV
+
+      - name: Save SSH Keys as Secrets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh secret set ARGOCD_DEPLOY_PRIVATE_KEY --body "$PRIVATE_KEY"
+          gh secret set ARGOCD_DEPLOY_PUBLIC_KEY --body "$PUBLIC_KEY"
 
       - name: Create onboarding issue
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
+        uses: actions/github-script@v7
         with:
           script: |
             const repo = context.repo.repo;
@@ -46,7 +59,9 @@ jobs:
                 "| `TF_TOKEN_app_terraform_io` | Terraform Cloud API token |\n" +
                 "| `HOSTNAME`             | Expected hostname of the target node |\n" +
                 "| `GITHUB_TOKEN`         | GitHub token for dispatching workflows (optional override) |\n" +
-                "| `RENOVATE_TOKEN`       | Token for Renovate bot (if enabled) |\n\n" +
+                "| `RENOVATE_TOKEN`       | Token for Renovate bot (if enabled) |\n" +
+                "| `ARGOCD_DEPLOY_PRIVATE_KEY` | Private key for ArgoCD deployments |\n" +
+                "| `ARGOCD_DEPLOY_PUBLIC_KEY`  | Public key for ArgoCD deployments |\n\n" +
                 "<details>\n<summary>💡 Add secrets via CLI</summary>\n\n" +
                 "```bash\n" +
                 "gh secret set SSH_USERNAME --body \"loeken\"\n" +
@@ -58,6 +73,8 @@ jobs:
                 "gh secret set TF_TOKEN_app_terraform_io --body \"your-tf-cloud-token\"\n" +
                 "gh secret set GITHUB_TOKEN --body \"\$(gh auth token)\"\n" +
                 "gh secret set RENOVATE_TOKEN --body \"your-renovate-token\"\n" +
+                "gh secret set ARGOCD_DEPLOY_PRIVATE_KEY --body \"your-private-key\"\n" +
+                "gh secret set ARGOCD_DEPLOY_PUBLIC_KEY --body \"your-public-key\"\n" +
                 "```\n\n</details>\n\n" +
                 "_Or create a `.secrets` file to run locally with `act`._\n\n" +
                 "---\n\n" +

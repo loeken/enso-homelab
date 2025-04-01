@@ -13,7 +13,6 @@ jobs:
   run-install:
     if: github.event.issue.pull_request == null && github.event.comment.body == '/install-k3s'
     runs-on: ubuntu-latest
-    environment: prod
     steps:
       - name: Acknowledge command
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7

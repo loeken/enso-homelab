@@ -24,7 +24,6 @@ permissions:
 jobs:
   install-k3s:
     runs-on: ubuntu-latest
-    environment: prod
     env:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_app_terraform_io }}
       TF_CLI_CONFIG_FILE: ${{ github.workspace }}/.terraformrc
