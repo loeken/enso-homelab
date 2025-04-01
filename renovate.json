@@ -43,13 +43,14 @@
       "customType": "regex",
       "fileMatch": [".github/workflows/k3s-integration-test.yml"],
       "matchStrings": [
-        "--image\\s+rancher/k3s:(?<currentValue>v\\d+\\.\\d+\\.\\d+(?:-[a-z0-9]+)*-k3s\\d+)"
+        "--image\\s+rancher/k3s:(?<currentValue>v\\d+\\.\\d+\\.\\d+-k3s1)"
       ],
       "depNameTemplate": "k3s-docker",
       "datasourceTemplate": "docker",
       "packageNameTemplate": "rancher/k3s",
-      "versioningTemplate": "loose"
-    }    
+      "versioningTemplate": "loose",
+      "allowedVersions": "^v\\d+\\.\\d+\\.\\d+-k3s1$"
+    }
   ],
   "enabledManagers": [
     "regex",
