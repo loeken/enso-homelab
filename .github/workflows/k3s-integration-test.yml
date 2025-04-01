@@ -27,7 +27,7 @@ jobs:
 
       - name: Create k3d cluster (pinned K3s version)
         run: |
-          k3d cluster create ensotest --image rancher/k3s:v1.26.4-k3s1 --wait
+          k3d cluster create ensotest --image "rancher/k3s:v1.26.4-k3s1" --wait
           kubectl get nodes
 
       - name: Install Helm
