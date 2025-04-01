@@ -34,9 +34,8 @@
       "depNameTemplate": "k3s",
       "datasourceTemplate": "github-releases",
       "packageNameTemplate": "k3s-io/k3s",
-      "versioningTemplate": "loose",
-      "replaceStringTemplate": "--image rancher/k3s:\"{{{newValue}}}\""
-    } 
+      "versioningTemplate": "loose"
+    }
   ],
   "enabledManagers": [
     "regex",
