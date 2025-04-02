@@ -69,7 +69,7 @@ jobs:
                 "gh secret set HOSTNAME --body \"homelab\"\n" +
                 "gh secret set SSH_PRIVATE_KEY --body \"\$(cat ~/.ssh/id_ed25519 | base64)\"\n" +
                 "gh secret set TF_TOKEN_app_terraform_io --body \"your-tf-cloud-token\"\n" +
-                "gh secret set PAT_GITHUB_TOKEN --body \"process-described-above"\n" +
+                "gh secret set PAT_GITHUB_TOKEN --body \"process-described-above\"\n" +
                 "gh secret set RENOVATE_TOKEN --body \"your-renovate-token\"\n" +
                 "gh secret set ARGOCD_DEPLOY_PRIVATE_KEY --body \"your-private-key\" # Optional\n" +
                 "gh secret set ARGOCD_DEPLOY_PUBLIC_KEY --body \"your-public-key\"   # Optional\n" +

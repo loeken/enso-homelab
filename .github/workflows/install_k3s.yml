@@ -68,9 +68,6 @@ jobs:
           echo "TF_WORKSPACE=enso-homelab-${{ secrets.TF_WORKSPACE }}" >> "$GITHUB_ENV"
           echo "TF_CLOUD_ORGANIZATION=${{ secrets.TF_CLOUD_ORGANIZATION }}" >> "$GITHUB_ENV"
 
-      - name: Ensure jq is installed
-        run: sudo apt-get update && sudo apt-get install -y jq
-        
       - name: Ensure Terraform Cloud workspace exists and set to local execution
         if: env.SKIP_WORKFLOW != 'true'
         run: |
@@ -197,3 +194,14 @@ jobs:
           name: kubeconfig
           path: kubeconfig
           retention-days: 1
+
+      - name: Save kubeconfig as GitHub Secret
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && env.SKIP_WORKFLOW != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        run: |
+          # Encode the kubeconfig file to base64 to handle special characters
+          KUBECONFIG_CONTENT=$(base64 -w 0 kubeconfig)
+          
+          # Use the gh CLI to set the KUBECONFIG secret
+          echo "$KUBECONFIG_CONTENT" | gh secret set KUBECONFIG --body -
