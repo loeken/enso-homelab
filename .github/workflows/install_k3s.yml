@@ -121,7 +121,7 @@ jobs:
             echo "✅ Workspace execution mode set to local."
           else
             echo "❌ Failed to set execution mode: HTTP $PATCH_RESPONSE"
-            exit 1
+            exit 1s
           fi
 
 
@@ -161,7 +161,15 @@ jobs:
         working-directory: deploy/terraform/k3s
         run: terraform apply -auto-approve -input=false
 
+      - name: Check if cluster is operational
+        id: check_cluster
+        working-directory: deploy/terraform/k3s
+        run: |
+          terraform show -json | jq -e '.values.root_module.resources[] | select(.type=="kubernetes_cluster")' > /dev/null 2>&1 || exit 1
+        continue-on-error: true
+
       - name: Copy kubeconfig to host or upload as artifact
+        if: steps.check_cluster.outcome != 'success'
         run: |
           if [ "${ACT}" = "true" ]; then
             cp deploy/terraform/k3s/kubeconfig /output/kubeconfig
@@ -170,14 +178,15 @@ jobs:
           fi
 
       - name: Upload kubeconfig artifact (only in GitHub Actions)
-        if: env.ACT != 'true'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: steps.check_cluster.outcome != 'success' && env.ACT != 'true'
+        uses: actions/upload-artifact@v4
         with:
           name: kubeconfig
           path: kubeconfig
           retention-days: 1
 
       - name: Save kubeconfig as GitHub Secret
+        if: steps.check_cluster.outcome != 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         run: |

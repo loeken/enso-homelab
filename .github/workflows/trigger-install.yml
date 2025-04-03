@@ -25,8 +25,20 @@ jobs:
           echo "EXISTING_PRIVATE_KEY=$EXISTING_PRIVATE_KEY" >> $GITHUB_ENV
           echo "EXISTING_PUBLIC_KEY=$EXISTING_PUBLIC_KEY" >> $GITHUB_ENV
 
+      - name: Check for Existing Deploy Key in Repository
+        id: check_deploy_key
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        run: |
+          EXISTING_DEPLOY_KEY=$(curl -s \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/keys | \
+            jq -r '.[] | select(.title=="ArgoCD Deploy Key") | .key' || echo "not_found")
+          echo "EXISTING_DEPLOY_KEY=$EXISTING_DEPLOY_KEY" >> $GITHUB_ENV
+
       - name: Generate SSH Key Pair (if not exists)
-        if: env.EXISTING_PRIVATE_KEY == 'not_found' || env.EXISTING_PUBLIC_KEY == 'not_found'
+        if: env.EXISTING_PRIVATE_KEY == 'not_found' || env.EXISTING_PUBLIC_KEY == 'not_found' || env.EXISTING_DEPLOY_KEY == 'not_found'
         id: generate_ssh_keys
         run: |
           ssh-keygen -t ed25519 -f deploy_key -N "" -C "argocd-deploy-key"
@@ -34,7 +46,7 @@ jobs:
           echo "ARGOCD_DEPLOY_PUBLIC_KEY=$(cat deploy_key.pub)" >> $GITHUB_ENV
 
       - name: Save SSH Keys as Secrets (if generated)
-        if: env.EXISTING_PRIVATE_KEY == 'not_found' || env.EXISTING_PUBLIC_KEY == 'not_found'
+        if: env.EXISTING_PRIVATE_KEY == 'not_found' || env.EXISTING_PUBLIC_KEY == 'not_found' || env.EXISTING_DEPLOY_KEY == 'not_found'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         run: |
@@ -42,7 +54,7 @@ jobs:
           gh secret set ARGOCD_DEPLOY_PUBLIC_KEY --body "$ARGOCD_DEPLOY_PUBLIC_KEY"
 
       - name: Register Deploy Key in Repository
-        if: env.EXISTING_PUBLIC_KEY == 'not_found'
+        if: env.EXISTING_DEPLOY_KEY == 'not_found'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         run: |
