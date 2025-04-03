@@ -57,6 +57,11 @@ jobs:
           gh secret set ARGOCD_DEPLOY_PRIVATE_KEY --body "$ARGOCD_DEPLOY_PRIVATE_KEY"
           gh secret set ARGOCD_DEPLOY_PUBLIC_KEY --body "$ARGOCD_DEPLOY_PUBLIC_KEY"
 
+      - name: Debug Public Key
+        if: env.EXISTING_DEPLOY_KEY == 'not_found'
+        run: |
+          echo "Public Key: $ARGOCD_DEPLOY_PUBLIC_KEY"
+
       - name: Register Deploy Key in Repository
         if: env.EXISTING_DEPLOY_KEY == 'not_found'
         env:
