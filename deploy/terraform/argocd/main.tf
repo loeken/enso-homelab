@@ -30,6 +30,7 @@ resource "null_resource" "validate_kubeconfig" {
 
   provisioner "local-exec" {
     command = <<EOT
+      cat kubeconfig.yaml
       kubectl --kubeconfig=kubeconfig.yaml cluster-info
     EOT
   }
