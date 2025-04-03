@@ -14,6 +14,12 @@ jobs:
   install-argocd:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_app_terraform_io }}
+      TF_CLI_CONFIG_FILE: ${{ github.workspace }}/.terraformrc
+      TF_WORKSPACE: "argocd-prod" # Hardcoded workspace name
+      TF_CLOUD_ORGANIZATION: ${{ secrets.TF_CLOUD_ORGANIZATION }}
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -23,24 +29,37 @@ jobs:
         with:
           terraform_version: latest
 
+      - name: Configure Terraform local execution
+        working-directory: deploy/terraform/argocd
+        run: |
+          cat <<EOF > ${{ github.workspace }}/.terraformrc
+          credentials "app.terraform.io" {
+            token = "${TF_TOKEN_app_terraform_io}"
+          }
+          EOF
+
+      - name: Generate auto.tfvars from secrets
+        working-directory: deploy/terraform/argocd
+        run: |
+          cat <<EOF > github.auto.tfvars
+          ssh_username        = "${{ secrets.SSH_USERNAME }}"
+          ssh_server_address  = "${{ secrets.SSH_SERVER_ADDRESS }}"
+          ssh_server_port     = "${{ secrets.SSH_SERVER_PORT }}"
+          ssh_private_key     = "${{ secrets.SSH_PRIVATE_KEY }}"
+          internal_ip         = "${{ secrets.INTERNAL_IP }}"
+          external_ip         = "${{ secrets.EXTERNAL_IP }}"
+          hostname            = "${{ secrets.HOSTNAME }}"
+          kubeconfig_content  = "${{ secrets.KUBECONFIG_CONTENT }}"
+          EOF
+
       - name: Terraform Init
         working-directory: deploy/terraform/argocd
-        env:
-          KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG_CONTENT }}
-          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_SERVER_ADDRESS: ${{ secrets.SSH_SERVER_ADDRESS }}
-          SSH_SERVER_PORT: ${{ secrets.SSH_SERVER_PORT }}
-          INTERNAL_IP: ${{ secrets.INTERNAL_IP }}
         run: terraform init -input=false
+
+      - name: Terraform Plan
+        working-directory: deploy/terraform/argocd
+        run: terraform plan -input=false
 
       - name: Terraform Apply
         working-directory: deploy/terraform/argocd
-        env:
-          KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG_CONTENT }}
-          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_SERVER_ADDRESS: ${{ secrets.SSH_SERVER_ADDRESS }}
-          SSH_SERVER_PORT: ${{ secrets.SSH_SERVER_PORT }}
-          INTERNAL_IP: ${{ secrets.INTERNAL_IP }}
         run: terraform apply -auto-approve -input=false
