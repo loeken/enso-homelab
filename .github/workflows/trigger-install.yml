@@ -35,7 +35,11 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/keys | \
             jq -r '.[] | select(.title=="ArgoCD Deploy Key") | .key' || echo "not_found")
-          echo "EXISTING_DEPLOY_KEY=$EXISTING_DEPLOY_KEY" >> $GITHUB_ENV
+          if [ "$EXISTING_DEPLOY_KEY" != "not_found" ]; then
+            echo "EXISTING_DEPLOY_KEY=$EXISTING_DEPLOY_KEY" >> $GITHUB_ENV
+          else
+            echo "EXISTING_DEPLOY_KEY=not_found" >> $GITHUB_ENV
+          fi
 
       - name: Generate SSH Key Pair (if not exists)
         if: env.EXISTING_PRIVATE_KEY == 'not_found' || env.EXISTING_PUBLIC_KEY == 'not_found' || env.EXISTING_DEPLOY_KEY == 'not_found'
