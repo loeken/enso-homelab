@@ -1,28 +1,35 @@
-name: Install ArgoCD
+name: Destroy ArgoCD Infrastructure
 
 on:
-  workflow_run:
-    workflows:
-      - Terraform Infrastructure
-    types:
-      - completed
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 permissions:
   contents: read
 
 jobs:
-  install-argocd:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  destroy-argocd:
     runs-on: ubuntu-latest
     env:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_app_terraform_io }}
-      TF_CLI_CONFIG_FILE: ${{ github.workspace }}/.terraformrc
-      TF_WORKSPACE: "argocd-prod"
+      TF_WORKSPACE: "argocd-prod" # Hardcoded workspace name
       TF_CLOUD_ORGANIZATION: ${{ secrets.TF_CLOUD_ORGANIZATION }}
+      TF_CLI_CONFIG_FILE: ${{ github.workspace }}/.terraformrc
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        run: .github/scripts/validate-secrets.sh
+        shell: bash
+        env:
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_SERVER_ADDRESS: ${{ secrets.SSH_SERVER_ADDRESS }}
+          SSH_INTERNAL_ADDRESS: ${{ secrets.SSH_INTERNAL_ADDRESS }}
+          SSH_SERVER_PORT: ${{ secrets.SSH_SERVER_PORT }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_app_terraform_io }}
+          HOSTNAME: ${{ secrets.HOSTNAME }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -56,10 +63,26 @@ jobs:
         working-directory: deploy/terraform/argocd
         run: terraform init -input=false
 
-      - name: Terraform Plan
+      - name: Terraform Plan Destroy
         working-directory: deploy/terraform/argocd
-        run: terraform plan -input=false
+        run: terraform plan -destroy -input=false
 
-      - name: Terraform Apply
+      - name: Terraform Destroy
         working-directory: deploy/terraform/argocd
-        run: terraform apply -auto-approve -input=false
+        run: terraform destroy -auto-approve -input=false
+
+      - name: Cleanup Terraform State
+        working-directory: deploy/terraform/argocd
+        run: |
+          echo "Cleaning up Terraform state files..."
+          rm -rf .terraform
+          rm -f .terraform.lock.hcl
+          rm -f terraform.tfstate
+          rm -f terraform.tfstate.backup
+
+      - name: Remove kubeconfig Secret
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        run: |
+          echo "Removing KUBECONFIG secret..."
+          gh secret remove KUBECONFIG || echo "KUBECONFIG secret not found, skipping."
