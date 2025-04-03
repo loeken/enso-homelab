@@ -28,3 +28,13 @@ variable "internal_ip" {
   type        = string
   description = "The internal IP address of the server."
 }
+
+variable "external_ip" {
+  type        = string
+  description = "External IP address of the server."
+}
+
+variable "hostname" {
+  type        = string
+  description = "Hostname of the server."
+}

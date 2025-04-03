@@ -9,7 +9,7 @@ resource "null_resource" "decode_kubeconfig" {
 resource "null_resource" "ssh_tunnel" {
   provisioner "local-exec" {
     command = <<EOT
-      ssh -i ${var.ssh_private_key} -N -L 127.0.0.1:6433:${var.internal_ip}:6443 ${var.ssh_username}@${var.ssh_server_address} -p ${var.ssh_server_port} &
+      ssh -o StrictHostKeyChecking=no -i ${var.ssh_private_key} -N -L 127.0.0.1:6433:${var.internal_ip}:6443 ${var.ssh_username}@${var.ssh_server_address} -p ${var.ssh_server_port} &
       echo $! > ssh_tunnel.pid
     EOT
   }
@@ -25,6 +25,16 @@ resource "null_resource" "rewrite_kubeconfig" {
   }
 }
 
+resource "null_resource" "validate_kubeconfig" {
+  depends_on = [null_resource.rewrite_kubeconfig]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      kubectl --kubeconfig=kubeconfig.yaml cluster-info
+    EOT
+  }
+}
+
 resource "helm_release" "argocd" {
   name       = "argocd"
   chart      = "argo-cd"
@@ -35,7 +45,5 @@ resource "helm_release" "argocd" {
     "${file("argocd-values.yaml")}"
   ]
 
-  # Set KUBECONFIG environment variable
-  depends_on = [null_resource.rewrite_kubeconfig]
-
+  depends_on = [null_resource.validate_kubeconfig]
 }
