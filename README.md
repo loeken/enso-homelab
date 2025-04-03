@@ -91,7 +91,6 @@ gh secret set SSH_PRIVATE_KEY --body "$(cat ~/.ssh/id_ed25519 | base64)"
 gh secret set TF_TOKEN_app_terraform_io --body "your-tf-cloud-token"
 gh secret set PAT_GITHUB_TOKEN --body "$(gh auth token)"
 gh secret set RENOVATE_TOKEN --body "your-renovate-token"
-gh secret set TF_WORKSPACE --body "prod"
 gh secret set TF_CLOUD_ORGANIZATION --body "ime"
 ```
 
