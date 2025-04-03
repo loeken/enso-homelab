@@ -161,15 +161,20 @@ jobs:
         working-directory: deploy/terraform/k3s
         run: terraform apply -auto-approve -input=false
 
-      - name: Check if cluster is operational
-        id: check_cluster
-        working-directory: deploy/terraform/k3s
+
+      - name: Check if kubeconfig exists
+        id: check_kubeconfig
         run: |
-          terraform show -json | jq -e '.values.root_module.resources[] | select(.type=="kubernetes_cluster")' > /dev/null 2>&1 || exit 1
-        continue-on-error: true
+          if [ -f deploy/terraform/k3s/kubeconfig ]; then
+            echo "Kubeconfig file exists."
+            echo "kubeconfig_exists=true" >> $GITHUB_ENV
+          else
+            echo "Kubeconfig file does not exist."
+            echo "kubeconfig_exists=false" >> $GITHUB_ENV
+          fi
 
       - name: Copy kubeconfig to host or upload as artifact
-        if: steps.check_cluster.outcome != 'success'
+        if: env.kubeconfig_exists == 'true'
         run: |
           if [ "${ACT}" = "true" ]; then
             cp deploy/terraform/k3s/kubeconfig /output/kubeconfig
@@ -178,7 +183,7 @@ jobs:
           fi
 
       - name: Upload kubeconfig artifact (only in GitHub Actions)
-        if: steps.check_cluster.outcome != 'success' && env.ACT != 'true'
+        if: env.kubeconfig_exists == 'true' && env.ACT != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: kubeconfig
@@ -186,7 +191,7 @@ jobs:
           retention-days: 1
 
       - name: Save kubeconfig as GitHub Secret
-        if: steps.check_cluster.outcome != 'success'
+        if: env.kubeconfig_exists == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         run: |
