@@ -41,6 +41,21 @@ jobs:
           gh secret set ARGOCD_DEPLOY_PRIVATE_KEY --body "$ARGOCD_DEPLOY_PRIVATE_KEY"
           gh secret set ARGOCD_DEPLOY_PUBLIC_KEY --body "$ARGOCD_DEPLOY_PUBLIC_KEY"
 
+      - name: Register Deploy Key in Repository
+        if: env.EXISTING_PUBLIC_KEY == 'not_found'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        run: |
+          curl -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/keys \
+            -d '{
+              "title": "ArgoCD Deploy Key",
+              "key": "'"$ARGOCD_DEPLOY_PUBLIC_KEY"'",
+              "read_only": false
+            }'
+
       - name: Acknowledge command
         uses: actions/github-script@v7
         with:
