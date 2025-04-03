@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_app_terraform_io }}
-      TF_WORKSPACE: enso-k3s
+      TF_WORKSPACE: k3s-prod
       TF_CLOUD_ORGANIZATION: ${{ secrets.TF_CLOUD_ORGANIZATION }}
       TF_CLI_CONFIG_FILE: ${{ github.workspace }}/.terraformrc
 
