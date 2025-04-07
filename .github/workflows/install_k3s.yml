@@ -7,9 +7,6 @@ on:
         description: 'Source of the trigger'
         required: false
         default: 'manual'
-  push:
-    paths:
-      - 'deploy/terraform/k3s/**'
       
 permissions:
   contents: read
