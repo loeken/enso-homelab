@@ -38,12 +38,16 @@ jobs:
           ssh-keygen -t ed25519 -f deploy_key -N "" -C "argocd-deploy-key"
           PRIVATE_KEY=$(base64 -w 0 deploy_key)
           PUBLIC_KEY=$(cat deploy_key.pub)
-
+      
           # Upload secrets
           gh secret set ARGOCD_DEPLOY_PRIVATE_KEY --body "$PRIVATE_KEY"
           gh secret set ARGOCD_DEPLOY_PUBLIC_KEY --body "$PUBLIC_KEY"
-
+      
           echo "SSH key pair generated and uploaded as secrets."
+      
+          # Make PUBLIC_KEY available to later steps
+          echo "PUBLIC_KEY=${PUBLIC_KEY}" >> $GITHUB_ENV
+        
 
       - name: Debug Public Key
         if: env.key_exists == 'false'
