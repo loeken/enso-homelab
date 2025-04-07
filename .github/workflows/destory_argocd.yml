@@ -80,9 +80,9 @@ jobs:
           rm -f terraform.tfstate
           rm -f terraform.tfstate.backup
 
-      - name: Remove kubeconfig Secret
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
-        run: |
-          echo "Removing KUBECONFIG secret..."
-          gh secret remove KUBECONFIG || echo "KUBECONFIG secret not found, skipping."
+      # - name: Remove kubeconfig Secret
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+      #   run: |
+      #     echo "Removing KUBECONFIG secret..."
+      #     gh secret remove KUBECONFIG || echo "KUBECONFIG secret not found, skipping."

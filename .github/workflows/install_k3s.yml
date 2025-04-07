@@ -195,26 +195,31 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         run: |
-          # Check if the kubeconfig file exists
           if [ -f kubeconfig ]; then
-            echo "✅ kubeconfig file found. Contents:"
-            cat kubeconfig
+            echo "✅ kubeconfig file found."
 
-            # Encode the kubeconfig file to base64
-            KUBECONFIG=$(base64 -w 0 kubeconfig)
-            echo "✅ Base64-encoded kubeconfig:"
-            echo "$KUBECONFIG"
+            # Checksum for debug
+            echo "📦 kubeconfig SHA256:"
+            sha256sum kubeconfig || shasum -a 256 kubeconfig
 
-            # Set the KUBECONFIG secret
-            if [ -n "$KUBECONFIG" ]; then
-              echo "$KUBECONFIG" | gh secret set KUBECONFIG --body -
-              echo "✅ KUBECONFIG secret set successfully."
+            # Encode using platform-agnostic base64 (collapse newlines)
+            if base64 --help 2>&1 | grep -q -- '-w'; then
+              base64 -w 0 kubeconfig > kubeconfig.b64
             else
-              echo "❌ Failed to encode kubeconfig."
-              exit 1
+              base64 kubeconfig | tr -d '\n' > kubeconfig.b64
             fi
+
+            echo "✅ Base64 encoding complete."
+
+            # Optional preview (first 80 chars only for sanity check)
+            echo "🔐 Preview:"
+            head -c 80 kubeconfig.b64 && echo "... (truncated)"
+
+            # Set GitHub secret using CLI
+            gh secret set KUBECONFIG < kubeconfig.b64
+
+            echo "✅ GitHub secret 'KUBECONFIG' updated."
           else
             echo "❌ kubeconfig file not found!"
             exit 1
           fi
-

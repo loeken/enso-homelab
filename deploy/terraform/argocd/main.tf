@@ -13,7 +13,7 @@ resource "null_resource" "ssh_tunnel" {
     command = <<EOT
       echo "${var.ssh_private_key}" | base64 -d > /tmp/id_ed25519
       chmod 600 /tmp/id_ed25519
-      nohup ssh -o StrictHostKeyChecking=no -i /tmp/id_ed25519 -N -L 127.0.0.1:6433:${var.internal_ip}:6443 ${var.ssh_username}@${var.ssh_server_address} -p ${var.ssh_server_port} > /dev/null 2>&1 &
+      nohup ssh -o StrictHostKeyChecking=no -i /tmp/id_ed25519 -N -L 127.0.0.1:6443:${var.internal_ip}:6443 ${var.ssh_username}@${var.ssh_server_address} -p ${var.ssh_server_port} > /dev/null 2>&1 &
       echo $! > ssh_tunnel.pid
     EOT
   }
@@ -24,7 +24,7 @@ resource "null_resource" "rewrite_kubeconfig" {
 
   provisioner "local-exec" {
     command = <<EOT
-      sed -i 's|server: https://.*:6443|server: https://127.0.0.1:6433|' kubeconfig.yaml
+      sed -i 's|server: https://.*:6443|server: https://127.0.0.1:6443|' kubeconfig.yaml
       echo "Rewritten kubeconfig.yaml:"
       cat kubeconfig.yaml
     EOT
@@ -40,7 +40,14 @@ resource "null_resource" "validate_kubeconfig" {
       cat kubeconfig.yaml
 
       echo "Testing kubectl connection:"
-      kubectl --kubeconfig=kubeconfig.yaml cluster-info
+      for i in {1..10}; do
+        kubectl --kubeconfig=kubeconfig.yaml cluster-info && exit 0
+        echo "Cluster not ready yet. Retrying in 10 seconds... (Attempt $i/10)"
+        sleep 10
+      done
+
+      echo "❌ Cluster did not become ready in time."
+      exit 1
     EOT
   }
 }
