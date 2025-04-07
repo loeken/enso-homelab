@@ -74,10 +74,11 @@ The following repository secrets must be set:
 | `SSH_INTERNAL_ADDRESS` | Internal (private) IP for advertising k3s nodes |
 | `SSH_SERVER_PORT`      | Custom SSH port (e.g. 60023) |
 | `SSH_PRIVATE_KEY`      | Base64-encoded private key for SSH access |
-| `TF_TOKEN_app_terraform_io` | Terraform Cloud API token |
 | `HOSTNAME`             | Expected hostname of the target node |
-| `PAT_GITHUB_TOKEN`         | GitHub token (optional override) |
-| `RENOVATE_TOKEN`       | Token for Renovate bot (optional) |
+| `TF_TOKEN_app_terraform_io` | Terraform Cloud API token |
+| `TF_CLOUD_ORGANIZATION` | Terraform Cloud Organization Name |
+| `PAT_GITHUB_TOKEN`         | GitHub token |
+| `RENOVATE_TOKEN`       | Token for Renovate bot |
 
 To set secrets quickly:
 
@@ -89,9 +90,10 @@ gh secret set SSH_SERVER_PORT --body "60023"
 gh secret set HOSTNAME --body "homelab"
 gh secret set SSH_PRIVATE_KEY --body "$(cat ~/.ssh/id_ed25519 | base64)"
 gh secret set TF_TOKEN_app_terraform_io --body "your-tf-cloud-token"
+gh secret set TF_CLOUD_ORGANIZATION --body "ime"
 gh secret set PAT_GITHUB_TOKEN --body "$(gh auth token)"
 gh secret set RENOVATE_TOKEN --body "your-renovate-token"
-gh secret set TF_CLOUD_ORGANIZATION --body "ime"
+
 ```
 
 ---
