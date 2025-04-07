@@ -41,7 +41,7 @@ resource "null_resource" "validate_kubeconfig" {
 
       echo "Testing kubectl connection:"
       for i in {1..10}; do
-        kubectl --kubeconfig=kubeconfig.yaml cluster-info && exit 0
+        kubectl --kubeconfig=kubeconfig.yaml cluster-info && exit 0 || true
         echo "Cluster not ready yet. Retrying in 10 seconds... (Attempt $i/10)"
         sleep 10
       done
@@ -57,6 +57,7 @@ resource "helm_release" "argocd" {
   chart      = "argo-cd"
   repository = "https://argoproj.github.io/argo-helm"
   namespace  = "argocd"
+  create_namespace = true
 
   values = [
     "${file("argocd-values.yaml")}"
