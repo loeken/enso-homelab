@@ -40,13 +40,15 @@ resource "null_resource" "validate_kubeconfig" {
       cat kubeconfig.yaml
 
       echo "Testing kubectl connection:"
-      for i in {1..30}; do
+      i=1
+      while [ $i -le 30 ]; do
         if kubectl --kubeconfig=kubeconfig.yaml cluster-info > /dev/null 2>&1; then
           echo "✅ Cluster is ready!"
           exit 0
         else
           echo "Cluster not ready yet. Retrying in 10 seconds... (Attempt $i/30)"
           sleep 10
+          i=$((i + 1))
         fi
       done
 
@@ -55,7 +57,6 @@ resource "null_resource" "validate_kubeconfig" {
     EOT
   }
 }
-
 
 resource "helm_release" "argocd" {
   name       = "argocd"
