@@ -2,6 +2,7 @@ resource "null_resource" "decode_kubeconfig" {
   provisioner "local-exec" {
     command = <<EOT
       echo "${var.kubeconfig_content}" | base64 -d > kubeconfig.yaml
+      echo "Decoded kubeconfig.yaml:"
       cat kubeconfig.yaml
     EOT
   }
@@ -12,7 +13,7 @@ resource "null_resource" "ssh_tunnel" {
     command = <<EOT
       echo "${var.ssh_private_key}" | base64 -d > /tmp/id_ed25519
       chmod 600 /tmp/id_ed25519
-      ssh -o StrictHostKeyChecking=no -i /tmp/id_ed25519 -N -L 127.0.0.1:6433:${var.internal_ip}:6443 ${var.ssh_username}@${var.ssh_server_address} -p ${var.ssh_server_port} &
+      nohup ssh -o StrictHostKeyChecking=no -i /tmp/id_ed25519 -N -L 127.0.0.1:6433:${var.internal_ip}:6443 ${var.ssh_username}@${var.ssh_server_address} -p ${var.ssh_server_port} > /dev/null 2>&1 &
       echo $! > ssh_tunnel.pid
     EOT
   }
@@ -24,6 +25,8 @@ resource "null_resource" "rewrite_kubeconfig" {
   provisioner "local-exec" {
     command = <<EOT
       sed -i 's|server: https://.*:6443|server: https://127.0.0.1:6433|' kubeconfig.yaml
+      echo "Rewritten kubeconfig.yaml:"
+      cat kubeconfig.yaml
     EOT
   }
 }
@@ -33,7 +36,10 @@ resource "null_resource" "validate_kubeconfig" {
 
   provisioner "local-exec" {
     command = <<EOT
+      echo "Contents of kubeconfig.yaml:"
       cat kubeconfig.yaml
+
+      echo "Testing kubectl connection:"
       kubectl --kubeconfig=kubeconfig.yaml cluster-info
     EOT
   }

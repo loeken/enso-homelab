@@ -56,7 +56,7 @@ jobs:
           internal_ip         = "${{ secrets.INTERNAL_IP }}"
           external_ip         = "${{ secrets.EXTERNAL_IP }}"
           hostname            = "${{ secrets.HOSTNAME }}"
-          kubeconfig_content  = "${{ secrets.KUBECONFIG_CONTENT }}"
+          kubeconfig_content  = "${{ secrets.KUBECONFIG }}"
           EOF
 
       - name: Terraform Init
