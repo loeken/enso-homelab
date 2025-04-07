@@ -2,6 +2,7 @@ resource "null_resource" "decode_kubeconfig" {
   provisioner "local-exec" {
     command = <<EOT
       echo "${var.kubeconfig_content}" | base64 -d > kubeconfig.yaml
+      cat kubeconfig.yaml
     EOT
   }
 }
@@ -9,7 +10,9 @@ resource "null_resource" "decode_kubeconfig" {
 resource "null_resource" "ssh_tunnel" {
   provisioner "local-exec" {
     command = <<EOT
-      ssh -o StrictHostKeyChecking=no -i ${var.ssh_private_key} -N -L 127.0.0.1:6433:${var.internal_ip}:6443 ${var.ssh_username}@${var.ssh_server_address} -p ${var.ssh_server_port} &
+      echo "${var.ssh_private_key}" | base64 -d > /tmp/id_ed25519
+      chmod 600 /tmp/id_ed25519
+      ssh -o StrictHostKeyChecking=no -i /tmp/id_ed25519 -N -L 127.0.0.1:6433:${var.internal_ip}:6443 ${var.ssh_username}@${var.ssh_server_address} -p ${var.ssh_server_port} &
       echo $! > ssh_tunnel.pid
     EOT
   }
