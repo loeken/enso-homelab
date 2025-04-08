@@ -33,7 +33,6 @@ jobs:
       - name: Configure Terraform local execution
         working-directory: deploy/terraform/argocd
         run: |
-          echo "SECRET FOO ${{ secrets.KUBECONFIG }}"
           cat <<EOF > ${{ github.workspace }}/.terraformrc
           credentials "app.terraform.io" {
             token = "${TF_TOKEN_app_terraform_io}"

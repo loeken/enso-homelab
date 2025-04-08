@@ -2,8 +2,6 @@ resource "null_resource" "decode_kubeconfig" {
   provisioner "local-exec" {
     command = <<EOT
       echo "${var.kubeconfig_content}" | base64 -d > kubeconfig.yaml
-      echo "Decoded kubeconfig.yaml:"
-      cat kubeconfig.yaml
     EOT
   }
 }
@@ -25,8 +23,6 @@ resource "null_resource" "rewrite_kubeconfig" {
   provisioner "local-exec" {
     command = <<EOT
       sed -i 's|server: https://.*:6443|server: https://127.0.0.1:6443|' kubeconfig.yaml
-      echo "Rewritten kubeconfig.yaml:"
-      cat kubeconfig.yaml
     EOT
   }
 }
