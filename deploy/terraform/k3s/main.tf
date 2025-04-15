@@ -31,15 +31,15 @@ resource "null_resource" "bootstrap-k3s" {
     echo '${var.ssh_private_key}' | base64 -d > /tmp/id_ed25519
     chmod 600 /tmp/id_ed25519
 
-    echo "[DEBUG] Running k3sup install with:"
-    echo "/usr/local/bin/k3sup install \\"
-    echo "  --ip ${var.ssh_server_address} \\"
-    echo "  --user ${var.ssh_username} \\"
-    echo "  --ssh-key /tmp/id_ed25519 \\"
-    echo "  --ssh-port ${var.ssh_server_port} \\"
-    echo "  --cluster \\"
-    echo "  --k3s-version ${var.kubernetes_version} \\"
-    echo "  --k3s-extra-args '--disable=traefik --node-external-ip=${var.external_ip} --advertise-address=${var.internal_ip} --node-ip=${var.internal_ip}'"
+    # echo "[DEBUG] Running k3sup install with:"
+    # echo "/usr/local/bin/k3sup install \\"
+    # echo "  --ip ${var.ssh_server_address} \\"
+    # echo "  --user ${var.ssh_username} \\"
+    # echo "  --ssh-key /tmp/id_ed25519 \\"
+    # echo "  --ssh-port ${var.ssh_server_port} \\"
+    # echo "  --cluster \\"
+    # echo "  --k3s-version ${var.kubernetes_version} \\"
+    # echo "  --k3s-extra-args '--disable=traefik --node-external-ip=${var.external_ip} --advertise-address=${var.internal_ip} --node-ip=${var.internal_ip}'"
 
     /usr/local/bin/k3sup install \
       --ip ${var.ssh_server_address} \

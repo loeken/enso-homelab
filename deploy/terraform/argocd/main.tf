@@ -67,3 +67,45 @@ resource "helm_release" "argocd" {
 
   depends_on = [null_resource.validate_kubeconfig]
 }
+
+resource "helm_release" "sealed_secrets" {
+  name       = "sealed-secrets"
+  chart      = "sealed-secrets"
+  repository = "https://bitnami-labs.github.io/sealed-secrets"
+  namespace  = "kube-system"
+  create_namespace = true
+
+  values = [
+    <<EOF
+controller:
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "128Mi"
+      cpu: "100m"
+EOF
+  ]
+}
+
+resource "null_resource" "kubeseal_argocd_repo_secret" {
+  depends_on = [helm_release.argocd, helm_release.sealed_secrets]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      echo "apiVersion: v1
+      kind: Secret
+      metadata:
+        name: argocd-repo-secret
+        namespace: argocd
+      data:
+        sshPrivateKey: $(echo -n "${var.argocd_deploy_private_key}" | base64)
+        repoName: $(echo -n "${var.argocd_repo_name}" | base64)
+      type: Opaque" > argocd-repo-secret.yaml
+
+      kubeseal --format yaml --cert /path/to/sealed-secrets-cert.pem < argocd-repo-secret.yaml > sealed-argocd-repo-secret.yaml
+      kubectl apply -f sealed-argocd-repo-secret.yaml
+    EOT
+  }
+}

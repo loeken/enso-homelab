@@ -38,3 +38,12 @@ variable "hostname" {
   type        = string
   description = "Hostname of the server."
 }
+
+variable "argocd_deploy_private_key" {
+  type        = string
+  description = "Base64-encoded private key for ArgoCD deployment."
+}
+variable "argocd_repo_name" {
+  description = "The name of the Git repository for ArgoCD to pull from"
+  type        = string
+}
