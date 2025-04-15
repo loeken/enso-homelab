@@ -15,6 +15,10 @@ resource "null_resource" "ssh_tunnel" {
       echo $! > ssh_tunnel.pid
     EOT
   }
+
+  triggers = {
+    always_run = timestamp()
+  }
 }
 
 resource "null_resource" "rewrite_kubeconfig" {
@@ -32,9 +36,6 @@ resource "null_resource" "validate_kubeconfig" {
 
   provisioner "local-exec" {
     command = <<EOT
-      echo "Contents of kubeconfig.yaml:"
-      cat kubeconfig.yaml
-
       echo "Testing kubectl connection:"
       i=1
       while [ $i -le 30 ]; do
@@ -87,6 +88,8 @@ controller:
       cpu: "100m"
 EOF
   ]
+
+  depends_on = [null_resource.validate_kubeconfig]
 }
 
 resource "null_resource" "kubeseal_argocd_repo_secret" {
@@ -94,18 +97,82 @@ resource "null_resource" "kubeseal_argocd_repo_secret" {
 
   provisioner "local-exec" {
     command = <<EOT
-      echo "apiVersion: v1
-      kind: Secret
-      metadata:
-        name: argocd-repo-secret
-        namespace: argocd
-      data:
-        sshPrivateKey: $(echo -n "${var.argocd_deploy_private_key}" | base64)
-        repoName: $(echo -n "${var.argocd_repo_name}" | base64)
-      type: Opaque" > argocd-repo-secret.yaml
+      cat <<EOF > argocd-repo-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: repo-argocd
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repository
+data:
+  name: $(echo -n "${var.argocd_repo_name}" | base64)
+  url: $(echo -n "git@github.com:${var.argocd_repo_name}.git" | base64)
+  sshPrivateKey: ${var.argocd_deploy_private_key}
+type: Opaque
+EOF
 
-      kubeseal --format yaml --cert /path/to/sealed-secrets-cert.pem < argocd-repo-secret.yaml > sealed-argocd-repo-secret.yaml
-      kubectl apply -f sealed-argocd-repo-secret.yaml
+      # Validate the YAML file
+      echo "Validating the generated YAML file..."
+      cat argocd-repo-secret.yaml
+      kubectl --kubeconfig=kubeconfig.yaml apply --dry-run=client -f argocd-repo-secret.yaml
+
+      # Use the hardcoded service name for kubeseal
+      kubeseal --kubeconfig=kubeconfig.yaml --format yaml --controller-name=sealed-secrets --controller-namespace=kube-system < argocd-repo-secret.yaml > sealed-argocd-repo-secret.yaml
+
+      # Apply the sealed secret
+      kubectl --kubeconfig=kubeconfig.yaml apply -f sealed-argocd-repo-secret.yaml
+    EOT
+  }
+}
+resource "null_resource" "create_argocd_application" {
+  depends_on = [null_resource.kubeseal_argocd_repo_secret]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      cat <<EOF > app-of-apps.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-of-apps
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    path: deploy/argocd
+    repoURL: git@github.com:${var.argocd_repo_name}
+    targetRevision: HEAD
+    helm:
+      valueFiles:
+      - values.yaml
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+EOF
+
+      # Apply the Application resource
+      echo "Applying the ArgoCD Application resource..."
+      kubectl --kubeconfig=kubeconfig.yaml apply -f app-of-apps.yaml
+    EOT
+  }
+}
+resource "null_resource" "close_ssh_tunnel" {
+  depends_on = [helm_release.argocd, helm_release.sealed_secrets, null_resource.kubeseal_argocd_repo_secret,null_resource.create_argocd_application]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      if [ -f ssh_tunnel.pid ]; then
+        kill $(cat ssh_tunnel.pid) || true
+        rm -f ssh_tunnel.pid
+      fi
     EOT
   }
 }

@@ -48,13 +48,15 @@ jobs:
         run: |
           cat <<EOF > github.auto.tfvars
           ssh_username        = "${{ secrets.SSH_USERNAME }}"
-          ssh_server_address  = "${{ secrets.SSH_SERVER_ADDRESS }}"
-          ssh_server_port     = "${{ secrets.SSH_SERVER_PORT }}"
-          ssh_private_key     = "${{ secrets.SSH_PRIVATE_KEY }}"
-          internal_ip         = "${{ secrets.SSH_INTERNAL_ADDRESS }}"
-          external_ip         = "${{ secrets.SSH_SERVER_ADDRESS }}"
-          hostname            = "${{ secrets.HOSTNAME }}"
-          storage             = "local-path"
+          ssh_server_address          = "${{ secrets.SSH_SERVER_ADDRESS }}"
+          ssh_server_port             = "${{ secrets.SSH_SERVER_PORT }}"
+          ssh_private_key             = "${{ secrets.SSH_PRIVATE_KEY }}"
+          internal_ip                 = "${{ secrets.SSH_INTERNAL_ADDRESS }}"
+          external_ip                 = "${{ secrets.SSH_SERVER_ADDRESS }}"
+          hostname                    = "${{ secrets.HOSTNAME }}"
+          storage                     = "local-path"
+          argocd_deploy_private_key   = "${{ secrets.ARGOCD_DEPLOY_PRIVATE_KEY }}"
+          argocd_repo_name            = "${{ github.repository }}"
           EOF
 
       - name: Terraform Init

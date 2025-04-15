@@ -57,6 +57,8 @@ jobs:
           external_ip         = "${{ secrets.EXTERNAL_IP }}"
           hostname            = "${{ secrets.HOSTNAME }}"
           kubeconfig_content  = "${{ secrets.KUBECONFIG }}"
+          argocd_deploy_private_key   = "${{ secrets.ARGOCD_DEPLOY_PRIVATE_KEY }}"
+          argocd_repo_name            = "${{ github.repository }}"
           EOF
 
       - name: Terraform Init
