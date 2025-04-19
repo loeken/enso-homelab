@@ -75,20 +75,7 @@ resource "helm_release" "sealed_secrets" {
   repository = "https://bitnami-labs.github.io/sealed-secrets"
   namespace  = "kube-system"
   create_namespace = true
-
-  values = [
-    <<EOF
-controller:
-  resources:
-    requests:
-      memory: "64Mi"
-      cpu: "50m"
-    limits:
-      memory: "128Mi"
-      cpu: "100m"
-EOF
-  ]
-
+  version    = "2.17.1"
   depends_on = [null_resource.validate_kubeconfig]
 }
 
