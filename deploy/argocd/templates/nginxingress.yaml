@@ -1,4 +1,3 @@
-{{ if .Values.nginxingress.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -12,6 +11,9 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
+    repoURL: registry-1.docker.io/bitnamicharts
+    path: 'nginx-ingress-controller'
+    targetRevision: 11.6.7
     chart: nginx-ingress-controller
     helm:
       values: |
@@ -24,13 +26,10 @@ spec:
         service:
           externalTrafficPolicy: Local
           type: NodePort
-    repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: 11.6.13
+
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
     - CreateNamespace=true
-
-{{ end }}
