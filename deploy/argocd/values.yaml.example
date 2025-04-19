@@ -3,3 +3,5 @@ nginxingress:
   enabled: true
 certmanager:
   enabled: true
+whoami:
+  enabled: true

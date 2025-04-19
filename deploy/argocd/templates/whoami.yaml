@@ -1,0 +1,53 @@
+{{ if .Values.whoami.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: whoami
+  namespace: argocd
+spec:
+  destination:
+    namespace: whoami
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: whoami
+    helm:
+      values: |
+        service:
+          service.externalTrafficPolicy: Local
+        ingress:
+          annotations:
+            cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+            external-dns.alpha.kubernetes.io/hostname: "whoami.{{ .Values.domain }}."
+            external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+            external-dns.alpha.kubernetes.io/ttl: "120"
+            nginx.ingress.kubernetes.io/auth-snippet: |
+              proxy_set_header X-Forwarded-Method $request_method;
+            nginx.ingress.kubernetes.io/configuration-snippet: |
+              proxy_set_header X-Forwarded-Method $request_method;
+
+          enabled: true
+          ingressClassName: nginx
+          pathType: ImplementationSpecific
+          hosts:
+            - host: whoami.{{ .Values.domain }}
+              paths:
+              - /
+          tls:
+          - secretName: whoami-tls
+            hosts:
+              - whoami.{{ .Values.domain }}
+    repoURL: https://cowboysysop.github.io/charts/
+    targetRevision: 5.2.1
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+
+{{ end }}
