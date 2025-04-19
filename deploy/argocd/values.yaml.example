@@ -1,1 +1,5 @@
 domain: loeken.xyz
+nginxingress:
+  enabled: true
+certmanager:
+  enabled: true
