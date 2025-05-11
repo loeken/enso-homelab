@@ -7,3 +7,5 @@ certmanager:
   enabled: true
 whoami:
   enabled: true
+githubUser: loeken
+githubRepo: enso-homelab

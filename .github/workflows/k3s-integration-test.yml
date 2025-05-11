@@ -48,10 +48,114 @@ jobs:
             --namespace argocd \
             --create-namespace \
             --version 5.51.6 \
-            --values .github/test/values-argocd.yaml
+            --values .github/test/values-argocd.yaml \
+            --set server.insecure=true
 
       - name: Wait for ArgoCD to be ready
         run: |
           kubectl wait --for=condition=available --timeout=120s -n argocd deployment/argocd-server
           kubectl get pods -n argocd
-          echo "done for now"
+          echo "ArgoCD is ready ✅"
+
+      - name: Install Sealed Secrets controller
+        run: |
+          helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+          helm repo update
+          helm install sealed-secrets sealed-secrets/sealed-secrets \
+            --namespace kube-system \
+            --version 2.17.1
+          kubectl wait --for=condition=available --timeout=60s -n kube-system deployment/sealed-secrets
+
+      - name: Create Self-Signed ClusterIssuer
+        run: |
+          cat <<EOF > clusterissuer.yaml
+          apiVersion: cert-manager.io/v1
+          kind: ClusterIssuer
+          metadata:
+            name: selfsigned-cluster-issuer
+          spec:
+            selfSigned: {}
+          EOF
+          kubectl apply -f clusterissuer.yaml
+
+      - name: Configure ArgoCD repository credentials
+        run: |
+          # Create repository credentials for ArgoCD
+          cat <<EOF > repo-secret.yaml
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: repo-argocd
+            namespace: argocd
+            labels:
+              argocd.argoproj.io/secret-type: repository
+          stringData:
+            type: git
+            url: https://github.com/loeken/enso-homelab.git
+          EOF
+          kubectl apply -f repo-secret.yaml
+
+      - name: Deploy app-of-apps Application
+        run: |
+          cat <<EOF > app-of-apps.yaml
+          apiVersion: argoproj.io/v1alpha1
+          kind: Application
+          metadata:
+            name: app-of-apps
+            namespace: argocd
+            finalizers:
+              - resources-finalizer.argocd.argoproj.io
+          spec:
+            project: default
+            source:
+              path: deploy/argocd
+              repoURL: https://github.com/loeken/enso-homelab.git
+              targetRevision: ${{ github.head_ref || github.ref_name }}
+              helm:
+                valueFiles:
+                - values-test.yaml
+            destination:
+              namespace: argocd
+              server: https://kubernetes.default.svc
+            syncPolicy:
+              automated:
+                prune: true
+                selfHeal: true
+              syncOptions:
+                - CreateNamespace=true
+          EOF
+          
+          kubectl apply -f app-of-apps.yaml
+
+      - name: Monitor ArgoCD Application Status
+        run: |
+          # Wait for the app-of-apps to be created and synced
+          echo "Waiting for app-of-apps to sync..."
+          for i in {1..30}; do
+            APP_STATUS=$(kubectl get application app-of-apps -n argocd -o jsonpath='{.status.sync.status}' 2>/dev/null || echo "NotFound")
+            HEALTH_STATUS=$(kubectl get application app-of-apps -n argocd -o jsonpath='{.status.health.status}' 2>/dev/null || echo "NotFound")
+            
+            echo "Attempt $i: Sync Status: $APP_STATUS, Health: $HEALTH_STATUS"
+            
+            if [ "$APP_STATUS" = "Synced" ] && [ "$HEALTH_STATUS" = "Healthy" ]; then
+              echo "✅ app-of-apps is successfully synced and healthy!"
+              break
+            fi
+            
+            if [ $i -eq 30 ]; then
+              echo "❌ Timeout waiting for app-of-apps to sync."
+              kubectl get all -A
+              kubectl get application -A -o yaml
+              exit 1
+            fi
+            
+            sleep 10
+          done
+          
+          # List all applications
+          echo "ArgoCD Applications:"
+          kubectl get applications -n argocd
+          
+          # Check pod status across all namespaces
+          echo "Pod Status:"
+          kubectl get pods -A
