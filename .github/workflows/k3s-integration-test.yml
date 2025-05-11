@@ -120,7 +120,7 @@ jobs:
         run: |
           # Wait for the app-of-apps to be created and synced
           echo "Waiting for app-of-apps to sync..."
-          for i in {1..30}; do
+          for i in {1..15}; do
             APP_STATUS=$(kubectl get application app-of-apps -n argocd -o jsonpath='{.status.sync.status}' 2>/dev/null || echo "NotFound")
             HEALTH_STATUS=$(kubectl get application app-of-apps -n argocd -o jsonpath='{.status.health.status}' 2>/dev/null || echo "NotFound")
             

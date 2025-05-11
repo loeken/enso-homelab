@@ -15,8 +15,8 @@ spec:
   project: default
   source:
     path: deploy/helm/cluster_issuer
-    repoURL: {{ .Values.spec.source.repoURL }}
-    targetRevision: {{ .Values.spec.source.targetRevision }}
+    repoURL: git@github.com:{{ .Values.githubUser }}/{{ .Values.githubRepo }}.git
+    targetRevision: HEAD
     helm:
       valueFiles:
       - ../../values.yaml
