@@ -1,7 +1,7 @@
 name: K3s Integration Test
 
 on:
-  pull_request:
+  push:
     branches:
       - main
   workflow_dispatch:
