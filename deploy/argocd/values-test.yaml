@@ -1,4 +1,4 @@
-domain: loeken.xyz
+domain: gitresethard.life
 clusterIssuer: letsencrypt-prod
 # app specific
 nginxingress:
@@ -9,3 +9,5 @@ whoami:
   enabled: true
 githubUser: loeken
 githubRepo: enso-homelab
+externaldns:
+  enabled: true
