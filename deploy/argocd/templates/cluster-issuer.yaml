@@ -1,0 +1,29 @@
+{{ if .Values.certmanager.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"  # Ensure this runs after cert-manager is installed
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: cluster-issuer
+  namespace: argocd
+spec:
+  destination:
+    namespace: cert-manager
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: deploy/helm/cluster_issuer
+    repoURL: {{ .Values.spec.source.repoURL }}
+    targetRevision: {{ .Values.spec.source.targetRevision }}
+    helm:
+      valueFiles:
+      - ../../values.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=false
+{{ end }}

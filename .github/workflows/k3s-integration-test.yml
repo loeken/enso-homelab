@@ -148,16 +148,3 @@ jobs:
           # Check pod status across all namespaces
           echo "Pod Status:"
           kubectl get pods -A
-
-
-      - name: Create Self-Signed ClusterIssuer
-        run: |
-          cat <<EOF > clusterissuer.yaml
-          apiVersion: cert-manager.io/v1
-          kind: ClusterIssuer
-          metadata:
-            name: selfsigned-cluster-issuer
-          spec:
-            selfSigned: {}
-          EOF
-          kubectl apply -f clusterissuer.yaml
