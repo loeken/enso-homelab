@@ -138,18 +138,19 @@ jobs:
         run: |
           # Wait for the app-of-apps to be created and synced
           echo "Waiting for app-of-apps to sync..."
-          for i in {1..15}; do
+          APP_OF_APPS_MAX_ATTEMPTS=15
+          for i in $(seq 1 $APP_OF_APPS_MAX_ATTEMPTS); do
             APP_STATUS=$(kubectl get application app-of-apps -n argocd -o jsonpath='{.status.sync.status}' 2>/dev/null || echo "NotFound")
             HEALTH_STATUS=$(kubectl get application app-of-apps -n argocd -o jsonpath='{.status.health.status}' 2>/dev/null || echo "NotFound")
             
-            echo "Attempt $i: Sync Status: $APP_STATUS, Health: $HEALTH_STATUS"
+            echo "Attempt $i/$APP_OF_APPS_MAX_ATTEMPTS: Sync Status: $APP_STATUS, Health: $HEALTH_STATUS"
             
             if [ "$APP_STATUS" = "Synced" ] && [ "$HEALTH_STATUS" = "Healthy" ]; then
               echo "✅ app-of-apps is successfully synced and healthy!"
               break
             fi
             
-            if [ $i -eq 15 ]; then
+            if [ $i -eq $APP_OF_APPS_MAX_ATTEMPTS ]; then
               echo "❌ Timeout waiting for app-of-apps to sync."
               kubectl get all -A
               kubectl get application -A -o yaml
@@ -165,41 +166,64 @@ jobs:
           
           # Now wait for all child applications to be synced and healthy
           echo "Waiting for all child applications to sync..."
-          MAX_ATTEMPTS=30
-          for i in {1..30}; do
-            ALL_SYNCED=true
-            ALL_HEALTHY=true
-            
-            # Get all applications and their statuses
+          MAX_ATTEMPTS=10
+          for i in $(seq 1 $MAX_ATTEMPTS); do
             echo "Checking application status (attempt $i/$MAX_ATTEMPTS):"
+            
+            # Show detailed application status in a table format
             kubectl get applications -n argocd -o custom-columns="NAME:.metadata.name,SYNC:.status.sync.status,HEALTH:.status.health.status"
             
             # Check if any application is not synced or not healthy
             NOT_SYNCED=$(kubectl get applications -n argocd -o jsonpath='{.items[?(@.status.sync.status!="Synced")].metadata.name}')
             NOT_HEALTHY=$(kubectl get applications -n argocd -o jsonpath='{.items[?(@.status.health.status!="Healthy")].metadata.name}')
             
+            # If we have apps that aren't synced, show their conditions to understand why
             if [ -n "$NOT_SYNCED" ]; then
               echo "⚠️ Applications not synced yet: $NOT_SYNCED"
-              ALL_SYNCED=false
+              for app in $NOT_SYNCED; do
+                echo "===== Details for $app ====="
+                kubectl get application $app -n argocd -o jsonpath='{.status.conditions}' | jq -r '.' || echo "Unable to get conditions"
+              done
             fi
             
+            # If we have apps that aren't healthy, show their conditions
             if [ -n "$NOT_HEALTHY" ]; then
               echo "⚠️ Applications not healthy yet: $NOT_HEALTHY"
-              ALL_HEALTHY=false
+              for app in $NOT_HEALTHY; do
+                echo "===== Details for $app ====="
+                kubectl get application $app -n argocd -o jsonpath='{.status.conditions}' | jq -r '.' || echo "Unable to get conditions"
+                # Also check if any pods related to this app are not ready
+                namespace=$(kubectl get application $app -n argocd -o jsonpath='{.spec.destination.namespace}' 2>/dev/null)
+                if [ -n "$namespace" ]; then
+                  echo "Pods in namespace $namespace:"
+                  kubectl get pods -n $namespace
+                fi
+              done
             fi
             
-            if $ALL_SYNCED && $ALL_HEALTHY; then
+            if [ -z "$NOT_SYNCED" ] && [ -z "$NOT_HEALTHY" ]; then
               echo "✅ All applications are successfully synced and healthy!"
               break
             fi
             
             if [ $i -eq $MAX_ATTEMPTS ]; then
               echo "❌ Timeout waiting for all applications to sync and become healthy."
-              kubectl get all -A
-              kubectl get application -A -o yaml
+              echo "Final status of applications:"
+              kubectl get applications -n argocd -o wide
+              echo "Detailed pod status for problematic namespaces:"
+              for app in $NOT_SYNCED $NOT_HEALTHY; do
+                namespace=$(kubectl get application $app -n argocd -o jsonpath='{.spec.destination.namespace}' 2>/dev/null)
+                if [ -n "$namespace" ]; then
+                  echo "==== Pods in namespace $namespace ===="
+                  kubectl get pods -n $namespace -o wide
+                  echo "==== Events in namespace $namespace ===="
+                  kubectl get events -n $namespace --sort-by='.lastTimestamp'
+                fi
+              done
               exit 1
             fi
             
+            echo "Waiting 20 seconds before next check..."
             sleep 20
           done
           
