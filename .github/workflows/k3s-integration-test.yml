@@ -47,7 +47,7 @@ jobs:
           helm upgrade --install argocd argo/argo-cd \
             --namespace argocd \
             --create-namespace \
-            --version 8.0.1 \
+            --version 8.0.0 \
             --values .github/test/values-argocd.yaml \
             --set server.insecure=true
 
