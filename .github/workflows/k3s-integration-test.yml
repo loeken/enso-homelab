@@ -84,10 +84,29 @@ jobs:
             --version 2.17.1
           kubectl wait --for=condition=available --timeout=60s -n kube-system deployment/sealed-secrets
 
-
-      - name: Configure ArgoCD repository credentials
+      - name: Configure ArgoCD repository credentials with SSH
         run: |
-          # Create repository credentials for ArgoCD
+          # Check if ARGOCD_DEPLOY_KEY exists as a GitHub secret
+          if [ -n "${{ secrets.ARGOCD_DEPLOY_KEY }}" ]; then
+            echo "Using existing ARGOCD_DEPLOY_KEY"
+            SSH_PRIVATE_KEY="${{ secrets.ARGOCD_DEPLOY_KEY }}"
+          else
+            echo "Generating new SSH key pair for ArgoCD..."
+            # Generate SSH key pair
+            ssh-keygen -t ed25519 -f /tmp/argocd_deploy_key -N "" -C "argocd-integration-test@github-actions"
+            
+            # Output instructions for adding the deploy key to the repository
+            echo "============================================================="
+            echo "IMPORTANT: Add this public key as a deploy key to your repository with read access:"
+            cat /tmp/argocd_deploy_key.pub
+            echo "============================================================="
+            echo "Then add the private key as a repository secret named ARGOCD_DEPLOY_KEY"
+            
+            # For now, use the newly generated key
+            SSH_PRIVATE_KEY=$(cat /tmp/argocd_deploy_key)
+          fi
+          
+          # Create repository credentials for ArgoCD with SSH
           cat <<EOF > repo-secret.yaml
           apiVersion: v1
           kind: Secret
@@ -98,9 +117,17 @@ jobs:
               argocd.argoproj.io/secret-type: repository
           stringData:
             type: git
-            url: https://github.com/loeken/enso-homelab.git
+            url: git@github.com:loeken/enso-homelab.git
+            sshPrivateKey: |
+              $(echo "$SSH_PRIVATE_KEY" | sed 's/^/              /')
           EOF
+          
           kubectl apply -f repo-secret.yaml
+          
+          # Clean up any temporary files
+          if [ -f /tmp/argocd_deploy_key ]; then
+            rm -f /tmp/argocd_deploy_key /tmp/argocd_deploy_key.pub
+          fi
 
       - name: Deploy app-of-apps Application
         run: |
@@ -206,7 +233,7 @@ jobs:
               break
             fi
             
-            if [ $i -eq $MAX_ATTEMPTS ]; then
+            if [ $i -eq $MAX_ATTEMPTS]; then
               echo "❌ Timeout waiting for all applications to sync and become healthy."
               echo "Final status of applications:"
               kubectl get applications -n argocd -o wide
