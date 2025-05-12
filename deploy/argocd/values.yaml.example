@@ -1,5 +1,8 @@
 domain: loeken.xyz
 clusterIssuer: letsencrypt-prod
+githubUser: loeken
+githubRepo: enso-homelab
+
 # app specific
 externaldns:
   enabled: true

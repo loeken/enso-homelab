@@ -18,8 +18,8 @@ spec:
     repoURL: git@github.com:{{ .Values.githubUser }}/{{ .Values.githubRepo }}.git
     targetRevision: HEAD
     helm:
-      valueFiles:
-      - ../../values.yaml
+      values: |
+        domain: {{ .Values.domain }}
   syncPolicy:
     automated:
       prune: true
