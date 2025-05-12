@@ -15,7 +15,7 @@ spec:
   project: default
   source:
     path: deploy/helm/cluster_issuer
-    repoURL: git@github.com:{{ .Values.githubUser }}/{{ .Values.githubRepo }}.git
+    repoURL: https://github.com/loeken/enso-homelab.git
     targetRevision: HEAD
     helm:
       values: |
