@@ -57,6 +57,24 @@ jobs:
           kubectl get pods -n argocd
           echo "ArgoCD is ready ✅"
 
+      - name: Apply Sealed Secrets key and External DNS secret
+        run: |
+          # Create kube-system namespace if it doesn't exist
+          kubectl create namespace kube-system --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Apply the sealed-secrets-key from GitHub secret
+          echo "${{ secrets.TEST_SEALED_SECRETS_KEY }}" > sealed-secrets-key.yaml
+          kubectl apply -f sealed-secrets-key.yaml
+          
+          # Create external-dns namespace if it doesn't exist
+          kubectl create namespace external-dns --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Apply the external-dns secret from GitHub secret
+          echo "${{ secrets.TEST_EXTERNAL_DNS }}" > external-dns-secret.yaml
+          kubectl apply -f external-dns-secret.yaml
+          
+          echo "✅ Sealed Secrets key and External DNS secret applied successfully"
+
       - name: Install Sealed Secrets controller
         run: |
           helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets

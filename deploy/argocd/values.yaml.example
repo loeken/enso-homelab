@@ -1,6 +1,8 @@
 domain: loeken.xyz
 clusterIssuer: letsencrypt-prod
 # app specific
+externaldns:
+  enabled: true
 nginxingress:
   enabled: true
 certmanager:

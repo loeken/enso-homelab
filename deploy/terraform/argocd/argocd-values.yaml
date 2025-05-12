@@ -1,6 +1,4 @@
 server:
-  extraArgs:
-    - --insecure
   config:
     # Argo CD instance label key
     application.instanceLabelKey: argocd.argoproj.io/instance
@@ -24,3 +22,10 @@ server:
             hs = {}
             hs.status = "Healthy"
             return hs
+controller:
+  config:
+    # this block will become the `repositories:` key in argocd-cm
+    repositories: |
+      - url: https://charts.bitnami.com/bitnami
+        name: bitnami
+        type: helm
