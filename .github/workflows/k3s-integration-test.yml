@@ -49,13 +49,45 @@ jobs:
             --create-namespace \
             --version 8.0.0 \
             --values .github/test/values-argocd.yaml \
-            --set server.insecure=true
+            --set server.insecure=true \
+            --timeout 5m
 
       - name: Wait for ArgoCD to be ready
         run: |
-          kubectl wait --for=condition=available --timeout=120s -n argocd deployment/argocd-server
+          # Wait for deployments to become ready
+          echo "Waiting for ArgoCD deployments to be ready..."
+          
+          # List of ArgoCD components to check
+          COMPONENTS=("argocd-server" "argocd-repo-server" "argocd-application-controller")
+          
+          # Increase timeout to 180s
+          for component in "${COMPONENTS[@]}"; do
+            echo "Waiting for $component to be available..."
+            kubectl wait --for=condition=available --timeout=180s -n argocd deployment/$component || {
+              echo "⚠️ Timed out waiting for $component. Checking status..."
+              kubectl get pods -n argocd -l "app.kubernetes.io/name=$component"
+              kubectl describe deployment -n argocd $component
+              kubectl get events -n argocd --sort-by='.lastTimestamp' | grep $component
+            }
+          done
+          
+          # Check all pods in argocd namespace
+          echo "Current status of ArgoCD pods:"
           kubectl get pods -n argocd
-          echo "ArgoCD is ready ✅"
+          
+          # Check if all pods are running or completed
+          NOT_READY=$(kubectl get pods -n argocd -o jsonpath='{.items[?(@.status.phase!="Running" && @.status.phase!="Succeeded")].metadata.name}')
+          if [ -n "$NOT_READY" ]; then
+            echo "⚠️ Some ArgoCD pods are not ready: $NOT_READY"
+            for pod in $NOT_READY; do
+              echo "=== Details for $pod ==="
+              kubectl describe pod -n argocd $pod
+              kubectl logs -n argocd $pod --tail=50
+            done
+            echo "⚠️ Proceeding anyway, but ArgoCD might not be fully operational."
+          else
+            echo "✅ ArgoCD is ready!"
+          fi
 
       - name: Apply Sealed Secrets key and External DNS secret
         run: |

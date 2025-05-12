@@ -1,16 +1,7 @@
-global:
-  image:
-    tag: v2.10.2 # renovate: datasource=docker depName=argoproj/argocd
-
 configs:
   params:
     server.insecure: true
-
-server:
-  service:
-    type: ClusterIP
-    port: 80
-  config:
+  cm:
     # Argo CD instance label key
     application.instanceLabelKey: argocd.argoproj.io/instance
     resource.customizations: |
@@ -33,14 +24,22 @@ server:
             hs = {}
             hs.status = "Healthy"
             return hs
-controller:
-  replicas: 1
-  config:
-    # this block will become the `repositories:` key in argocd-cm
+    # Repository configurations
     repositories: |
       - url: https://charts.bitnami.com/bitnami
         name: bitnami
         type: helm
+
+server:
+  service:
+    type: ClusterIP
+    port: 80
+  extraArgs:
+    - --insecure
+
+controller:
+  replicas: 1
+
 repoServer:
   replicas: 1
 
