@@ -88,7 +88,7 @@ jobs:
           kubectl get pods -n argocd
           
           # Check if all pods are running or completed
-          NOT_READY=$(kubectl get pods -n argocd -o jsonpath='{.items[?(@.status.phase!="Running" && @.status.phase!="Succeeded")].metadata.name}')
+          NOT_READY=$(kubectl get pods -n argocd -o json | jq -r '.items[] | select(.status.phase != "Running" and .status.phase != "Succeeded") | .metadata.name')
           if [ -n "$NOT_READY" ]; then
             echo "⚠️ Some ArgoCD pods are not ready: $NOT_READY"
             for pod in $NOT_READY; do
