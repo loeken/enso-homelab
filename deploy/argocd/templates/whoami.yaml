@@ -25,11 +25,6 @@ spec:
             external-dns.alpha.kubernetes.io/hostname: "whoami.{{ .Values.domain }}."
             external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
             external-dns.alpha.kubernetes.io/ttl: "120"
-            nginx.ingress.kubernetes.io/auth-snippet: |
-              proxy_set_header X-Forwarded-Method $request_method;
-            nginx.ingress.kubernetes.io/configuration-snippet: |
-              proxy_set_header X-Forwarded-Method $request_method;
-
           enabled: true
           ingressClassName: nginx
           pathType: ImplementationSpecific
