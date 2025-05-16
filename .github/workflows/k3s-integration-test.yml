@@ -63,12 +63,24 @@ jobs:
           # Increase timeout to 180s
           for component in "${COMPONENTS[@]}"; do
             echo "Waiting for $component to be available..."
-            kubectl wait --for=condition=available --timeout=180s -n argocd deployment/$component || {
-              echo "⚠️ Timed out waiting for $component. Checking status..."
-              kubectl get pods -n argocd -l "app.kubernetes.io/name=$component"
-              kubectl describe deployment -n argocd $component
-              kubectl get events -n argocd --sort-by='.lastTimestamp' | grep $component
-            }
+
+            if kubectl get deployment -n argocd "$component" >/dev/null 2>&1; then
+              kubectl wait --for=condition=available --timeout=180s -n argocd deployment/$component || {
+                echo "⚠️ Timed out waiting for deployment $component. Checking status..."
+                kubectl get pods -n argocd -l "app.kubernetes.io/name=$component"
+                kubectl describe deployment -n argocd $component
+                kubectl get events -n argocd --sort-by='.lastTimestamp' | grep $component
+              }
+            elif kubectl get statefulset -n argocd "$component" >/dev/null 2>&1; then
+              kubectl rollout status statefulset/$component -n argocd --timeout=180s || {
+                echo "⚠️ Timed out waiting for statefulset $component. Checking status..."
+                kubectl get pods -n argocd -l "app.kubernetes.io/name=$component"
+                kubectl describe statefulset -n argocd $component
+                kubectl get events -n argocd --sort-by='.lastTimestamp' | grep $component
+              }
+            else
+              echo "❌ Component $component not found as a Deployment or StatefulSet"
+            fi
           done
           
           # Check all pods in argocd namespace
