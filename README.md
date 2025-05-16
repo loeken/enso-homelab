@@ -62,7 +62,15 @@ This assumes you're running on a small Linux machine (like an Intel NUC or KVM g
 2. **Wait for the onboarding issue to be auto-created**  
 3. **Set required secrets using GitHub CLI or UI**  
 4. **Trigger install by commenting `/install-k3s` or `/install-proxmox` on the issue**  
-
+5. **Define which parts to use**
+```
+cp deploy/argocd/values.yaml.example deploy/argocd/values.yaml
+nano deploy/argocd/values.yaml
+git add deploy/argocd/values.yaml
+git commit -m "adding values.yaml"
+git push
+```
+6. **Run GitHub action "Check Secrets" to see which secrets to add and how**
 That's it. The rest is automated.
 
 ---
