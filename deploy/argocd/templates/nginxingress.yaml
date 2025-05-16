@@ -12,9 +12,8 @@ spec:
   project: default
   source:
     repoURL: registry-1.docker.io/bitnamicharts
-    path: 'nginx-ingress-controller'
-    targetRevision: 11.6.7
     chart: nginx-ingress-controller
+    targetRevision: 11.6.20
     helm:
       values: |
         kind: DaemonSet
@@ -23,9 +22,49 @@ spec:
           hostPorts:
             http: 80
             https: 443
+
         service:
           externalTrafficPolicy: Local
           type: NodePort
+
+        ingressClassResource:
+          name: nginx
+          enabled: true
+          default: true
+
+        controller:
+          ingressClass: nginx
+
+        defaultBackend:
+          enabled: true
+          containerPort: 8080  # <-- change from 80 to avoid conflict
+
+          service:
+            ports:
+              http: 8080        # <-- also change this to match
+
+          serverBlockConfig: |-
+            location /healthz {
+              return 200;
+            }
+
+            location / {
+              default_type 'text/html; charset=utf-8';
+              return 200 '
+              <html>
+                <head>
+                  <meta charset="UTF-8">
+                  <title>Welcome</title>
+                  <style>
+                    body { font-family: sans-serif; text-align: center; padding-top: 2em; }
+                  </style>
+                </head>
+                <body>
+                  <h1>🚀 Kubernoodles powered Homelab!</h1>
+                  <p>This is the default landing page.</p>
+                </body>
+              </html>';
+            }
 
   syncPolicy:
     automated:

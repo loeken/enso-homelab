@@ -71,7 +71,7 @@ EOF
       kubectl --kubeconfig=kubeconfig.yaml apply --dry-run=client -f argocd-repo-secret.yaml
 
       # Use the hardcoded service name for kubeseal
-      kubeseal --kubeconfig=kubeconfig.yaml --format yaml --controller-name=sealed-secrets --controller-namespace=kube-system < argocd-repo-secret.yaml > sealed-argocd-repo-secret.yaml
+      kubeseal --kubeconfig=kubeconfig.yaml --format yaml --controller-name=sealed-secrets-controller --controller-namespace=kube-system < argocd-repo-secret.yaml > sealed-argocd-repo-secret.yaml
 
       # Apply the sealed secret
       kubectl --kubeconfig=kubeconfig.yaml apply -f sealed-argocd-repo-secret.yaml
