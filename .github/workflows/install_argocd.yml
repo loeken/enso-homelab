@@ -141,6 +141,20 @@ jobs:
           EOF
 
 
+      - name: Start SSH tunnel to k3s API
+        working-directory: deploy/terraform/argocd
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > /tmp/id_ed25519
+          chmod 600 /tmp/id_ed25519
+          nohup ssh -o StrictHostKeyChecking=no -i /tmp/id_ed25519 -N -L 127.0.0.1:6443:${{ env.INTERNAL_IP }}:6443 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER_ADDRESS }} -p ${{ secrets.SSH_SERVER_PORT }} > /dev/null 2>&1 &
+          echo $! > ssh_tunnel.pid
+
+      - name: Write kubeconfig.yaml from secret
+        working-directory: deploy/terraform/argocd
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
+          sed -i 's|server: https://.*:6443|server: https://127.0.0.1:6443|' kubeconfig.yaml
+
       - name: Terraform Init
         working-directory: deploy/terraform/argocd
         run: terraform init -input=false
@@ -152,3 +166,12 @@ jobs:
       - name: Terraform Apply
         working-directory: deploy/terraform/argocd
         run: terraform apply -auto-approve -input=false
+
+      - name: Stop SSH tunnel
+        working-directory: deploy/terraform/argocd
+        if: always()
+        run: |
+          if [ -f ssh_tunnel.pid ]; then
+            kill $(cat ssh_tunnel.pid) || true
+            rm -f ssh_tunnel.pid
+          fi

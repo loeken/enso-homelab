@@ -1,38 +1,4 @@
-resource "null_resource" "decode_kubeconfig" {
-  provisioner "local-exec" {
-    command = <<EOT
-      echo "${var.kubeconfig_content}" | base64 -d > kubeconfig.yaml
-    EOT
-  }
-}
-
-resource "null_resource" "ssh_tunnel" {
-  provisioner "local-exec" {
-    command = <<EOT
-      echo "${var.ssh_private_key}" | base64 -d > /tmp/id_ed25519
-      chmod 600 /tmp/id_ed25519
-      nohup ssh -o StrictHostKeyChecking=no -i /tmp/id_ed25519 -N -L 127.0.0.1:6443:${var.internal_ip}:6443 ${var.ssh_username}@${var.ssh_server_address} -p ${var.ssh_server_port} > /dev/null 2>&1 &
-      echo $! > ssh_tunnel.pid
-    EOT
-  }
-
-  triggers = {
-    always_run = timestamp()
-  }
-}
-
-resource "null_resource" "rewrite_kubeconfig" {
-  depends_on = [null_resource.decode_kubeconfig, null_resource.ssh_tunnel]
-
-  provisioner "local-exec" {
-    command = <<EOT
-      sed -i 's|server: https://.*:6443|server: https://127.0.0.1:6443|' kubeconfig.yaml
-    EOT
-  }
-}
-
 resource "null_resource" "validate_kubeconfig" {
-  depends_on = [null_resource.rewrite_kubeconfig]
 
   provisioner "local-exec" {
     command = <<EOT
@@ -70,7 +36,7 @@ resource "helm_release" "argocd" {
 }
 
 resource "helm_release" "sealed_secrets" {
-  name       = "sealed-secrets"
+  name       = "sealed-secrets-controller"
   chart      = "sealed-secrets"
   repository = "https://bitnami-labs.github.io/sealed-secrets"
   namespace  = "kube-system"
@@ -148,18 +114,6 @@ EOF
       # Apply the Application resource
       echo "Applying the ArgoCD Application resource..."
       kubectl --kubeconfig=kubeconfig.yaml apply -f app-of-apps.yaml
-    EOT
-  }
-}
-resource "null_resource" "close_ssh_tunnel" {
-  depends_on = [helm_release.argocd, helm_release.sealed_secrets, null_resource.kubeseal_argocd_repo_secret,null_resource.create_argocd_application]
-
-  provisioner "local-exec" {
-    command = <<EOT
-      if [ -f ssh_tunnel.pid ]; then
-        kill $(cat ssh_tunnel.pid) || true
-        rm -f ssh_tunnel.pid
-      fi
     EOT
   }
 }
