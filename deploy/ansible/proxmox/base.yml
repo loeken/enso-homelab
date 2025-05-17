@@ -1,0 +1,8 @@
+---
+- name: Run base system provisioning
+  hosts: all
+  become: true
+  vars:
+    root_password: changeme
+  roles:
+    - base

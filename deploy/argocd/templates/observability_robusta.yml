@@ -18,7 +18,7 @@ spec:
     targetRevision: 0.23.0
     helm:
       values: |
-        clusterName: {{ .Values.ClusterName }}
+        clusterName: {{ .Values.clusterName }}
 
         globalConfig:
           signing_key: "{{`{{`}} env.SIGNING_KEY {{`}}`}}"
