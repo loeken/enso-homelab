@@ -38,11 +38,11 @@ spec:
             annotations:
               cert-manager.io/cluster-issuer: "selfsigned-cluster-issuer"
             hosts:
-              - prometheus-apolloexample.com
+              - prometheus.{{ .Valus.domain }}
             tls:
               - secretName: prometheus-tls
                 hosts:
-                  - prometheus-apolloexample.com
+                  - prometheus-{{ .Valus.domain }}
 
         alertmanager:
           config:
@@ -80,11 +80,11 @@ spec:
             annotations:
               cert-manager.io/cluster-issuer: "selfsigned-cluster-issuer"
             hosts:
-              - alertmanager-apolloexample.com
+              - alertmanager.{{ .Valus.domain }}
             tls:
               - secretName: alertmanager-tls
                 hosts:
-                  - alertmanager-apolloexample.com
+                  - alertmanager-{{ .Valus.domain }}
 
         grafana:
           enabled: false
