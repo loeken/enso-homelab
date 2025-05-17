@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: robusta-secret
+  namespace: observability
+type: Opaque
+stringData:
+  SIGNING_KEY: ""
+  ACCOUNT_ID: ""
+  SLACK_API_KEY: ""
+  ROBUSTA_UI_TOKEN: ""
