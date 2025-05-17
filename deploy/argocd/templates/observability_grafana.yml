@@ -28,7 +28,7 @@ spec:
           size: 5Gi
         grafana.ini:
           server:
-            root_url: https://grafana{{ .Valus.domain }}
+            root_url: https://grafana{{ .Values.domain }}
             domain: aneralabs.lan
           users:
             auto_assign_org_role: Editor
@@ -41,11 +41,11 @@ spec:
           annotations:
             cert-manager.io/cluster-issuer: "selfsigned-cluster-issuer"
           hosts:
-            - grafana.{{ .Valus.domain }}
+            - grafana.{{ .Values.domain }}
           tls:
             - secretName: grafana-tls
               hosts:
-                - grafana.{{ .Valus.domain }}
+                - grafana.{{ .Values.domain }}
 
         sidecar:
           dashboards:
@@ -69,7 +69,7 @@ spec:
         hostAliases:
           - ip: "10.1.0.101"
             hostnames:
-              - "auth{{ .Valus.domain }}"
+              - "auth{{ .Values.domain }}"
   destination:
     server: https://kubernetes.default.svc
     namespace: observability
