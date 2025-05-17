@@ -1,0 +1,119 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: observability-kube-prometheus-stack
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 72.3.1
+    helm:
+      skipCrds: true
+      values: |
+        fullnameOverride: kube-prometheus-stack
+
+        prometheus:
+          prometheusSpec:
+            serviceMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelectorNilUsesHelmValues: false
+            ruleSelectorNilUsesHelmValues: false
+            retention: 14d
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: local-path
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 10Gi
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              cert-manager.io/cluster-issuer: "selfsigned-cluster-issuer"
+            hosts:
+              - prometheus-apollo.aneralabs.lan
+            tls:
+              - secretName: prometheus-tls
+                hosts:
+                  - prometheus-apollo.aneralabs.lan
+
+        alertmanager:
+          config:
+            global:
+              resolve_timeout: 5m
+            receivers:
+              - name: 'robusta'
+                webhook_configs:
+                  - url: 'http://observability-robusta-runner.observability.svc.cluster.local/api/alerts'
+                    send_resolved: true
+              - name: 'default-receiver'
+            route:
+              routes:
+                - receiver: 'robusta'
+                  group_by: [ '...' ]
+                  group_wait: 1s
+                  group_interval: 1s
+                  matchers:
+                    - severity =~ ".*"
+                  repeat_interval: 4h
+                  continue: true
+              receiver: 'default-receiver'
+          alertmanagerSpec:
+            storage:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: local-path
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 2Gi
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              cert-manager.io/cluster-issuer: "selfsigned-cluster-issuer"
+            hosts:
+              - alertmanager-apollo.aneralabs.lan
+            tls:
+              - secretName: alertmanager-tls
+                hosts:
+                  - alertmanager-apollo.aneralabs.lan
+
+        grafana:
+          enabled: false
+
+        defaultRules:
+          create: true
+
+        kubeScheduler:
+          enabled: true
+        kubeControllerManager:
+          enabled: true
+        kubeProxy:
+          enabled: false
+        kubeEtcd:
+          enabled: true
+        nodeExporter:
+          enabled: true
+        kubeStateMetrics:
+          enabled: true
+        kubelet:
+          enabled: true
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

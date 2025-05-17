@@ -1,0 +1,91 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: observability-grafana
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: grafana
+    targetRevision: 9.0.0
+    helm:
+      values: |
+        admin:
+          existingSecret: grafana-admin-credentials
+          userKey: admin-user
+          passwordKey: admin-password
+
+        persistence:
+          enabled: true
+          storageClassName: local-path
+          accessModes:
+            - ReadWriteOnce
+          size: 5Gi
+        grafana.ini:
+          server:
+            root_url: https://grafana-apollo.aneralabs.lan
+            domain: aneralabs.lan
+          users:
+            auto_assign_org_role: Editor
+        envFromSecret: grafana-oauth-config
+        plugins:
+          - ae3e-plotly-panel
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          annotations:
+            cert-manager.io/cluster-issuer: "selfsigned-cluster-issuer"
+          hosts:
+            - grafana-apollo.aneralabs.lan
+          tls:
+            - secretName: grafana-tls
+              hosts:
+                - grafana-apollo.aneralabs.lan
+
+        sidecar:
+          dashboards:
+            enabled: false
+          datasources:
+            enabled: true
+
+        datasources:
+          datasources.yaml:
+            apiVersion: 1
+            datasources:
+              - name: Loki
+                type: loki
+                access: proxy
+                url: http://observability-loki:3100
+              - name: Prometheus
+                type: prometheus
+                access: proxy
+                url: http://kube-prometheus-stack-prometheus:9090
+                isDefault: true
+              - name: InfluxDB prod liquid sphere core
+                type: influxdb
+                access: proxy
+                url: http://prod-liquid-sphere-core-influxdb.prod-liquid-sphere:8086
+                jsonData:
+                  dbName: primary
+                  httpHeaderName1: 'Authorization'
+                secureJsonData:
+                  httpHeaderValue1: 'Token UHORfLjktlawuZJyy5d3rD_5dUkNby3loCBj9pt9M9iReoTp1TKMTlrN2YKI_tShS0WUcT6H6fOC-tVzJ06Fhg=='
+        hostAliases:
+          - ip: "10.1.0.101"
+            hostnames:
+              - "auth.aneralabs.lan"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

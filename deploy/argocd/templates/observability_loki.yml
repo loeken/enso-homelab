@@ -1,0 +1,88 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: observability-loki
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: loki
+    targetRevision: 6.29.0
+    helm:
+      values: |
+        deploymentMode: SingleBinary
+
+        singleBinary:
+          replicas: 1
+          persistence:
+            enabled: true
+            storageClass: local-path
+            accessModes:
+              - ReadWriteOnce
+            size: 10Gi
+
+        # Required to avoid dual-mode conflict
+        backend: { replicas: 0 }
+        read: { replicas: 0 }
+        write: { replicas: 0 }
+        gateway: { replicas: 0 }
+        ingester: { replicas: 0 }
+        querier: { replicas: 0 }
+        queryFrontend: { replicas: 0 }
+        queryScheduler: { replicas: 0 }
+        distributor: { replicas: 0 }
+        compactor: { replicas: 0 }
+        indexGateway: { replicas: 0 }
+        bloomCompactor: { replicas: 0 }
+        bloomGateway: { replicas: 0 }
+
+        loki:
+          storage:
+            type: filesystem
+            bucketNames:
+              chunks: dummy
+              ruler: dummy
+              admin: dummy
+
+          structuredConfig:
+            auth_enabled: false
+            server:
+              log_level: info
+            common:
+              replication_factor: 1
+              path_prefix: /var/loki
+            schema_config:
+              configs:
+                - from: "2024-04-01"
+                  store: boltdb-shipper
+                  object_store: filesystem
+                  schema: v11
+                  index:
+                    prefix: index_
+                    period: 24h
+            storage_config:
+              boltdb_shipper:
+                active_index_directory: /var/loki/index
+                cache_location: /var/loki/cache
+              filesystem:
+                directory: /var/loki/chunks
+            limits_config:
+              allow_structured_metadata: false
+
+
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
