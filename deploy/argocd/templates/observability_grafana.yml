@@ -28,7 +28,7 @@ spec:
           size: 5Gi
         grafana.ini:
           server:
-            root_url: https://grafana-apollo.aneralabs.lan
+            root_url: https://grafana{{ .Valus.domain }}
             domain: aneralabs.lan
           users:
             auto_assign_org_role: Editor
@@ -41,11 +41,11 @@ spec:
           annotations:
             cert-manager.io/cluster-issuer: "selfsigned-cluster-issuer"
           hosts:
-            - grafana-apollo.aneralabs.lan
+            - grafana.{{ .Valus.domain }}
           tls:
             - secretName: grafana-tls
               hosts:
-                - grafana-apollo.aneralabs.lan
+                - grafana.{{ .Valus.domain }}
 
         sidecar:
           dashboards:
@@ -66,19 +66,10 @@ spec:
                 access: proxy
                 url: http://kube-prometheus-stack-prometheus:9090
                 isDefault: true
-              - name: InfluxDB prod liquid sphere core
-                type: influxdb
-                access: proxy
-                url: http://prod-liquid-sphere-core-influxdb.prod-liquid-sphere:8086
-                jsonData:
-                  dbName: primary
-                  httpHeaderName1: 'Authorization'
-                secureJsonData:
-                  httpHeaderValue1: 'Token UHORfLjktlawuZJyy5d3rD_5dUkNby3loCBj9pt9M9iReoTp1TKMTlrN2YKI_tShS0WUcT6H6fOC-tVzJ06Fhg=='
         hostAliases:
           - ip: "10.1.0.101"
             hostnames:
-              - "auth.aneralabs.lan"
+              - "auth{{ .Valus.domain }}"
   destination:
     server: https://kubernetes.default.svc
     namespace: observability

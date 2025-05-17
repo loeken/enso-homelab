@@ -38,11 +38,11 @@ spec:
             annotations:
               cert-manager.io/cluster-issuer: "selfsigned-cluster-issuer"
             hosts:
-              - prometheus-apollo.aneralabs.lan
+              - prometheus-apolloexample.com
             tls:
               - secretName: prometheus-tls
                 hosts:
-                  - prometheus-apollo.aneralabs.lan
+                  - prometheus-apolloexample.com
 
         alertmanager:
           config:
@@ -80,11 +80,11 @@ spec:
             annotations:
               cert-manager.io/cluster-issuer: "selfsigned-cluster-issuer"
             hosts:
-              - alertmanager-apollo.aneralabs.lan
+              - alertmanager-apolloexample.com
             tls:
               - secretName: alertmanager-tls
                 hosts:
-                  - alertmanager-apollo.aneralabs.lan
+                  - alertmanager-apolloexample.com
 
         grafana:
           enabled: false
