@@ -85,7 +85,6 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
           sed -i 's|server: https://.*:6443|server: https://127.0.0.1:6443|' kubeconfig.yaml
 
-
       - name: Port-forward to ArgoCD and disable syncs
         working-directory: deploy/terraform/argocd
         env:
