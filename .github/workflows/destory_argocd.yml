@@ -86,6 +86,41 @@ jobs:
           sed -i 's|server: https://.*:6443|server: https://127.0.0.1:6443|' kubeconfig.yaml
 
 
+      - name: Port-forward to ArgoCD and disable syncs
+        working-directory: deploy/terraform/argocd
+        env:
+          KUBECONFIG: ${{ github.workspace }}/deploy/terraform/argocd/kubeconfig.yaml
+        run: |
+          # Install kubectl and argocd CLI if not present
+          if ! command -v kubectl &> /dev/null; then
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            chmod +x kubectl
+            sudo mv kubectl /usr/local/bin/
+          fi
+          if ! command -v argocd &> /dev/null; then
+            curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+            chmod +x /usr/local/bin/argocd
+          fi
+
+          # Port-forward ArgoCD API server in background
+          kubectl port-forward svc/argocd-server -n argocd 8080:443 &
+          PF_PID=$!
+          sleep 5
+
+          # Get ArgoCD admin password from secret
+          ARGOCD_PWD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+
+          # Login to ArgoCD CLI
+          argocd login localhost:8080 --username admin --password "$ARGOCD_PWD" --insecure
+
+          # Disable auto-sync for all apps
+          for app in $(argocd app list -o name); do
+            argocd app set "$app" --sync-policy none
+          done
+
+          # Kill port-forward
+          kill $PF_PID
+
       - name: Terraform Init
         working-directory: deploy/terraform/argocd
         run: terraform init -input=false
@@ -115,10 +150,3 @@ jobs:
           rm -f .terraform.lock.hcl
           rm -f terraform.tfstate
           rm -f terraform.tfstate.backup
-
-      # - name: Remove kubeconfig Secret
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
-      #   run: |
-      #     echo "Removing KUBECONFIG secret..."
-      #     gh secret remove KUBECONFIG || echo "KUBECONFIG secret not found, skipping."
