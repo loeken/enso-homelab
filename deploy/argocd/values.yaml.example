@@ -1,5 +1,6 @@
 domain: loeken.xyz
 clusterIssuer: letsencrypt-prod
+clusterName: enso-homelab
 githubUser: loeken
 githubRepo: enso-homelab
 
