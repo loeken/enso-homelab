@@ -1,0 +1,38 @@
+name: Proxmox Convert & Template
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  run-proxmox-ansible:
+    if: |
+      github.event.issue.pull_request == null &&
+      contains(github.event.comment.body, '/convert-to-proxmox')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and start devcontainer
+        run: |
+          docker-compose up -d
+
+      - name: Wait for container to be ready
+        run: |
+          for i in {1..10}; do
+            docker-compose exec -T enso-homelab true && break || sleep 2
+          done
+
+      - name: Run Ansible Playbook inside container
+        run: |
+          docker-compose exec -T enso-homelab \
+            ansible-playbook -i deploy/ansible/proxmox/inventory deploy/ansible/proxmox/base.yml
+
+      - name: Tear down devcontainer
+        if: always()
+        run: docker-compose down -v

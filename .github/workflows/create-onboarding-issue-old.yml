@@ -1,0 +1,90 @@
+name: Create Onboarding Issue
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/create-onboarding-issue.yml
+
+permissions:
+  issues: write
+  contents: write
+
+jobs:
+  create-issue:
+    if: github.repository != 'loeken/enso-homelab'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Create onboarding issue
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
+        with:
+          script: |
+            const repo = context.repo.repo;
+            const owner = context.repo.owner;
+            const base = `https://github.com/${owner}/${repo}/blob/main`;
+            await github.rest.issues.create({
+              owner,
+              repo,
+              title: "📝 Welcome! Let's deploy your homelab 🚀",
+              body:
+                "👋 Welcome to your new **ensō-homelab**!\n\n" +
+                "### ✅ Next Steps\n\n" +
+                "1. **Configure Secrets**  ([view docs](" + base + "/docs/secrets/README.md))\n\n" +
+                "To deploy your homelab, you'll need to set these repository secrets:\n\n" +
+                "| Secret | Description | Required |\n" +
+                "|--------|-------------|----------|\n" +
+                "| `SSH_USERNAME`         | SSH user for your VM/server | Yes |\n" +
+                "| `SSH_SERVER_ADDRESS`   | Public IP or hostname of the VM/server | Yes |\n" +
+                "| `SSH_INTERNAL_ADDRESS` | Internal (private) IP for advertising k3s nodes | Yes |\n" +
+                "| `SSH_SERVER_PORT`      | Custom SSH port (e.g. 60023) | Yes |\n" +
+                "| `SSH_PRIVATE_KEY`      | Base64-encoded private key for SSH access | Yes |\n" +
+                "| `TF_TOKEN_app_terraform_io` | Terraform Cloud API token | Yes |\n" +
+                "| `HOSTNAME`             | Expected hostname of the target node | Yes |\n" +
+                "| `PAT_GITHUB_TOKEN`         | GitHub token for dispatching workflows | Yes |\n" +
+                "| `RENOVATE_TOKEN`       | Token for Renovate bot (if enabled) | Yes |\n" +
+                "| `ARGOCD_DEPLOY_PRIVATE_KEY` | Private key for ArgoCD deployments | Optional |\n" +
+                "| `ARGOCD_DEPLOY_PUBLIC_KEY`  | Public key for ArgoCD deployments | Optional |\n\n" +
+                "### 🔑 How to Create `PAT_GITHUB_TOKEN`\n\n" +
+                "To create the `PAT_GITHUB_TOKEN` with the required permissions:\n\n" +
+                "1. Go to [GitHub Developer Settings](https://github.com/settings/tokens).\n" +
+                "2. Click **Generate new token** (classic).\n" +
+                "3. Provide a **note** to identify the token (e.g., `PAT for GitHub Actions`).\n" +
+                "4. Set the **expiration** (e.g., 90 days or no expiration).\n" +
+                "5. Select the following **scopes**:\n" +
+                "   - `repo` (Full control of private repositories)\n" +
+                "   - `admin:repo_hook` (Manage repository hooks and secrets)\n" +
+                "6. Click **Generate token**.\n" +
+                "7. Copy the token and store it securely.\n\n" +
+                "### 💻 Set the Token via CLI\n\n" +
+                "Once you have the token, set it as a repository secret using the `gh` CLI:\n\n" +
+                "```bash\n" +
+                "gh secret set SSH_USERNAME --body \"loeken\"\n" +
+                "gh secret set SSH_SERVER_ADDRESS --body \"94.134.58.166\"\n" +
+                "gh secret set SSH_INTERNAL_ADDRESS --body \"192.168.1.185\"\n" +
+                "gh secret set SSH_SERVER_PORT --body \"60023\"\n" +
+                "gh secret set HOSTNAME --body \"homelab\"\n" +
+                "gh secret set SSH_PRIVATE_KEY --body \"\$(cat ~/.ssh/id_ed25519 | base64)\"\n" +
+                "gh secret set TF_TOKEN_app_terraform_io --body \"your-tf-cloud-token\"\n" +
+                "gh secret set PAT_GITHUB_TOKEN --body \"process-described-above\"\n" +
+                "gh secret set RENOVATE_TOKEN --body \"your-renovate-token\"\n" +
+                "gh secret set ARGOCD_DEPLOY_PRIVATE_KEY --body \"your-private-key\" # Optional\n" +
+                "gh secret set ARGOCD_DEPLOY_PUBLIC_KEY --body \"your-public-key\"   # Optional\n" +
+                "```\n\n</details>\n\n" +
+                "_If `ARGOCD_DEPLOY_PRIVATE_KEY` and `ARGOCD_DEPLOY_PUBLIC_KEY` are not set, a random key pair will be generated during the installation process._\n\n" +
+                "---\n\n" +
+                "2. **Run the Setup Workflow**\n" +
+                "([Install K3s](" + base + "/docs/install/k3s) · " +
+                "[Set up Proxmox](" + base + "/docs/install/proxmox))\n\n" +
+                "You can:\n- Trigger it manually below 👇\n" +
+                "- Or run it locally with [`act`](https://github.com/nektos/act)\n\n" +
+                "---\n\n" +
+                "### ▶️ Start the Install\n\n" +
+                "To kick off the install process, comment with one of the following:\n\n" +
+                "- `/install-k3s` → Install K3s using Terraform + k3sup\n" +
+                "- `/install-proxmox` → Set up Proxmox on a Debian host and create a VM _(WIP)_\n\n" +
+                "This will apply the Terraform stack and set up your homelab infrastructure."
+            });
