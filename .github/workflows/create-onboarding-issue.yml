@@ -1,4 +1,4 @@
-name: Create Onboarding Issue
+name: Create Onboarding Issue & Respond
 
 on:
   push:
@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - .github/workflows/create-onboarding-issue.yml
+  issue_comment:
+    types: [created]
 
 permissions:
   issues: write
@@ -13,7 +15,7 @@ permissions:
 
 jobs:
   create-issue:
-    if: github.repository != 'loeken/enso-homelab'
+    if: github.repository != 'loeken/enso-homelab' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -62,3 +64,96 @@ jobs:
                 "- [ArgoCD Apps](" + base + "/deploy/argocd)\n\n" +
                 "_If you need help, just reply to this issue!_"
             });
+
+  respond-to-comments:
+    if: github.event_name == 'issue_comment' && contains(github.event.issue.title, 'Welcome! Let')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Respond to onboarding commands
+        id: respond-to-onboarding-commands
+        uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        with:
+          script: |
+            // Only declare this ONCE at the top!
+            const comment = context.payload.comment.body.trim();
+            const issue_number = context.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            if (
+              comment === '/install-k3s' ||
+              comment === '/proxmox-single' ||
+              comment === '/proxmox-multi'
+            ) {
+              await github.rest.issues.createComment({
+                issue_number,
+                owner,
+                repo,
+                body:
+                  "🔑 Please set the following secrets before continuing:\n\n" +
+                  "- `SSH_USERNAME`\n" +
+                  "- `SSH_SERVER_ADDRESS`\n" +
+                  "- `SSH_INTERNAL_ADDRESS`\n" +
+                  "- `SSH_SERVER_PORT`\n" +
+                  "- `HOSTNAME`\n" +
+                  "- `SSH_PRIVATE_KEY`\n" +
+                  "- `TF_TOKEN_app_terraform_io`\n" +
+                  "- `PAT_GITHUB_TOKEN`\n" +
+                  "- `RENOVATE_TOKEN`\n" +
+                  "- `ARGOCD_DEPLOY_PRIVATE_KEY` *(Optional)*\n" +
+                  "- `ARGOCD_DEPLOY_PUBLIC_KEY` *(Optional)*\n" +
+                  "- `TF_CLOUD_ORGANIZATION` *(Optional)*\n" +
+                  "- `KUBECONFIG` *(Optional)*\n\n" +
+                  "You can set them using the GitHub CLI:\n\n" +
+                  "```sh\n" +
+                  "gh secret set SSH_USERNAME --body \"loeken\"\n" +
+                  "gh secret set SSH_SERVER_ADDRESS --body \"94.134.58.166\"\n" +
+                  "gh secret set SSH_INTERNAL_ADDRESS --body \"192.168.1.185\"\n" +
+                  "gh secret set SSH_SERVER_PORT --body \"60023\"\n" +
+                  "gh secret set HOSTNAME --body \"homelab\"\n" +
+                  "gh secret set SSH_PRIVATE_KEY --body \"$(cat ~/.ssh/id_ed25519 | base64)\"\n" +
+                  "gh secret set TF_TOKEN_app_terraform_io --body \"your-tf-cloud-token\"\n" +
+                  "gh secret set PAT_GITHUB_TOKEN --body \"process-described-above\"\n" +
+                  "gh secret set RENOVATE_TOKEN --body \"your-renovate-token\"\n" +
+                  "gh secret set ARGOCD_DEPLOY_PRIVATE_KEY --body \"your-private-key\" # Optional\n" +
+                  "gh secret set ARGOCD_DEPLOY_PUBLIC_KEY --body \"your-public-key\"   # Optional\n" +
+                  "gh secret set TF_CLOUD_ORGANIZATION --body \"your-tf-org\"         # Optional\n" +
+                  "gh secret set KUBECONFIG --body \"your-kubeconfig\"                # Optional\n" +
+                  "```\n\n" +
+                  "Once you have set your secrets, comment `/validate-secrets` to trigger validation."
+              });
+            } else if (comment === '/install-proxmox') {
+              await github.rest.issues.createComment({
+                issue_number,
+                owner,
+                repo,
+                body:
+                  "🔧 Proxmox install selected! Please choose your cluster type:\n\n" +
+                  "1️⃣ **Single Node Cluster**\n" +
+                  "   - Comment `/proxmox-single` to proceed with a single node setup.\n\n" +
+                  "2️⃣ **Multi Node Cluster**\n" +
+                  "   - Comment `/proxmox-multi` to proceed with a multi node setup."
+              });
+            } else if (comment === '/validate-secrets') {
+              await github.rest.issues.createComment({
+                issue_number,
+                owner,
+                repo,
+                body:
+                  "🔎 Validating your secrets! The validation workflow will now run.\n\n" +
+                  "Check the Actions tab for results."
+              });
+              core.setOutput('trigger_validation', 'true');
+            }
+      - name: Trigger validate-secrets workflow
+        if: steps.respond-to-onboarding-commands.outputs.trigger_validation == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        run: |
+          curl -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/validate-secrets.yml/dispatches \
+            -d '{"ref":"main"}'
