@@ -1,3 +1,5 @@
+# roles/template-debian/tasks/main.yml
+
 ---
 - name: Gather VM list to check if template exists
   ansible.builtin.shell: qm list --full 2>/dev/null | grep -q 'template-debian-{{ inventory_hostname }}'
@@ -90,6 +92,8 @@
     - 'virt-customize -a /var/lib/vz/images/{{ vm_create.vmid }}/vm-{{ vm_create.vmid }}-disk-0.raw --install cron,qemu-guest-agent,cloud-init'
     - 'virt-customize -a /var/lib/vz/images/{{ vm_create.vmid }}/vm-{{ vm_create.vmid }}-disk-0.raw --run-command "truncate -s 0 /etc/machine-id"'
     - 'virt-customize -a /var/lib/vz/images/{{ vm_create.vmid }}/vm-{{ vm_create.vmid }}-disk-0.raw --append-line "/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg:# network: {config: disabled}"'
+    - 'virt-customize -a /var/lib/vz/images/{{ vm_create.vmid }}/vm-{{ vm_create.vmid }}-disk-0.raw --append-line "/etc/systemd/resolved.conf:DNS=8.8.8.8 8.8.4.4 1.1.1.1 1.0.0.1"'
+    - 'virt-customize -a /var/lib/vz/images/{{ vm_create.vmid }}/vm-{{ vm_create.vmid }}-disk-0.raw --run-command "systemctl enable qemu-guest-agent"'
   when: not template_exists
 
 - name: Clone and convert VM to template

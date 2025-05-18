@@ -102,9 +102,9 @@
     delay: 3
     timeout: 300
 
-- name: Re-add SSH host key to known_hosts
-  ansible.builtin.known_hosts:
-    path: "{{ lookup('env', 'HOME') + '/.ssh/known_hosts' }}"
-    name: "{{ ansible_host }}"
-    key: "{{ lookup('pipe', 'ssh-keyscan -t ecdsa ' + ansible_host) }}"
-  delegate_to: localhost
+# - name: Re-add SSH host key to known_hosts
+#   ansible.builtin.known_hosts:
+#     path: "{{ lookup('env', 'HOME') + '/.ssh/known_hosts' }}"
+#     name: "{{ ansible_host }}"
+#     key: "{{ lookup('pipe', 'ssh-keyscan -t ecdsa ' + ansible_host) }}"
+#   delegate_to: localhost
