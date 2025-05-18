@@ -1,0 +1,60 @@
+- name: Check if corosync.conf exists
+  ansible.builtin.stat:
+    path: /etc/pve/corosync.conf
+  register: corosync_conf
+
+- name: Determine master node
+  ansible.builtin.set_fact:
+    master_node: "{{ item }}"
+  loop: "{{ ansible_play_batch }}"
+  when: hostvars[item]['is_master'] == 'yes'
+  run_once: true
+
+- name: Create Proxmox cluster (only if not present and is master)
+  ansible.builtin.shell: pvecm create {{ ansible_facts.hostname.split('.')[0] }}
+  when:
+    - not corosync_conf.stat.exists
+    - inventory_hostname == master_node
+
+- name: Start corosync service (on master)
+  ansible.builtin.systemd:
+    name: corosync
+    state: started
+  when: inventory_hostname == master_node
+
+- name: Wait for corosync service to become active (on master)
+  ansible.builtin.command: systemctl is-active corosync
+  register: corosync_active
+  retries: 15
+  delay: 2
+  until: corosync_active.stdout == "active"
+  when: inventory_hostname == master_node
+
+- name: Wait for corosync.conf to appear (non-master nodes)
+  ansible.builtin.wait_for:
+    path: /etc/pve/corosync.conf
+    timeout: 60
+  when: inventory_hostname != master_node
+
+- name: Join Proxmox cluster (on non-master nodes)
+  ansible.builtin.shell: "pvecm add {{ hostvars[master_node]['ssh_internal_address'] }} --use_ssh"
+  when:
+    - inventory_hostname != master_node
+    - not corosync_conf.stat.exists
+
+- name: Ensure Corosync service is started (on all nodes)
+  ansible.builtin.systemd:
+    name: corosync
+    state: started
+
+- name: Wait for Corosync to be active (on all nodes)
+  ansible.builtin.command: systemctl is-active corosync
+  register: corosync_verify
+  retries: 15
+  delay: 2
+  until: corosync_verify.stdout == "active"
+
+- name: Fail if Corosync is not active
+  ansible.builtin.fail:
+    msg: "Corosync service is not active"
+  when: corosync_verify.stdout != 'active'

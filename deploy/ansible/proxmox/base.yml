@@ -2,7 +2,19 @@
 - name: Run base system provisioning
   hosts: all
   become: true
+
   vars:
-    root_password: changeme
+    root_password: homelab1337
+
   roles:
     - base
+    - network           # Configure system networking (bridges, DNS, interfaces)
+    - proxmox-repo      # Set up Proxmox repositories and install kernel
+    - ssh-access        # Ensure SSH key setup and authorized_keys propagation
+    - cluster           # Create or join Proxmox cluster using Corosync
+    - template-debian   # Import and configure Debian cloud image VM template
+    # - opnsense          # Create and configure OPNsense VM (conditional)
+    # - fog               # Create and configure Fog PXE server VM (conditional)
+    # - debian12cloud     # Additional setup for Debian 12 cloud templates
+    # - nfs-server        # Setup external disk and export NFS share (on master)
+    # - post-checks       # Validate external IP, hostname, services, and save facts

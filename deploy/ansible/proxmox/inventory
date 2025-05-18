@@ -1,2 +1,2 @@
 [homelab]
-homelab ansible_host=192.168.1.185 ansible_user=loeken
+homelab.ime.lan ansible_host=192.168.1.185 ansible_user=loeken is_master=yes ssh_internal_address=192.168.1.185
