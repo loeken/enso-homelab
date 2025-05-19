@@ -8,7 +8,7 @@ on:
       - .github/workflows/create-onboarding-issue.yml
   issue_comment:
     types: [created]
-
+  workflow_dispatch:
 permissions:
   issues: write
   contents: read
