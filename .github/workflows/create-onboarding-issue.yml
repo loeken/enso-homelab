@@ -38,6 +38,7 @@ jobs:
                 "- `/install-k3s` (Baremetal K3s)\n" +
                 "- `/proxmox-single` (Proxmox Single Node)\n" +
                 "- `/proxmox-multi` (Proxmox Multi Node)\n"
+            });
 
   respond-to-comments:
     if: github.event_name == 'issue_comment' && contains(github.event.issue.title, 'Welcome! Let')
