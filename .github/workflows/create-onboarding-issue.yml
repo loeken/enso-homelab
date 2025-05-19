@@ -27,46 +27,25 @@ jobs:
           script: |
             const repo = context.repo.repo;
             const owner = context.repo.owner;
-            const base = `https://github.com/${owner}/${repo}/blob/main`;
 
             await github.rest.issues.create({
               owner,
               repo,
-              title: "📝 Welcome! Let's deploy your homelab 🚀",
+              title: "📝 Homelab Onboarding: Choose your deployment",
               body:
-                "👋 Welcome to your new **ensō-homelab**!\n\n" +
-                "## 🚦 Choose your deployment path\n\n" +
-                "You can deploy your homelab in two main ways:\n\n" +
-                "### 1️⃣ **Baremetal (Single Node)**\n" +
-                "- Installs K3s directly on your Debian 12 (Bookworm) server\n" +
-                "- Deploys ArgoCD (app-of-apps pattern) to manage workloads defined in [`deploy/argocd`](" + base + "/deploy/argocd)\n" +
-                "- **Start with:** A simple Debian 12 netinstall\n\n" +
-                "**To trigger:**\n" +
-                "- Comment `/install-k3s`\n\n" +
-                "---\n\n" +
-                "### 2️⃣ **Proxmox-based (Virtualized Lab)**\n" +
-                "- Converts a Debian 12 (Bookworm) install to Proxmox\n" +
-                "- Creates a Debian 12 nocloud template\n" +
-                "- Supports running multiple Proxmox nodes and multiple KVMs\n" +
-                "- Optional: Install OPNsense (firewall/routing/DHCP) and Fog Project (PXE server for unattended installs)\n" +
-                "- **Start with:** A simple Debian 12 netinstall\n\n" +
-                "**To trigger:**\n" +
-                "- Comment `/install-proxmox`\n\n" +
-                "---\n\n" +
-                "### 🛠️ Next Steps\n" +
-                "1. [Configure required secrets](" + base + "/docs/secrets/README.md)\n" +
-                "2. Trigger your chosen install by commenting as above\n" +
-                "3. Monitor this issue for progress and further instructions\n\n" +
-                "---\n\n" +
-                "#### ℹ️ **More info**\n" +
-                "- [K3s Install Docs](" + base + "/docs/install/k3s)\n" +
-                "- [Proxmox Install Docs](" + base + "/docs/install/proxmox)\n" +
-                "- [ArgoCD Apps](" + base + "/deploy/argocd)\n\n" +
-                "_If you need help, just reply to this issue!_"
+                "Welcome to your new **ensō-homelab**!\n\n" +
+                "Please choose one of the following deployment options by commenting the corresponding code below:\n\n" +
+                "1. **Baremetal Install**\n" +
+                "   - Comment: `baremetal-install`\n" +
+                "2. **Proxmox Single Node**\n" +
+                "   - Comment: `proxmox-single-node`\n" +
+                "3. **Proxmox Multi Node**\n" +
+                "   - Comment: `proxmox-multi-node`\n\n" +
+                "Once you comment, the appropriate installation workflow will be triggered automatically."
             });
 
   respond-to-comments:
-    if: github.event_name == 'issue_comment' && contains(github.event.issue.title, 'Welcome! Let')
+    if: github.event_name == 'issue_comment' && contains(github.event.issue.title, 'Homelab Onboarding')
     runs-on: ubuntu-latest
     steps:
       - name: Respond to onboarding commands
@@ -76,84 +55,34 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         with:
           script: |
-            // Only declare this ONCE at the top!
-            const comment = context.payload.comment.body.trim();
+            const comment = context.payload.comment.body.trim().toLowerCase();
             const issue_number = context.issue.number;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
+            let workflow = null;
 
-            if (
-              comment === '/install-k3s' ||
-              comment === '/proxmox-single' ||
-              comment === '/proxmox-multi'
-            ) {
-              await github.rest.issues.createComment({
-                issue_number,
-                owner,
-                repo,
-                body:
-                  "🔑 Please set the following secrets before continuing:\n\n" +
-                  "- `SSH_USERNAME`\n" +
-                  "- `SSH_SERVER_ADDRESS`\n" +
-                  "- `SSH_INTERNAL_ADDRESS`\n" +
-                  "- `SSH_SERVER_PORT`\n" +
-                  "- `HOSTNAME`\n" +
-                  "- `SSH_PRIVATE_KEY`\n" +
-                  "- `TF_TOKEN_app_terraform_io`\n" +
-                  "- `PAT_GITHUB_TOKEN`\n" +
-                  "- `RENOVATE_TOKEN`\n" +
-                  "- `ARGOCD_DEPLOY_PRIVATE_KEY` *(Optional)*\n" +
-                  "- `ARGOCD_DEPLOY_PUBLIC_KEY` *(Optional)*\n" +
-                  "- `TF_CLOUD_ORGANIZATION` *(Optional)*\n" +
-                  "- `KUBECONFIG` *(Optional)*\n\n" +
-                  "You can set them using the GitHub CLI:\n\n" +
-                  "```sh\n" +
-                  "gh secret set SSH_USERNAME --body \"loeken\"\n" +
-                  "gh secret set SSH_SERVER_ADDRESS --body \"94.134.58.166\"\n" +
-                  "gh secret set SSH_INTERNAL_ADDRESS --body \"192.168.1.185\"\n" +
-                  "gh secret set SSH_SERVER_PORT --body \"60023\"\n" +
-                  "gh secret set HOSTNAME --body \"homelab\"\n" +
-                  "gh secret set SSH_PRIVATE_KEY --body \"$(cat ~/.ssh/id_ed25519 | base64)\"\n" +
-                  "gh secret set TF_TOKEN_app_terraform_io --body \"your-tf-cloud-token\"\n" +
-                  "gh secret set PAT_GITHUB_TOKEN --body \"process-described-above\"\n" +
-                  "gh secret set RENOVATE_TOKEN --body \"your-renovate-token\"\n" +
-                  "gh secret set ARGOCD_DEPLOY_PRIVATE_KEY --body \"your-private-key\" # Optional\n" +
-                  "gh secret set ARGOCD_DEPLOY_PUBLIC_KEY --body \"your-public-key\"   # Optional\n" +
-                  "gh secret set TF_CLOUD_ORGANIZATION --body \"your-tf-org\"         # Optional\n" +
-                  "gh secret set KUBECONFIG --body \"your-kubeconfig\"                # Optional\n" +
-                  "```\n\n" +
-                  "Once you have set your secrets, comment `/validate-secrets` to trigger validation."
-              });
-            } else if (comment === '/install-proxmox') {
-              await github.rest.issues.createComment({
-                issue_number,
-                owner,
-                repo,
-                body:
-                  "🔧 Proxmox install selected! Please choose your cluster type:\n\n" +
-                  "1️⃣ **Single Node Cluster**\n" +
-                  "   - Comment `/proxmox-single` to proceed with a single node setup.\n\n" +
-                  "2️⃣ **Multi Node Cluster**\n" +
-                  "   - Comment `/proxmox-multi` to proceed with a multi node setup."
-              });
-            } else if (comment === '/validate-secrets') {
-              await github.rest.issues.createComment({
-                issue_number,
-                owner,
-                repo,
-                body:
-                  "🔎 Validating your secrets! The validation workflow will now run.\n\n" +
-                  "Check the Actions tab for results."
-              });
-              core.setOutput('trigger_validation', 'true');
+            if (comment === 'baremetal-install') {
+              workflow = "install_k3s.yml";
+            } else if (comment === 'proxmox-single-node' || comment === 'proxmox-multi-node') {
+              workflow = "install_proxmox.yml";
             }
-      - name: Trigger validate-secrets workflow
-        if: steps.respond-to-onboarding-commands.outputs.trigger_validation == 'true'
+
+            if (workflow) {
+              await github.rest.issues.createComment({
+                issue_number,
+                owner,
+                repo,
+                body: `🚀 Starting workflow: **${workflow.replace('.yml','')}**. Check the Actions tab for progress.`
+              });
+              core.setOutput('trigger_workflow', workflow);
+            }
+      - name: Trigger selected workflow
+        if: steps.respond-to-onboarding-commands.outputs.trigger_workflow
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         run: |
           curl -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/actions/workflows/validate-secrets.yml/dispatches \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ steps.respond-to-onboarding-commands.outputs.trigger_workflow }}/dispatches \
             -d '{"ref":"main"}'
