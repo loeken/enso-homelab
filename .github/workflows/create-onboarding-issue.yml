@@ -1,89 +1,89 @@
-name: Manual K3s Install Trigger
+name: Create Onboarding Issue & Respond
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/create-onboarding-issue.yml
   issue_comment:
     types: [created]
 
 permissions:
-  contents: read
   issues: write
-  actions: write
+  contents: read
 
 jobs:
-  run-install:
-    if: github.event.issue.pull_request == null && github.event.comment.body == '/install-k3s'
+  create-issue:
+    if: github.repository != 'loeken/enso-homelab' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@v4
 
-      - name: Check for Existing Secrets
+      - name: Create onboarding issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const repo = context.repo.repo;
+            const owner = context.repo.owner;
+            await github.rest.issues.create({
+              owner,
+              repo,
+              title: "📝 Welcome! Let's deploy your homelab 🚀",
+              body:
+                "👋 Welcome to your new **ensō-homelab**!\n\n" +
+                "## 🚦 Choose your deployment path\n\n" +
+                "Comment one of the following to select your deployment type:\n\n" +
+                "- `/install-k3s` (Baremetal K3s)\n" +
+                "- `/proxmox-single` (Proxmox Single Node)\n" +
+                "- `/proxmox-multi` (Proxmox Multi Node)\n"
+
+  respond-to-comments:
+    if: github.event_name == 'issue_comment' && contains(github.event.issue.title, 'Welcome! Let')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Handle deployment type selection
+        id: handle-deployment
+        uses: actions/github-script@v7
         env:
-          GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
-        run: |
-          EXISTING_PRIVATE_KEY=$(gh secret list | grep ARGOCD_DEPLOY_PRIVATE_KEY || echo "not_found")
-          if [ "$EXISTING_PRIVATE_KEY" != "not_found" ]; then
-            echo "Secret already exists. Skipping key generation."
-            echo "key_exists=true" >> $GITHUB_ENV
-          else
-            echo "key_exists=false" >> $GITHUB_ENV
-          fi
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        with:
+          script: |
+            const comment = context.payload.comment.body.trim();
+            const issue_number = context.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            let deploymentType = null;
 
-      - name: Generate and Upload SSH Key Pair
-        if: env.key_exists == 'false'
-        env:
-          GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
-        run: |
-          # Generate SSH key pair
-          ssh-keygen -t ed25519 -f deploy_key -N "" -C "argocd-deploy-key"
-          PRIVATE_KEY=$(base64 -w 0 deploy_key)
-          PUBLIC_KEY=$(cat deploy_key.pub)
-      
-          # Upload secrets
-          gh secret set ARGOCD_DEPLOY_PRIVATE_KEY --body "$PRIVATE_KEY"
-          gh secret set ARGOCD_DEPLOY_PUBLIC_KEY --body "$PUBLIC_KEY"
-      
-          echo "SSH key pair generated and uploaded as secrets."
-      
-          # Make PUBLIC_KEY available to later steps
-          echo "PUBLIC_KEY=${PUBLIC_KEY}" >> $GITHUB_ENV
-        
+            if (comment === '/install-k3s') {
+              deploymentType = 'k3s';
+            } else if (comment === '/proxmox-single') {
+              deploymentType = 'proxmox-single';
+            } else if (comment === '/proxmox-multi') {
+              deploymentType = 'proxmox-multi';
+            }
 
-      - name: Debug Public Key
-        if: env.key_exists == 'false'
-        run: |
-          echo "Public Key: $PUBLIC_KEY"
+            if (deploymentType) {
+              // Save deployment type as a secret
+              const execSync = require('child_process').execSync;
+              execSync(`gh secret set DEPLOYMENT_TYPE --body "${deploymentType}"`, { stdio: 'inherit' });
 
-      - name: Register Deploy Key in Repository
-        if: env.key_exists == 'false'
+              await github.rest.issues.createComment({
+                issue_number,
+                owner,
+                repo,
+                body: `✅ Deployment type set to \`${deploymentType}\`. Now validating secrets...`
+              });
+              core.setOutput('trigger_validation', 'true');
+            }
+      - name: Trigger validate-secrets workflow
+        if: steps.handle-deployment.outputs.trigger_validation == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         run: |
           curl -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/keys \
-            -d '{
-              "title": "ArgoCD Deploy Key",
-              "key": "'"$PUBLIC_KEY"'",
-              "read_only": false
-            }'
-
-      - name: Acknowledge command
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "🚀 Initiating K3s installation via GitHub Actions..."
-            });
-
-      - name: Trigger Terraform Infrastructure Workflow
-        run: |
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.PAT_GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/actions/workflows/install_k3s.yml/dispatches \
-            -d '{"ref":"main", "inputs": {"triggered_by": "issue_comment"}}'
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/validate-secrets.yml/dispatches \
+            -d '{"ref":"main"}'
