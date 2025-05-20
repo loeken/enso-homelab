@@ -44,6 +44,9 @@ RUN sed -i 's#/bin/sh#/bin/zsh#g' /etc/passwd
 # Install Renovate globally via npm
 RUN npm install -g renovate
 
+# permissions set
+RUN chown -R enso:enso /home/enso
+
 USER enso
 
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
@@ -64,6 +67,8 @@ ENV EDITOR=nano
 
 # copy default .zshrc to load plugins installed above
 COPY deploy/docker/.zshrc /home/enso/.zshrc
+
+COPY deploy .
 
 # Default command for devcontainer to stay alive
 CMD ["tail", "-f", "/dev/null"]

@@ -34,17 +34,50 @@ jobs:
               title: "📝 Welcome! Let's deploy your homelab 🚀",
               body:
                 "👋 Welcome to your new **ensō-homelab**!\n\n" +
+                "## 🛡️ Required Secrets\n\n" +
+                "Set **all** of these secrets before choosing your deployment type:\n\n" +
+                "- `DEPLOYMENT_TYPE`\n" +
+                "- `SSH_USERNAME`\n" +
+                "- `SSH_SERVER_ADDRESS`\n" +
+                "- `SSH_INTERNAL_ADDRESS`\n" +
+                "- `SSH_SERVER_PORT`\n" +
+                "- `SSH_PRIVATE_KEY`\n" +
+                "- `TF_TOKEN_app_terraform_io`\n" +
+                "- `HOSTNAME`\n" +
+                "- `TF_CLOUD_ORGANIZATION`\n" +
+                "- `PAT_GITHUB_TOKEN`\n" +
+                "- `RENOVATE_TOKEN`\n\n" +
+                "**Example:**\n" +
+                "```sh\n" +
+                "gh secret set DEPLOYMENT_TYPE --body \"your-deployment-type\"\n" +
+                "gh secret set SSH_USERNAME --body \"your-username\"\n" +
+                "gh secret set SSH_SERVER_ADDRESS --body \"your-server-address\"\n" +
+                "gh secret set SSH_INTERNAL_ADDRESS --body \"your-internal-address\"\n" +
+                "gh secret set SSH_SERVER_PORT --body \"your-ssh-port\"\n" +
+                "gh secret set SSH_PRIVATE_KEY --body \"$(cat ~/.ssh/id_ed25519 | base64)\"\n" +
+                "gh secret set TF_TOKEN_app_terraform_io --body \"your-tf-cloud-token\"\n" +
+                "gh secret set HOSTNAME --body \"your-hostname\"\n" +
+                "gh secret set TF_CLOUD_ORGANIZATION --body \"your-tf-org\"\n" +
+                "gh secret set PAT_GITHUB_TOKEN --body \"your-github-token\"\n" +
+                "gh secret set RENOVATE_TOKEN --body \"your-renovate-token\"\n" +
+                "```\n\n" +
+                "---\n\n" +
                 "## 🚦 Choose your deployment path\n\n" +
                 "Comment one of the following to select your deployment type:\n\n" +
                 "- `/install-k3s` (Baremetal K3s)\n" +
                 "- `/proxmox-single` (Proxmox Single Node)\n" +
-                "- `/proxmox-multi` (Proxmox Multi Node)\n"
+                "- `/proxmox-multi` (Proxmox Multi Node)\n\n" +
+                "---\n\n" +
+                "Once your secrets are set, comment your deployment type above to continue. The workflow will validate your secrets before proceeding and generate a values.yaml.example for you.\n"
             });
 
   respond-to-comments:
     if: github.event_name == 'issue_comment' && contains(github.event.issue.title, 'Welcome! Let')
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Handle deployment type selection
         id: handle-deployment
         uses: actions/github-script@v7
@@ -82,6 +115,7 @@ jobs:
               });
               core.setOutput('trigger_validation', 'true');
             }
+
       - name: Trigger validate-secrets workflow
         if: steps.handle-deployment.outputs.trigger_validation == 'true'
         env:
@@ -92,3 +126,44 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/actions/workflows/validate-secrets.yml/dispatches \
             -d '{"ref":"main"}'
+
+      - name: Upload values.yaml using gh CLI (only if not exists)
+        env:
+          GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        run: |
+          if [ ! -f deploy/argocd/values.yaml ]; then
+            USERNAME="${GITHUB_REPOSITORY%/*}"
+            REPONAME="${GITHUB_REPOSITORY#*/}"
+            mkdir -p deploy/argocd
+            cp deploy/argocd/values.yaml.example deploy/argocd/values.yaml.tmp
+            sed -i "s/loeken/${USERNAME}/g" deploy/argocd/values.yaml.tmp
+            sed -i "s/enso-homelab/${REPONAME}/g" deploy/argocd/values.yaml.tmp
+            mv deploy/argocd/values.yaml.tmp deploy/argocd/values.yaml
+
+            CONTENT_B64=$(base64 -w 0 deploy/argocd/values.yaml)
+            COMMIT_MSG="Add values.yaml with repo info"
+            BRANCH="main"
+            FILEPATH="deploy/argocd/values.yaml"
+
+            # Get the SHA if the file already exists (for update)
+            SHA=$(gh api repos/${GITHUB_REPOSITORY}/contents/${FILEPATH} --jq .sha || echo "")
+
+            if [ -z "$SHA" ]; then
+              gh api repos/${GITHUB_REPOSITORY}/contents/${FILEPATH} \
+                --method PUT \
+                -H "Accept: application/vnd.github+json" \
+                -f message="$COMMIT_MSG" \
+                -f content="$CONTENT_B64" \
+                -f branch="$BRANCH"
+            else
+              gh api repos/${GITHUB_REPOSITORY}/contents/${FILEPATH} \
+                --method PUT \
+                -H "Accept: application/vnd.github+json" \
+                -f message="$COMMIT_MSG" \
+                -f content="$CONTENT_B64" \
+                -f branch="$BRANCH" \
+                -f sha="$SHA"
+            fi
+          else
+            echo "deploy/argocd/values.yaml already exists, skipping upload."
+          fi
