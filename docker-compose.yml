@@ -10,9 +10,10 @@ services:
       - enso-homelab-network
     volumes:
       #- ${HOME}/.config/gh:/home/enso/.config/gh
-      - ${HOME}/.ssh:/home/enso/.ssh
-      #- ${HOME}/.zhistory:/home/enso/.zhistory
-      #- ${HOME}/.zshrc:/home/enso/.zshrc
+      - ./deploy:/home/enso/enso-homelab/deploy
+      - ${HOME}/.ssh/id_ed25519:/home/enso/.ssh/id_ed25519:ro
+      # - ${HOME}/.zhistory:/home/enso/.zhistory
+      # - ${HOME}/.zshrc:/home/enso/.zshrc
       - ./:/home/enso/enso-homelab
       #- /var/run/docker.sock:/var/run/docker.sock
       #- /home/loeken/.terraform.d/:/home/enso/.terraform.d/

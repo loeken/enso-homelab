@@ -32,7 +32,7 @@ jobs:
 
       - name: Build and start devcontainer
         run: |
-          docker-compose up --force-recreate --build --remove-orphans 
+          docker-compose up -d --force-recreate --build --remove-orphans 
 
       - name: Wait for container to be ready
         run: |
