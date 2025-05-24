@@ -17,12 +17,6 @@
       - gpg
     state: present
 
-- name: Disable Proxmox enterprise repo (if present)
-  ansible.builtin.shell: |
-    if [ -f /etc/apt/sources.list.d/pve-enterprise.list ]; then
-      sed -i 's/^deb/#deb/' /etc/apt/sources.list.d/pve-enterprise.list
-    fi
-  changed_when: false
 - name: Add Proxmox apt GPG key
   ansible.builtin.apt_key:
     url: "https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg"

@@ -1,0 +1,13 @@
+# This file is managed by Ansible
+
+auto lo
+iface lo inet loopback
+
+auto {{ primary_interface }}
+iface {{ primary_interface }} inet manual
+
+auto vmbr0
+iface vmbr0 inet dhcp
+    bridge-ports {{ primary_interface }}
+    bridge-stp off
+    bridge-fd 0

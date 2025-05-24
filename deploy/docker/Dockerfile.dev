@@ -1,7 +1,7 @@
 FROM golang:1.24-alpine@sha256:ef18ee7117463ac1055f5a370ed18b8750f01589f13ea0b48642f5792b234044
 
 # Set working directory
-WORKDIR /home/enso/
+WORKDIR /home/devcontainer
 
 # Install required packages
 RUN apk add --no-cache \
@@ -28,12 +28,10 @@ RUN apk add --no-cache \
     gcc \
     linux-headers \
     python3-dev \
-    gcc \
     musl-dev \
-    linux-headers \
     py3-passlib
 
-# pip install as we only use this in one ansible playbook we bypass 
+# Install passlib via pip to support Ansible's password hashing
 RUN pip3 install --break-system-packages passlib
 
 # Install k3sup
@@ -42,54 +40,42 @@ RUN cd /tmp && curl -sLS https://get.k3sup.dev | sh
 # Install act
 RUN curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
 
-# Create non-root user "enso" with passwordless sudo
-RUN adduser -D enso && echo "enso ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/enso
-
-# Ensure working directory exists and is owned by "enso"
-RUN mkdir -p $GOPATH /home/enso/enso-homelab && chown -R enso:enso $GOPATH /home/enso/enso-homelab
-
 # Set up zsh as default shell
 RUN sed -i 's#/bin/sh#/bin/zsh#g' /etc/passwd
 
 # Install Renovate globally via npm
 RUN npm install -g renovate
 
-# permissions set
-RUN mkdir /venv
-RUN chown -R enso:enso /venv
-RUN chown -R enso:enso /home/enso
-
-USER enso
-
-RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /home/enso/.oh-my-zsh/custom/themes/powerlevel10k && \
-    git clone https://github.com/zsh-users/zsh-autosuggestions /home/enso/.oh-my-zsh/custom/plugins/zsh-autosuggestions && \
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting /home/enso/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
-
-# Install Terraform manually from HashiCorp
-RUN git clone https://github.com/tfutils/tfenv.git ~/.tfenv \
- && sudo ln -s ~/.tfenv/bin/* /usr/local/bin \
- && sudo tfenv install
-
-
-# copy default .zshrc to load plugins installed above
-COPY deploy/docker/.zshrc /home/enso/.zshrc
-
-RUN mkdir /home/enso/.ssh
-
-# Create a venv at /venv (if not already done)
+# Create a virtualenv for OpenStack CLI
 RUN python3 -m venv /venv
 
-# Install OpenStack CLI + passlib inside the venv
+# Install OpenStack CLI into venv
 RUN . /venv/bin/activate && \
     pip install --upgrade pip && \
     pip install openstackclient
 
-# Set GOPATH and update PATH
-ENV HOME="/home/enso"
+# Optional SSH folder
+RUN mkdir -p /root/.ssh
+
+# Set environment
+ENV HOME="/root"
 ENV GOPATH="$HOME/go"
 ENV PATH="$GOPATH/bin:/venv/bin:$PATH"
 ENV EDITOR=nano
 
-# Default command for devcontainer to stay alive
+# Install Terraform manually from HashiCorp
+RUN git clone https://github.com/tfutils/tfenv.git ~/.tfenv \
+ && ln -s ~/.tfenv/bin/* /usr/local/bin \
+ && tfenv install
+
+# Oh My Zsh + Powerlevel10k + plugins
+RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k && \
+    git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions && \
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+
+# Copy ZSH config
+COPY deploy/docker/.zshrc /root/.zshrc
+
+# Default command
 CMD ["tail", "-f", "/dev/null"]

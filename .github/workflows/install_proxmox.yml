@@ -14,7 +14,6 @@ jobs:
 
     container:
       image: loeken/enso-devcontainer:latest
-      options: --user 1000:1000
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
@@ -26,12 +25,25 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_ed25519
+          echo "$SSH_PUBLIC_KEY" | base64 -d > ~/.ssh/id_ed25519.pub
           chmod 600 ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519.pub
+          
           echo "SSH key installed"
-          ls -l ~/.ssh
+
+      - name: Check if SSH port is reachable
+        run: |
+          echo "Testing SSH connectivity to 94.134.58.210:60023..."
+          if nc -zv 94.134.58.210 60023; then
+            echo "✅ Port 60023 on 94.134.58.210 is reachable."
+          else
+            echo "❌ Cannot connect to 94.134.58.210:60023 — check firewall or port forwarding."
+            exit 1
+          fi
 
       - name: Run Ansible Playbook
         run: |
           ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
+            --private-key ~/.ssh/id_ed25519 \
             -i ./deploy/ansible/proxmox/inventory \
             ./deploy/ansible/proxmox/base.yml

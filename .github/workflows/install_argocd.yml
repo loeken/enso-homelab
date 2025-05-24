@@ -27,7 +27,7 @@ jobs:
 
       - name: Validate required secrets
         uses: ./.github/workflows/validate-secrets.yml
-        secrets:
+        env:
           ARGOCD_DEPLOY_PRIVATE_KEY: ${{ secrets.ARGOCD_DEPLOY_PRIVATE_KEY }}
           ARGOCD_DEPLOY_PUBLIC_KEY: ${{ secrets.ARGOCD_DEPLOY_PUBLIC_KEY }}
           KUBECONFIG: ${{ secrets.KUBECONFIG }}

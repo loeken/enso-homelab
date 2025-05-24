@@ -4,28 +4,17 @@
   register: kernel_version
   changed_when: false
 
-- name: Add Proxmox APT source
-  ansible.builtin.copy:
-    dest: /etc/apt/sources.list.d/pve-install-repo.list
-    content: "deb [arch=amd64] http://download.proxmox.com/debian/pve bookworm pve-no-subscription"
-    mode: '0644'
-    backup: true
+- name: Ensure Proxmox no-subscription repo is present
+  ansible.builtin.lineinfile:
+    path: /etc/apt/sources.list.d/pve-no-subscription.list
+    line: "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription"
+    create: yes
 
 - name: Download Proxmox GPG key
   ansible.builtin.get_url:
     url: https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg
     dest: /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
     mode: '0644'
-
-- name: Remove Proxmox enterprise repo if present
-  ansible.builtin.file:
-    path: /etc/apt/sources.list.d/pve-enterprise.list
-    state: absent
-
-- name: Remove Proxmox Enterprise repository file
-  ansible.builtin.file:
-    path: /etc/apt/sources.list.d/pve-enterprise.list
-    state: absent
 
 - name: Remove enterprise.proxmox.com lines from /etc/apt/sources.list
   ansible.builtin.lineinfile:
@@ -75,14 +64,35 @@
     - vfio_pci
     - vfio_virqfd
 
-- name: Remove current kernel if not a Proxmox kernel
-  ansible.builtin.apt:
-    name: "linux-image-{{ kernel_version.stdout }}"
-    state: absent
-  when: "'pve' not in kernel_version.stdout"
-
 - name: Update GRUB config
   ansible.builtin.command: update-grub
+
+- name: Gather facts for interface detection
+  ansible.builtin.setup:
+    gather_subset:
+      - network
+
+- name: Identify physical interfaces and sort them
+  ansible.builtin.set_fact:
+    physical_interfaces: "{{ ansible_facts.interfaces | reject('match', '^(lo|wlo.*|vmbr.*|tap.*)$') | list | sort }}"
+
+- name: Identify the primary interface
+  ansible.builtin.set_fact:
+    primary_interface: "{{ physical_interfaces | first }}"
+
+- name: Write network interface config with vmbr0
+  ansible.builtin.template:
+    src: interfaces.j2
+    dest: /etc/network/interfaces
+    mode: '0644'
+  register: network_interface
+
+- name: Restart networking after bridge config
+  ansible.builtin.systemd:
+    name: networking
+    state: restarted
+    daemon_reload: true
+  when: network_interface.changed
 
 - name: Remove old SSH key from known_hosts
   ansible.builtin.shell: |
@@ -91,9 +101,17 @@
   delegate_to: localhost
   changed_when: false
 
-- name: Reboot system if required
-  ansible.builtin.reboot:
+- name: Reboot the system (non-blocking)
+  ansible.builtin.shell: |
+    sleep 2 && reboot
+  async: 1
+  poll: 0
+  ignore_errors: true
   when: "'pve' not in kernel_version.stdout"
+
+- name: Pause to let system start rebooting
+  ansible.builtin.pause:
+    seconds: 90
 
 - name: Wait for node to become reachable
   ansible.builtin.wait_for:
@@ -102,9 +120,15 @@
     delay: 3
     timeout: 300
 
-# - name: Re-add SSH host key to known_hosts
-#   ansible.builtin.known_hosts:
-#     path: "{{ lookup('env', 'HOME') + '/.ssh/known_hosts' }}"
-#     name: "{{ ansible_host }}"
-#     key: "{{ lookup('pipe', 'ssh-keyscan -t ecdsa ' + ansible_host) }}"
-#   delegate_to: localhost
+- name: Remove current kernel if not a Proxmox kernel
+  ansible.builtin.apt:
+    name: "linux-image-{{ kernel_version.stdout }}"
+    state: absent
+  when: "'pve' not in kernel_version.stdout"
+
+- name: Disable Proxmox enterprise repo (if present)
+  ansible.builtin.shell: |
+    if [ -f /etc/apt/sources.list.d/pve-enterprise.list ]; then
+      sed -i 's/^deb/#deb/' /etc/apt/sources.list.d/pve-enterprise.list
+    fi
+  changed_when: false
