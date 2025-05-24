@@ -47,3 +47,14 @@ jobs:
             --private-key ~/.ssh/id_ed25519 \
             -i ./deploy/ansible/proxmox/inventory \
             ./deploy/ansible/proxmox/base.yml
+
+      - name: Comment on onboarding issue
+        env:
+          GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        run: |
+          ISSUE_NUMBER=$(gh issue list --search "Welcome! Let's deploy your homelab" --state open --json number -q '.[0].number')
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh issue comment "$ISSUE_NUMBER" --body "✅ Proxmox server is now up and operational! Please run \`./install-k3s-vms\` to continue."
+          else
+            echo "No onboarding issue found."
+          fi

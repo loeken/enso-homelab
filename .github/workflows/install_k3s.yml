@@ -1,28 +1,29 @@
-name: Validate Required Secrets
+name: Install k3s
 
 on:
-  workflow_call:
-    inputs: {}
-    secrets:
-      SSH_USERNAME: {}
-      SSH_SERVER_ADDRESS: {}
-      SSH_INTERNAL_ADDRESS: {}
-      SSH_SERVER_PORT: {}
-      SSH_PRIVATE_KEY: {}
-      TF_TOKEN_app_terraform_io: {}
-      HOSTNAME: {}
-      TF_CLOUD_ORGANIZATION: {}
-      KUBECONFIG: {}
-      PAT_GITHUB_TOKEN: {}
-      RENOVATE_TOKEN: {}
-      # Add any other secrets you want to validate
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      triggered_by:
+        description: 'Source of the trigger'
+        required: false
+        default: 'manual'
+      
+permissions:
+  contents: read
+
 jobs:
-  validate-secrets:
+  install-k3s:
     runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.set-status.outputs.status }}
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_app_terraform_io }}
+      TF_CLI_CONFIG_FILE: ${{ github.workspace }}/.terraformrc
+      TF_WORKSPACE: k3s-prod
+      TF_CLOUD_ORGANIZATION: ${{ secrets.TF_CLOUD_ORGANIZATION }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Validate required secrets
         run: .github/scripts/validate-secrets.sh
@@ -35,7 +36,212 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_app_terraform_io }}
           HOSTNAME: ${{ secrets.HOSTNAME }}
-          TF_CLOUD_ORGANIZATION: ${{ secrets.TF_CLOUD_ORGANIZATION }}
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}
-          PAT_GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
-          RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: latest
+
+      - name: Install k3sup
+        run: curl -sLS https://get.k3sup.dev | sh
+
+      - name: Set external IP
+        run: |
+          if [ "${ACT}" = "true" ]; then
+            echo "EXTERNAL_IP=$(curl -s ifconfig.co -4)" >> "$GITHUB_ENV"
+            echo "INTERNAL_IP=${{ secrets.SSH_SERVER_ADDRESS }}" >> "$GITHUB_ENV"
+          else
+            echo "EXTERNAL_IP=${{ secrets.SSH_SERVER_ADDRESS }}" >> "$GITHUB_ENV"
+            echo "INTERNAL_IP=${{ secrets.SSH_INTERNAL_ADDRESS }}" >> "$GITHUB_ENV"
+          fi
+          echo "TF_CLOUD_ORGANIZATION=${{ secrets.TF_CLOUD_ORGANIZATION }}" >> "$GITHUB_ENV"
+
+      - name: Write kubeconfig.yaml from secret
+        working-directory: deploy/terraform/k3s
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
+          sed -i 's|server: https://.*:6443|server: https://127.0.0.1:6443|' kubeconfig.yaml
+
+      - name: Start SSH tunnel to k3s API
+        working-directory: deploy/terraform/k3s
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > /tmp/id_ed25519
+          chmod 600 /tmp/id_ed25519
+          nohup ssh -o StrictHostKeyChecking=no -i /tmp/id_ed25519 -N -L 127.0.0.1:6443:${{ env.INTERNAL_IP }}:6443 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER_ADDRESS }} -p ${{ secrets.SSH_SERVER_PORT }} > /dev/null 2>&1 &
+          echo $! > ssh_tunnel.pid
+
+      - name: Ensure Terraform Cloud workspace exists and set to local execution
+        run: |
+          echo "Checking or creating workspace: ${TF_WORKSPACE}"
+
+          # Create the workspace if it doesn't exist
+          PAYLOAD=$(cat <<EOF
+          {
+            "data": {
+              "attributes": {
+                "name": "${TF_WORKSPACE}",
+                "auto-apply": true
+              },
+              "type": "workspaces"
+            }
+          }
+          EOF
+          )
+
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${TF_TOKEN_app_terraform_io}" \
+            -H "Content-Type: application/vnd.api+json" \
+            -d "$PAYLOAD" \
+            https://app.terraform.io/api/v2/organizations/${TF_CLOUD_ORGANIZATION}/workspaces)
+
+          if [[ "$RESPONSE" == "201" ]]; then
+            echo "✅ Workspace ${TF_WORKSPACE} created."
+          elif [[ "$RESPONSE" == "422" ]]; then
+            echo "ℹ️  Workspace ${TF_WORKSPACE} already exists."
+          else
+            echo "❌ Unexpected response from Terraform Cloud API: HTTP $RESPONSE"
+            exit 1
+          fi
+
+          # Get the workspace ID
+          WORKSPACE_ID=$(curl -s \
+            -H "Authorization: Bearer ${TF_TOKEN_app_terraform_io}" \
+            -H "Content-Type: application/vnd.api+json" \
+            https://app.terraform.io/api/v2/organizations/${TF_CLOUD_ORGANIZATION}/workspaces/${TF_WORKSPACE} | jq -r '.data.id')
+
+          echo "Workspace ID: $WORKSPACE_ID"
+
+          # Set the workspace to use local execution mode
+          PATCH_PAYLOAD=$(cat <<EOF
+          {
+            "data": {
+              "type": "workspaces",
+              "attributes": {
+                "execution-mode": "local"
+              }
+            }
+          }
+          EOF
+          )
+
+          PATCH_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH \
+            -H "Authorization: Bearer ${TF_TOKEN_app_terraform_io}" \
+            -H "Content-Type: application/vnd.api+json" \
+            -d "$PATCH_PAYLOAD" \
+            https://app.terraform.io/api/v2/workspaces/${WORKSPACE_ID})
+
+          if [[ "$PATCH_RESPONSE" == "200" ]]; then
+            echo "✅ Workspace execution mode set to local."
+          else
+            echo "❌ Failed to set execution mode: HTTP $PATCH_RESPONSE"
+            exit 1s
+          fi
+
+
+
+      - name: Configure Terraform local execution
+        working-directory: deploy/terraform/k3s
+        run: |
+          cat <<EOF > ${{ github.workspace }}/.terraformrc
+          credentials "app.terraform.io" {
+            token = "${TF_TOKEN_app_terraform_io}"
+          }
+          EOF
+
+      - name: Generate auto.tfvars from secrets
+        working-directory: deploy/terraform/k3s
+        run: |
+          cat <<EOF > github.auto.tfvars
+          ssh_username        = "${{ secrets.SSH_USERNAME }}"
+          ssh_server_address  = "${{ secrets.SSH_SERVER_ADDRESS }}"
+          ssh_server_port     = "${{ secrets.SSH_SERVER_PORT }}"
+          ssh_private_key     = "${{ secrets.SSH_PRIVATE_KEY }}"
+          internal_ip         = "${{ env.INTERNAL_IP }}"
+          external_ip         = "${{ env.EXTERNAL_IP }}"
+          hostname            = "${{ secrets.HOSTNAME }}"
+          storage             = "local-path"
+          EOF
+
+      - name: Terraform Init
+        working-directory: deploy/terraform/k3s
+        run: terraform init -input=false
+
+      - name: Terraform Plan
+        working-directory: deploy/terraform/k3s
+        run: terraform plan -input=false
+
+      - name: Terraform Apply
+        working-directory: deploy/terraform/k3s
+        run: terraform apply -auto-approve -input=false
+
+
+      - name: Check if kubeconfig exists
+        id: check_kubeconfig
+        run: |
+          if [ -f deploy/terraform/k3s/kubeconfig ]; then
+            echo "Kubeconfig file exists."
+            echo "kubeconfig_exists=true" >> $GITHUB_ENV
+          else
+            echo "Kubeconfig file does not exist."
+            echo "kubeconfig_exists=false" >> $GITHUB_ENV
+          fi
+
+      - name: Copy kubeconfig to host or upload as artifact
+        if: env.kubeconfig_exists == 'true'
+        run: |
+          if [ "${ACT}" = "true" ]; then
+            cp deploy/terraform/k3s/kubeconfig /output/kubeconfig
+          else
+            cp deploy/terraform/k3s/kubeconfig kubeconfig
+          fi
+
+      - name: Upload kubeconfig artifact (only in GitHub Actions)
+        if: env.kubeconfig_exists == 'true' && env.ACT != 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: kubeconfig
+          path: kubeconfig
+          retention-days: 1
+
+      - name: Save kubeconfig as GitHub Secret
+        if: env.kubeconfig_exists == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        run: |
+          if [ -f kubeconfig ]; then
+            echo "✅ kubeconfig file found."
+
+            # Checksum for debug
+            echo "📦 kubeconfig SHA256:"
+            sha256sum kubeconfig || shasum -a 256 kubeconfig
+
+            # Encode using platform-agnostic base64 (collapse newlines)
+            if base64 --help 2>&1 | grep -q -- '-w'; then
+              base64 -w 0 kubeconfig > kubeconfig.b64
+            else
+              base64 kubeconfig | tr -d '\n' > kubeconfig.b64
+            fi
+
+            echo "✅ Base64 encoding complete."
+
+            # Optional preview (first 80 chars only for sanity check)
+            echo "🔐 Preview:"
+            head -c 80 kubeconfig.b64 && echo "... (truncated)"
+
+            # Set GitHub secret using CLI
+            gh secret set KUBECONFIG < kubeconfig.b64
+
+            echo "✅ GitHub secret 'KUBECONFIG' updated."
+          else
+            echo "❌ kubeconfig file not found!"
+            exit 1
+          fi
+
+      - name: Stop SSH tunnel
+        working-directory: deploy/terraform/k3s
+        if: always()
+        run: |
+          if [ -f ssh_tunnel.pid ]; thens
+            kill $(cat ssh_tunnel.pid) || true
+            rm -f ssh_tunnel.pid
+          fi
