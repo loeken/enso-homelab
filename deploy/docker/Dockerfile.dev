@@ -1,7 +1,7 @@
 FROM golang:1.24-alpine@sha256:ef18ee7117463ac1055f5a370ed18b8750f01589f13ea0b48642f5792b234044
 
 # Set working directory
-WORKDIR /home/enso/enso-homelab
+WORKDIR /home/enso/
 
 # Install required packages
 RUN apk add --no-cache \
@@ -24,7 +24,17 @@ RUN apk add --no-cache \
     zsh \
     nodejs \
     npm \
-    nano
+    nano \
+    gcc \
+    linux-headers \
+    python3-dev \
+    gcc \
+    musl-dev \
+    linux-headers \
+    py3-passlib
+
+# pip install as we only use this in one ansible playbook we bypass 
+RUN pip3 install --break-system-packages passlib
 
 # Install k3sup
 RUN cd /tmp && curl -sLS https://get.k3sup.dev | sh
@@ -45,6 +55,8 @@ RUN sed -i 's#/bin/sh#/bin/zsh#g' /etc/passwd
 RUN npm install -g renovate
 
 # permissions set
+RUN mkdir /venv
+RUN chown -R enso:enso /venv
 RUN chown -R enso:enso /home/enso
 
 USER enso
@@ -59,16 +71,25 @@ RUN git clone https://github.com/tfutils/tfenv.git ~/.tfenv \
  && sudo ln -s ~/.tfenv/bin/* /usr/local/bin \
  && sudo tfenv install
 
-# Set GOPATH and update PATH
-ENV HOME="/home/enso"
-ENV GOPATH="$HOME/go"
-ENV PATH="$GOPATH/bin:$PATH"
-ENV EDITOR=nano
 
 # copy default .zshrc to load plugins installed above
 COPY deploy/docker/.zshrc /home/enso/.zshrc
 
-COPY deploy .
+RUN mkdir /home/enso/.ssh
+
+# Create a venv at /venv (if not already done)
+RUN python3 -m venv /venv
+
+# Install OpenStack CLI + passlib inside the venv
+RUN . /venv/bin/activate && \
+    pip install --upgrade pip && \
+    pip install openstackclient
+
+# Set GOPATH and update PATH
+ENV HOME="/home/enso"
+ENV GOPATH="$HOME/go"
+ENV PATH="$GOPATH/bin:/venv/bin:$PATH"
+ENV EDITOR=nano
 
 # Default command for devcontainer to stay alive
 CMD ["tail", "-f", "/dev/null"]

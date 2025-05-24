@@ -1,9 +1,9 @@
 name: Proxmox Convert & Template
 
 on:
+  workflow_dispatch:
   issue_comment:
     types: [created]
-  workflow_dispatch:
 
 jobs:
   run-proxmox-ansible:
@@ -12,43 +12,26 @@ jobs:
       (github.event.issue.pull_request == null && contains(github.event.comment.body, '/convert-to-proxmox'))
     runs-on: ubuntu-latest
 
+    container:
+      image: loeken/enso-devcontainer:latest
+      options: --user 1000:1000
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Install Docker Compose
+      - name: Set up SSH key inside container
         run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "SSH key installed"
+          ls -l ~/.ssh
 
-      - name: Prepare .ssh key file on host
+      - name: Run Ansible Playbook
         run: |
-          mkdir -p $HOME/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > $HOME/.ssh/id_ed25519
-          chmod 600 $HOME/.ssh/id_ed25519
-
-      - name: Build and start devcontainer
-        run: |
-          docker-compose up -d --force-recreate --build --remove-orphans 
-
-      - name: Wait for container to be ready
-        run: |
-          for i in {1..10}; do
-            docker-compose exec -T enso-homelab true && break || sleep 2
-          done
-
-      - name: Run Ansible Playbook inside container
-        run: |
-          docker-compose exec -T enso-homelab \
-            env ANSIBLE_HOST_KEY_CHECKING=False \
-            ansible-playbook \
-              -i /home/enso/enso-homelab/deploy/ansible/proxmox/inventory \
-              /home/enso/enso-homelab/deploy/ansible/proxmox/base.yml
-        shell: bash
-
-      - name: Tear down devcontainer
-        if: always()
-        run: docker-compose down -v
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
+            -i ./deploy/ansible/proxmox/inventory \
+            ./deploy/ansible/proxmox/base.yml
