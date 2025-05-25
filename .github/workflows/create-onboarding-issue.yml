@@ -154,7 +154,19 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/actions/workflows/validate-proxmox-inventory.yml/dispatches \
             -d '{"ref":"main"}'
+      - name: Prepare and preview values.yaml
+        run: |
+          USERNAME="${GITHUB_REPOSITORY%/*}"
+          REPONAME="${GITHUB_REPOSITORY#*/}"
+          mkdir -p deploy/argocd
+          cp deploy/argocd/values.yaml.example deploy/argocd/values.yaml.tmp
+          sed -i "s/loeken/${USERNAME}/g" deploy/argocd/values.yaml.tmp
+          sed -i "s/enso-homelab/${REPONAME}/g" deploy/argocd/values.yaml.tmp
 
+          echo "📄 Contents of values.yaml (to be uploaded):"
+          echo "────────────────────────────────────────────"
+          cat deploy/argocd/values.yaml.tmp
+          echo "────────────────────────────────────────────"
       - name: Upload values.yaml using gh CLI (only if not exists)
         env:
           GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
@@ -172,7 +184,6 @@ jobs:
             COMMIT_MSG="Add values.yaml with repo info"
             BRANCH="main"
             FILEPATH="deploy/argocd/values.yaml"
-
             SHA=$(gh api repos/${GITHUB_REPOSITORY}/contents/${FILEPATH} --jq .sha || echo "")
 
             gh api repos/${GITHUB_REPOSITORY}/contents/${FILEPATH} \
@@ -184,3 +195,4 @@ jobs:
               ${SHA:+-f sha="$SHA"}
           else
             echo "deploy/argocd/values.yaml already exists, skipping upload."
+          fi
