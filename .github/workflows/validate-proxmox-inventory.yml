@@ -1,0 +1,97 @@
+name: Validate Proxmox Inventory
+
+on:
+  workflow_dispatch:
+
+jobs:
+  validate-inventory:
+    runs-on: ubuntu-latest
+
+    container:
+      image: loeken/enso-devcontainer:latest
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key inside container
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "SSH key installed"
+
+      - name: Validate inventory file and structure
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          INV=deploy/ansible/proxmox/inventory
+          REQUIRED_ARGS=(ansible_host= ansible_port= ansible_user= is_master= ssh_internal_address=)
+
+          echo "📄 DEBUG 1"
+          echo "📄 Validating inventory file: $INV"
+          echo "--- FILE CONTENT START ---"
+          cat "$INV"
+          echo "--- FILE CONTENT END ---"
+
+          echo "📄 DEBUG 2"
+          SERVERGROUPS=$(egrep '^\[.*\]' "$INV" | wc -l)
+          echo "🔍 Found group count: $SERVERGROUPS"
+
+          if [ "$SERVERGROUPS" -ne 1 ]; then
+            echo "❌ Inventory must contain exactly one group. Found: $SERVERGROUPS"
+            exit 1
+          fi
+
+          echo "📄 DEBUG 3"
+          echo "🔧 Beginning validation of each host line..."
+
+          while IFS= read -r line || [[ -n "$line" ]]; do
+            echo "📄 DEBUG 4"
+            echo ">>> DEBUG: read line: [$line]"
+            [[ "$line" =~ ^\[.*\]$ ]] && echo "🟡 Skipping group line: $line" && continue
+            [[ "$line" =~ ^---$ ]] && echo "🟠 Skipping YAML separator: $line" && continue
+            [[ -z "$line" ]] && echo "⚪ Skipping empty line" && continue
+
+            echo "🔎 Checking line: $line"
+            HOST=$(echo "$line" | awk '{print $1}')
+            echo "➡️ Host detected: $HOST"
+
+            if ! echo "$HOST" | grep -q '\.'; then
+              echo "❌ Host '$HOST' is not a valid FQDN. Line: $line"
+              exit 1
+            else
+              echo "✅ FQDN check passed for $HOST"
+            fi
+
+            for arg in "${REQUIRED_ARGS[@]}"; do
+              if echo "$line" | grep -q "$arg"; then
+                echo "✅ Found required argument: $arg"
+              else
+                echo "❌ Host '$HOST' missing required argument: $arg. Line: $line"
+                exit 1
+              fi
+            done
+          done < "$INV"
+
+          echo "✅ Inventory validation completed successfully."
+
+      - name: Run Ansible ping to verify SSH connectivity
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+        run: |
+          export ANSIBLE_PRIVATE_KEY_FILE=~/.ssh/id_ed25519
+          echo "🔗 Running Ansible ping check..."
+          ansible all -i deploy/ansible/proxmox/inventory -m ping
+
+      - name: Trigger Proxmox install workflow if deployment type is proxmox-single
+        if: ${{ env.DEPLOYMENT_TYPE == 'proxmox-single' }}
+        env:
+          GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+          DEPLOYMENT_TYPE: ${{ secrets.DEPLOYMENT_TYPE }}
+        run: |
+          echo "DEPLOYMENT_TYPE is proxmox-single, triggering install_proxmox.yml workflow..."
+          gh workflow run install_proxmox.yml

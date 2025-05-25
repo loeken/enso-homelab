@@ -19,6 +19,15 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+      - name: Set external IP
+        run: |
+          if [ "${ACT}" = "true" ]; then
+            echo "EXTERNAL_IP=$(curl -s ifconfig.co -4)" >> "$GITHUB_ENV"
+            echo "INTERNAL_IP=${{ secrets.SSH_SERVER_ADDRESS }}" >> "$GITHUB_ENV"
+          else
+            echo "EXTERNAL_IP=${{ secrets.SSH_SERVER_ADDRESS }}" >> "$GITHUB_ENV"
+            echo "INTERNAL_IP=${{ secrets.SSH_INTERNAL_ADDRESS }}" >> "$GITHUB_ENV"
+          fi
       - name: Generate auto.tfvars from secrets and hardcoded values
         working-directory: deploy/terraform/k3s-proxmox
         run: |
@@ -30,7 +39,7 @@ jobs:
           root_password       = "${{ secrets.ROOT_PASSWORD }}"
           proxmox_node_name   = "${{ secrets.PROXMOX_NODE_NAME }}"
           ssh_public_key      = "${{ secrets.SSH_PUBLIC_KEY }}"
-          external_ip         = "${{ secrets.EXTERNAL_IP }}"
+          external_ip         = "${{ env.EXTERNAL_IP }}"
           proxmox_api_url     = "${{ secrets.PROXMOX_API_URL }}"
           proxmox_api_token   = "${{ secrets.PROXMOX_API_TOKEN }}"
 
@@ -49,9 +58,12 @@ jobs:
       - name: Start SSH tunnel to Proxmox API
         working-directory: deploy/terraform/k3s-proxmox
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > /tmp/id_ed25519
-          chmod 600 /tmp/id_ed25519
-          nohup ssh -o StrictHostKeyChecking=no -i /tmp/id_ed25519 -N -L 127.0.0.1:${{ secrets.SSH_SERVER_PORT }}:${{ secrets.SSH_SERVER_ADDRESS }}:8006 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER_ADDRESS }} -p ${{ secrets.SSH_SERVER_PORT }} > /dev/null 2>&1 &
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_PUBLIC_KEY }}" | base64 -d > ~/.ssh/id_ed25519.pub
+          chmod 600 ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519.pub
+          nohup ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 -N -L 127.0.0.1:${{ secrets.SSH_SERVER_PORT }}:${{ secrets.SSH_SERVER_ADDRESS }}:8006 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER_ADDRESS }} -p ${{ secrets.SSH_SERVER_PORT }} > /dev/null 2>&1 &
           echo $! > ssh_tunnel.pid
 
       - name: Terraform Init

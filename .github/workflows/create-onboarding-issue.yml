@@ -15,6 +15,9 @@ permissions:
   contents: read
 
 jobs:
+  # ───────────────────────────────────────────────
+  # 1. CREATE INITIAL ISSUE
+  # ───────────────────────────────────────────────
   create-issue:
     if: github.repository != 'loeken/enso-homelab' && github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -26,8 +29,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const repo = context.repo.repo;
-            const owner = context.repo.owner;
+            const { repo, owner } = context.repo;
             await github.rest.issues.create({
               owner,
               repo,
@@ -71,6 +73,9 @@ jobs:
                 "Once your secrets are set, comment your deployment type above to continue. The workflow will validate your secrets before proceeding and generate a values.yaml.example for you.\n"
             });
 
+  # ───────────────────────────────────────────────
+  # 2. RESPOND TO COMMENTS
+  # ───────────────────────────────────────────────
   respond-to-comments:
     if: github.event_name == 'issue_comment' && contains(github.event.issue.title, 'Welcome! Let')
     runs-on: ubuntu-latest
@@ -86,23 +91,17 @@ jobs:
         with:
           script: |
             const comment = context.payload.comment.body.trim();
-            const issue_number = context.issue.number;
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            let deploymentType = null;
+            const { number: issue_number } = context.issue;
+            const { repo, owner } = context.repo;
 
-            if (comment === '/install-k3s') {
-              deploymentType = 'k3s';
-            } else if (comment === '/proxmox-single') {
-              deploymentType = 'proxmox-single';
-            } else if (comment === '/proxmox-multi') {
-              deploymentType = 'proxmox-multi';
-            } else if (comment === '/install-k3s-vms') {
-              deploymentType = 'install-k3s-vms';
-            }
+            let deploymentType = null;
+            if (comment === '/install-k3s') deploymentType = 'k3s';
+            else if (comment === '/proxmox-single') deploymentType = 'proxmox-single';
+            else if (comment === '/proxmox-multi') deploymentType = 'proxmox-multi';
+            else if (comment === '/install-k3s-vms') deploymentType = 'install-k3s-vms';
+            else if (comment === '/validate-proxmox-inventory') deploymentType = 'validate-proxmox-inventory';
 
             if (deploymentType) {
-              // Save deployment type as a secret
               const execSync = require('child_process').execSync;
               execSync(
                 `gh secret set DEPLOYMENT_TYPE --body "${deploymentType}"`,
@@ -115,9 +114,14 @@ jobs:
                 repo,
                 body: `✅ Deployment type set to \`${deploymentType}\`. Now validating secrets...`
               });
+
               core.setOutput('trigger_validation', 'true');
+              core.exportVariable('DEPLOYMENT_TYPE', deploymentType);
             }
 
+  # ───────────────────────────────────────────────
+  # 3. DISPATCH WORKFLOWS
+  # ───────────────────────────────────────────────
       - name: Trigger validate-secrets workflow
         if: steps.handle-deployment.outputs.trigger_validation == 'true'
         env:
@@ -140,6 +144,17 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/actions/workflows/install_create_k3s_vms.yaml/dispatches \
             -d '{"ref":"main"}'
 
+      - name: Trigger validate-proxmox-inventory workflow
+        if: steps.handle-deployment.outputs.trigger_validation == 'true' && env.DEPLOYMENT_TYPE == 'validate-proxmox-inventory'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        run: |
+          curl -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/validate-proxmox-inventory.yml/dispatches \
+            -d '{"ref":"main"}'
+
       - name: Upload values.yaml using gh CLI (only if not exists)
         env:
           GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
@@ -158,25 +173,14 @@ jobs:
             BRANCH="main"
             FILEPATH="deploy/argocd/values.yaml"
 
-            # Get the SHA if the file already exists (for update)
             SHA=$(gh api repos/${GITHUB_REPOSITORY}/contents/${FILEPATH} --jq .sha || echo "")
 
-            if [ -z "$SHA" ]; then
-              gh api repos/${GITHUB_REPOSITORY}/contents/${FILEPATH} \
-                --method PUT \
-                -H "Accept: application/vnd.github+json" \
-                -f message="$COMMIT_MSG" \
-                -f content="$CONTENT_B64" \
-                -f branch="$BRANCH"
-            else
-              gh api repos/${GITHUB_REPOSITORY}/contents/${FILEPATH} \
-                --method PUT \
-                -H "Accept: application/vnd.github+json" \
-                -f message="$COMMIT_MSG" \
-                -f content="$CONTENT_B64" \
-                -f branch="$BRANCH" \
-                -f sha="$SHA"
-            fi
+            gh api repos/${GITHUB_REPOSITORY}/contents/${FILEPATH} \
+              --method PUT \
+              -H "Accept: application/vnd.github+json" \
+              -f message="$COMMIT_MSG" \
+              -f content="$CONTENT_B64" \
+              -f branch="$BRANCH" \
+              ${SHA:+-f sha="$SHA"}
           else
             echo "deploy/argocd/values.yaml already exists, skipping upload."
-          fi

@@ -15,6 +15,18 @@
     fi
   changed_when: false
 
+- name: Update APT cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Install base packages
+  ansible.builtin.apt:
+    name:
+      - btop
+      - kubernetes-client
+      - curl
+      - gpg
+
 - name: Add Proxmox apt GPG key
   ansible.builtin.apt_key:
     url: "https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg"
