@@ -8,14 +8,12 @@
     msg: "Current hostname ({{ current_hostname.stdout }}) does not match expected ({{ inventory_hostname }})! Please set the correct hostname before running this playbook."
   when: current_hostname.stdout != inventory_hostname
 
-- name: Install base packages
-  ansible.builtin.apt:
-    name:
-      - btop
-      - kubernetes-client
-      - curl
-      - gpg
-    state: present
+- name: Disable Proxmox enterprise repo (if present)
+  ansible.builtin.shell: |
+    if [ -f /etc/apt/sources.list.d/pve-enterprise.list ]; then
+      sed -i 's/^deb/#deb/' /etc/apt/sources.list.d/pve-enterprise.list
+    fi
+  changed_when: false
 
 - name: Add Proxmox apt GPG key
   ansible.builtin.apt_key:
@@ -25,6 +23,15 @@
 - name: Update APT cache
   ansible.builtin.apt:
     update_cache: true
+
+- name: Install base packages
+  ansible.builtin.apt:
+    name:
+      - btop
+      - kubernetes-client
+      - curl
+      - gpg
+    state: present
 
 - name: Add noatime and nodiratime to ext4 mounts
   ansible.builtin.lineinfile:
