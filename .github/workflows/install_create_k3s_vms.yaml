@@ -2,14 +2,9 @@ name: Create K3s VMs
 
 on:
   workflow_dispatch:
-  issue_comment:
-    types: [created]
 
 jobs:
   create-k3s-vms:
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.issue.pull_request == null && contains(github.event.comment.body, '/install-k3s-vms'))
     runs-on: ubuntu-latest
 
     steps:

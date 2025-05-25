@@ -2,11 +2,6 @@ name: Install k3s
 
 on:
   workflow_dispatch:
-    inputs:
-      triggered_by:
-        description: 'Source of the trigger'
-        required: false
-        default: 'manual'
       
 permissions:
   contents: read

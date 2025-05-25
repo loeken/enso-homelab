@@ -2,14 +2,9 @@ name: Proxmox Convert & Template
 
 on:
   workflow_dispatch:
-  issue_comment:
-    types: [created]
 
 jobs:
   run-proxmox-ansible:
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.issue.pull_request == null && contains(github.event.comment.body, '/convert-to-proxmox'))
     runs-on: ubuntu-latest
 
     container:
