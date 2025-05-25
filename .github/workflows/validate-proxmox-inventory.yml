@@ -88,10 +88,13 @@ jobs:
           ansible all -i deploy/ansible/proxmox/inventory -m ping
 
       - name: Trigger Proxmox install workflow if deployment type is proxmox-single
-        if: ${{ env.DEPLOYMENT_TYPE == 'proxmox-single' }}
+        if: ${{ env.DEPLOYMENT_TYPE == 'validate-proxmox-inventory' }}
         env:
           GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
           DEPLOYMENT_TYPE: ${{ secrets.DEPLOYMENT_TYPE }}
         run: |
-          echo "DEPLOYMENT_TYPE is proxmox-single, triggering install_proxmox.yml workflow..."
-          gh workflow run install_proxmox.yml
+          curl -X POST \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/install_proxmox.yaml/dispatches \
+            -d '{"ref":"main"}'

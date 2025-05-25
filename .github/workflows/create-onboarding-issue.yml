@@ -108,12 +108,12 @@ jobs:
                 { stdio: 'inherit', env: { ...process.env, GH_TOKEN: process.env.GH_TOKEN } }
               );
 
-              await github.rest.issues.createComment({
-                issue_number,
-                owner,
-                repo,
-                body: `✅ Deployment type set to \`${deploymentType}\`. Now validating secrets...`
-              });
+              # await github.rest.issues.createComment({
+              #   issue_number,
+              #   owner,
+              #   repo,
+              #   body: `✅ Deployment type set to \`${deploymentType}\`. Now validating proxmox inventory...`
+              # });
 
               core.setOutput('trigger_validation', 'true');
               core.exportVariable('DEPLOYMENT_TYPE', deploymentType);

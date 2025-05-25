@@ -14,7 +14,7 @@ services:
       - ${HOME}/.ssh/id_ed25519:/home/enso/.ssh/id_ed25519:ro
       # - ${HOME}/.zhistory:/home/enso/.zhistory
       # - ${HOME}/.zshrc:/home/enso/.zshrc
-      - ./:/home/enso/enso-homelab
+      #- ./:/home//home/devcontainer/enso-homelab
       #- /var/run/docker.sock:/var/run/docker.sock
       #- /home/loeken/.terraform.d/:/home/enso/.terraform.d/
 
