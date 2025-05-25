@@ -13,9 +13,6 @@ resource "null_resource" "ssh_key_gen" {
         "if [ ! -f /home/${var.user_name}/.ssh/id_ed25519 ]; then ssh-keygen -t ed25519 -f /home/${var.user_name}/.ssh/id_ed25519 -N ''; fi"
     ]
   }
-  provisioner "local-exec" {
-    command = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -P ${var.port} ${var.user_name}@${var.external_ip}:/home/${var.user_name}/.ssh/id_ed25519.pub /opt/${replace(var.external_ip, ".", "_")}_id_ed25519.pub"
-  }
 }
 
 data "local_file" "proxmox_pub_key" {
@@ -227,10 +224,6 @@ resource "null_resource" "upload_ips" {
         host     = proxmox_virtual_environment_vm.k3s_vm[count.index].ipv4_addresses[1][0]
         user     = var.user_name
         private_key = file("~/.ssh/id_ed25519")
-        bastion_host = var.external_ip
-        bastion_port = var.port
-        bastion_user = var.user_name
-        bastion_private_key = file("~/.ssh/id_ed25519")
     }
     provisioner "file" {
         source     = "update_ips.sh"
@@ -252,10 +245,6 @@ resource "null_resource" "create_cronjob" {
     host        = proxmox_virtual_environment_vm.k3s_vm[count.index].ipv4_addresses[1][0]
     user        = var.user_name
     private_key = file("~/.ssh/id_ed25519")
-    bastion_host = var.external_ip
-    bastion_port = var.port
-    bastion_user = var.user_name
-    bastion_private_key = file("~/.ssh/id_ed25519")
   }
 
   provisioner "remote-exec" {
