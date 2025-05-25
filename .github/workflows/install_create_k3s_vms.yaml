@@ -80,3 +80,42 @@ jobs:
             rm -f ssh_tunnel.pid
           fi
 
+      - name: Comment on onboarding issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_GITHUB_TOKEN }}
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              per_page: 10
+            });
+            const onboarding = issues.data.find(issue =>
+              issue.title && issue.title.includes("Welcome! Let's deploy your homelab")
+            );
+            if (onboarding) {
+              await github.rest.issues.createComment({
+                issue_number: onboarding.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: "✅ K3s VMs have been created successfully!\n\n" +
+                      "📝 **Update SSH credentials:**\n" +
+                      "```sh\n" +
+                      "# Update SSH port (default is 22 for the VM)\n" +
+                      "gh secret set SSH_SERVER_PORT --body \"22\"\n\n" +
+                      "# Update internal IP address to the VM's IP\n" +
+                      "gh secret set SSH_INTERNAL_ADDRESS --body \"<VM_INTERNAL_IP>\"\n\n" +
+                      "# Update external IP if needed\n" +
+                      "gh secret set SSH_SERVER_ADDRESS --body \"<VM_EXTERNAL_IP>\"\n" +
+                      "```\n\n" +
+                      "▶️ **Then comment:**\n" +
+                      "```sh\n" +
+                      "/install-k3s\n" +
+                      "```\n" +
+                      "to continue with the installation."
+              });
+            } else {
+              core.warning("No onboarding issue found.");
+            }
+
