@@ -1,0 +1,2 @@
+[homelab]
+homelab.ime.lan ansible_host=94.134.58.210 ansible_port=60023 ansible_user=loeken is_master=yes ssh_internal_address=192.168.1.185
