@@ -34,6 +34,14 @@ RUN apk add --no-cache \
 # Install passlib via pip to support Ansible's password hashing
 RUN pip3 install --break-system-packages passlib
 
+# Install GitHub CLI manually
+RUN GH_ARCH="$(apk --print-arch | sed 's/x86_64/amd64/;s/aarch64/arm64/')" && \
+    GH_VERSION=$(curl -s https://api.github.com/repos/cli/cli/releases/latest | grep tag_name | cut -d '"' -f 4) && \
+    curl -L -o gh.tar.gz https://github.com/cli/cli/releases/download/${GH_VERSION}/gh_${GH_VERSION#v}_linux_${GH_ARCH}.tar.gz && \
+    tar -xzf gh.tar.gz && \
+    mv gh_*/bin/gh /usr/local/bin/ && \
+    rm -rf gh.tar.gz gh_*
+
 # Install k3sup
 RUN cd /tmp && curl -sLS https://get.k3sup.dev | sh
 

@@ -1,28 +1,43 @@
-# roles/template-debian/tasks/main.yml
-
 ---
+- name: Check if VM ID 999 already exists
+  ansible.builtin.shell: qm list --full 2>/dev/null | awk '{print $1}' | grep -q '^999$'
+  register: vmid_check
+  failed_when: false
+  changed_when: false
+
+- name: Set fact whether template 999 exists
+  ansible.builtin.set_fact:
+    template_999_exists: "{{ vmid_check.rc == 0 }}"
+
+- name: Default template_exists to false
+  ansible.builtin.set_fact:
+    template_exists: false
+
 - name: Gather VM list to check if template exists
   ansible.builtin.shell: qm list --full 2>/dev/null | grep -q 'template-debian-{{ inventory_hostname }}'
   register: template_check
   failed_when: false
   changed_when: false
+  when: not template_999_exists
 
 - name: Set fact whether template exists
   ansible.builtin.set_fact:
     template_exists: "{{ template_check.rc == 0 }}"
+  when: not template_999_exists
 
 - name: Ensure proxmoxer is installed on Proxmox host
   ansible.builtin.apt:
-    name:
-      - python3-proxmoxer
+    name: python3-proxmoxer
     state: present
     update_cache: true
+  when: not template_999_exists
 
 - name: Ensure virt-customize is installed
   ansible.builtin.apt:
     name: libguestfs-tools
     state: present
     update_cache: true
+  when: not template_999_exists
 
 - name: Create VM (if not exists)
   community.general.proxmox_kvm:
@@ -45,7 +60,7 @@
     nameservers:
       - 8.8.8.8
       - 1.1.1.1
-  when: not template_exists
+  when: not template_exists and not template_999_exists
   register: vm_create
 
 - name: Download Debian NoCloud image
@@ -53,15 +68,15 @@
     url: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-nocloud-amd64.qcow2
     dest: /var/lib/vz/images/debian-12-nocloud-amd64.qcow2
     mode: '0755'
-  when: not template_exists
+  when: not template_exists and not template_999_exists
 
 - name: Import disk to local storage
   ansible.builtin.command: qm importdisk {{ vm_create.vmid }} /var/lib/vz/images/debian-12-nocloud-amd64.qcow2 local
-  when: not template_exists
+  when: not template_exists and not template_999_exists
 
 - name: Attach disk to VM
   ansible.builtin.command: qm set {{ vm_create.vmid }} -scsihw virtio-scsi-pci -virtio0 /var/lib/vz/images/{{ vm_create.vmid }}/vm-{{ vm_create.vmid }}-disk-0.raw
-  when: not template_exists
+  when: not template_exists and not template_999_exists
 
 - name: Run base qm commands
   ansible.builtin.command: "{{ item }}"
@@ -71,7 +86,7 @@
     - qm set {{ vm_create.vmid }} -boot c -bootdisk virtio0
     - qm set {{ vm_create.vmid }} -hotplug disk,network,usb
     - qm set {{ vm_create.vmid }} -vcpus 1
-  when: not template_exists
+  when: not template_exists and not template_999_exists
 
 - name: Customize image with virt-customize
   ansible.builtin.command: "{{ item }}"
@@ -81,11 +96,11 @@
     - 'virt-customize -a /var/lib/vz/images/{{ vm_create.vmid }}/vm-{{ vm_create.vmid }}-disk-0.raw --append-line "/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg:# network: {config: disabled}"'
     - 'virt-customize -a /var/lib/vz/images/{{ vm_create.vmid }}/vm-{{ vm_create.vmid }}-disk-0.raw --append-line "/etc/systemd/resolved.conf:DNS=8.8.8.8 8.8.4.4 1.1.1.1 1.0.0.1"'
     - 'virt-customize -a /var/lib/vz/images/{{ vm_create.vmid }}/vm-{{ vm_create.vmid }}-disk-0.raw --run-command "systemctl enable qemu-guest-agent"'
-  when: not template_exists
+  when: not template_exists and not template_999_exists
 
 - name: Clone and convert VM to template
   ansible.builtin.shell: |
     qm clone {{ vm_create.vmid }} 999 --name template-debian-{{ inventory_hostname.split('.')[0] }} --full true
     qm template 999
     qm destroy {{ vm_create.vmid }}
-  when: not template_exists
+  when: not template_exists and not template_999_exists
