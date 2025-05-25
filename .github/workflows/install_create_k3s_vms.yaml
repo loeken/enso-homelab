@@ -32,7 +32,7 @@ jobs:
           hostname            = "${{ secrets.SSH_SERVER_ADDRESS }}"
           port                = ${{ secrets.SSH_SERVER_PORT }}
           root_password       = "${{ secrets.ROOT_PASSWORD }}"
-          proxmox_node_name   = "${{ secrets.PROXMOX_NODE_NAME }}"
+          proxmox_node_name   = "${{ secrets.HOSTNAME }}"
           ssh_public_key      = "${{ secrets.SSH_PUBLIC_KEY }}"
           external_ip         = "${{ env.EXTERNAL_IP }}"
           proxmox_api_url     = "${{ secrets.PROXMOX_API_URL }}"
@@ -40,14 +40,12 @@ jobs:
 
           # --- Hardcoded values ---
           vm_count            = 1
-          vm_core_count       = 10
+          vm_core_count       = 4
           vm_memory_mb        = "28672"
-          vm_disk_size_gb     = 50
+          vm_disk_size_gb     = 100
           macaddr_first_five  = "8E:AB:AB:4C:CE"
           proxmox_vm_name     = "k3s-enso"
-          kubernetes_version  = "v1.28.3+k3s1"
-          node_names          = []
-          tunnel_port         = "20000"
+          node_names          = ["homelab"]
           EOF
 
       - name: Start SSH tunnel to Proxmox API
@@ -58,7 +56,7 @@ jobs:
           echo "${{ secrets.SSH_PUBLIC_KEY }}" | base64 -d > ~/.ssh/id_ed25519.pub
           chmod 600 ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519.pub
-          nohup ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 -N -L 127.0.0.1:${{ secrets.SSH_SERVER_PORT }}:${{ secrets.SSH_SERVER_ADDRESS }}:8006 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER_ADDRESS }} -p ${{ secrets.SSH_SERVER_PORT }} > /dev/null 2>&1 &
+          nohup ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 -N -L 127.0.0.1:8006:127.0.0.1:8006 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER_ADDRESS }} -p ${{ secrets.SSH_SERVER_PORT }} > /dev/null 2>&1 &
           echo $! > ssh_tunnel.pid
 
       - name: Terraform Init

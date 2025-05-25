@@ -7,7 +7,7 @@ terraform {
     }
 }
 provider "proxmox" {
-    endpoint = "https://localhost:${var.tunnel_port}/api2/json" 
+    endpoint = "https://127.0.0.1:8006/api2/json" 
     username = "root@pam"
     password = var.root_password
     insecure = true
