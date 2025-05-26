@@ -184,7 +184,7 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/actions/workflows/validate-secrets.yml/dispatches \
             -d '{"ref":"main"}'
 
-      - name: Trigger install_create_k3s_vms workflow
+      - name: Trigger create_k3s_vms workflow
         if: steps.handle-deployment.outputs.trigger_validation == 'true' && env.DEPLOYMENT_TYPE == 'install-k3s-vms'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
@@ -192,7 +192,7 @@ jobs:
           curl -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/actions/workflows/install_create_k3s_vms.yaml/dispatches \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/create_k3s_vms.yml/dispatches \
             -d '{"ref":"main"}'
 
       - name: Trigger validate-proxmox-inventory workflow
