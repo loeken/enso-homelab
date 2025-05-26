@@ -200,15 +200,18 @@ jobs:
                   "1. **Download your kubeconfig:**\n" +
                   "   - Go to the **Actions** tab in GitHub, select the latest `install_k3s` workflow run, and download the `kubeconfig` artifact.\n" +
                   "   - Save it locally and set the environment variable:\n" +
+                  "\n" +
                   "     ```sh\n" +
                   "     export KUBECONFIG=</path/to/your/kubeconfig>\n" +
                   "     ```\n\n" +
                   "2. **Login to ArgoCD:**\n" +
                   "   - Get the ArgoCD admin password:\n" +
+                  "\n" +
                   "     ```sh\n" +
                   "     kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath=\"{.data.password}\" | base64 -d && echo\n" +
                   "     ```\n" +
                   "   - Port-forward the ArgoCD API:\n" +
+                  "\n" +
                   "     ```sh\n" +
                   "     kubectl port-forward -n argocd svc/argocd-server 8080:443\n" +
                   "     ```\n" +
@@ -217,15 +220,26 @@ jobs:
                   "   - Password: (the value you got from the previous command)\n\n" +
                   "3. **Add missing secrets if needed:**\n" +
                   "   - If the `Check Secrets` workflow reports missing secrets, you can add them as follows:\n" +
-                  "     ```sh\n" +
-                  "     cp data/example_credentials/<namespace>_<secret>.yaml data/credentials/mysecrets_unencrypted/<namespace>_<secret>.yaml\n" +
-                  "     cat data/credentials/mysecrets_unencrypted/<namespace>_<secret>.yaml | kubeseal > deploy/mysecrets/templates/<namespace>_<secret>.yaml\n" +
+                  "\n" +
+                  "     1. Fill out the required secrets in the files under `data/example_credentials/`.\n" +
+                  "     2. Run the sealing script to generate sealed secrets:\n" +
+                  "\n" +
+                  "        ```sh\n" +
+                  "        ./seal_passwords.sh\n" +
+                  "        ```\n" +
+                  "     3. Commit and push the new sealed secrets to your repository:\n" +
+                  "\n" +
+                  "        ```sh\n" +
+                  "        git add deploy/mysecrets/templates/\n" +
+                  "        git commit -m \"Add sealed secrets\"\n" +
+                  "        git push\n" +
+                  "        ```\n\n" +
+                  "4. **Validate your Kubernetes secrets:**\n" +
+                  "   - Once you have pushed your secrets and the `import-sealed-secrets` app in ArgoCD shows status **Synced** (meaning the secrets are present), you can validate them.\n" +
+                  "   - Comment the following on this issue to check the passwords:\n" +
+                  "\n" +
                   "     ```\n" +
-                  "   - Commit and push the new sealed secrets to your repository:\n" +
-                  "     ```sh\n" +
-                  "     git add deploy/mysecrets/templates/<namespace>_<secret>.yaml\n" +
-                  "     git commit -m \"Add sealed secret <namespace>_<secret>\"\n" +
-                  "     git push\n" +
+                  "     /validate-kubernetes-secrets\n" +
                   "     ```\n\n" +
                   "You're ready to manage your cluster with ArgoCD! 🎉"
               });

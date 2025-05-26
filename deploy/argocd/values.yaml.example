@@ -1,15 +1,17 @@
 domain: loeken.xyz
 clusterIssuer: letsencrypt-prod
-clusterName: enso-homelab
+clusterName: enso-homelab-prod
 githubUser: loeken
-githubRepo: enso-homelab
+githubRepo: enso-homelab-prod
 
 # app specific
-externaldns:
-  enabled: true
-nginxingress:
-  enabled: true
 certmanager:
-  enabled: true
+  enabled: false
+externaldns:
+  enabled: false
+nginxingress:
+  enabled: false
+observability:
+  enabled: false
 whoami:
-  enabled: true
+  enabled: false
