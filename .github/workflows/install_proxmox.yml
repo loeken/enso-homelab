@@ -8,13 +8,13 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: loeken/enso-devcontainer:latest
+      image: loeken/enso-devcontainer:latest@sha256:b882d7d93cc5f668a6ea5be012ac2abb7c4033e0f49846362f871d0f7d53130d
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Set up SSH key inside container
         run: |
@@ -42,6 +42,7 @@ jobs:
             --private-key ~/.ssh/id_ed25519 \
             -i ./deploy/ansible/proxmox/inventory \
             ./deploy/ansible/proxmox/base.yml
+
 
       - name: Trigger create_k3s_vms workflow
         env:
