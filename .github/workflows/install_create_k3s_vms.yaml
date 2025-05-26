@@ -107,7 +107,7 @@ jobs:
                       "# Update internal IP address to the VM's IP\n" +
                       "gh secret set SSH_INTERNAL_ADDRESS --body \"<VM_INTERNAL_IP>\"\n\n" +
                       "# Update external IP if needed\n" +
-                      "gh secret set SSH_SERVER_ADDRESS --body \"<VM_EXTERNAL_IP>\"\n" +
+                      "gh secret set SSH_SERVER_ADDRESS --body \"<VM_EXTERNAL_IP>\"\n\n" +
                       "# Change hostname to k3s server\n" +
                       "gh secret set HOSTNAME --body \"<k3s-enso-01>\"\n" +
                       "```\n\n" +

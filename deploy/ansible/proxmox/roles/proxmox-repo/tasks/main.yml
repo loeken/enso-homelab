@@ -87,6 +87,12 @@
     mode: '0644'
   register: network_interface
 
+- name: Disable Proxmox auto-network commit
+  ansible.builtin.systemd:
+    name: pvenetcommit.service
+    enabled: false
+    masked: true
+
 - name: Restart networking after bridge config
   ansible.builtin.systemd:
     name: networking
