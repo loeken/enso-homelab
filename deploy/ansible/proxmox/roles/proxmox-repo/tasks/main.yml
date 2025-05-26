@@ -111,7 +111,7 @@
 
 - name: Pause to let system start rebooting
   ansible.builtin.pause:
-    seconds: 90
+    seconds: 150
   when: "'pve' not in kernel_version.stdout"
 
 - name: Wait for node to become reachable
