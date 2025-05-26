@@ -1,8 +1,8 @@
 domain: loeken.xyz
 clusterIssuer: letsencrypt-prod
-clusterName: enso-homelab-prod
+clusterName: enso-homelab
 githubUser: loeken
-githubRepo: enso-homelab-prod
+githubRepo: enso-homelab
 
 # app specific
 certmanager:

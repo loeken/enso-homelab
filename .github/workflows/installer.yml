@@ -97,6 +97,7 @@ jobs:
             if (comment === '/install-k3s') deploymentType = 'install-k3s';
             else if (comment === '/proxmox-single') deploymentType = 'proxmox-single';
             else if (comment === '/proxmox-multi') deploymentType = 'proxmox-multi';
+            else if (comment === '/check-secrets') deploymentType = 'check-secrets';
             else if (comment === '/validate-proxmox-inventory') deploymentType = 'validate-proxmox-inventory';
 
             if (deploymentType) {
@@ -195,4 +196,15 @@ jobs:
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/actions/workflows/install_k3s.yml/dispatches \
+            -d '{"ref":"main"}'
+
+      - name: Trigger check-secrets workflow
+        if: steps.handle-deployment.outputs.trigger_validation == 'true' && env.DEPLOYMENT_TYPE == 'check-secrets'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        run: |
+          curl -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/check-secrets.yml/dispatches \
             -d '{"ref":"main"}'
