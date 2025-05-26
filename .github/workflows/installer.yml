@@ -68,7 +68,6 @@ jobs:
                 "Comment one of the following to select your deployment type:\n\n" +
                 "- `/install-k3s` (Baremetal K3s)\n" +
                 "- `/proxmox-single` (Proxmox Single Node)\n" +
-                "- `/proxmox-multi` (Proxmox Multi Node)\n\n" +
                 "---\n\n" +
                 "Once your secrets are set, comment your deployment type above to continue. The workflow will validate your secrets before proceeding and generate a values.yaml.example for you.\n"
             });
@@ -98,7 +97,6 @@ jobs:
             if (comment === '/install-k3s') deploymentType = 'install-k3s';
             else if (comment === '/proxmox-single') deploymentType = 'proxmox-single';
             else if (comment === '/proxmox-multi') deploymentType = 'proxmox-multi';
-            else if (comment === '/install-k3s-vms') deploymentType = 'install-k3s-vms';
             else if (comment === '/validate-proxmox-inventory') deploymentType = 'validate-proxmox-inventory';
 
             if (deploymentType) {
@@ -123,7 +121,7 @@ jobs:
   # 3. DISPATCH WORKFLOWS
   # ───────────────────────────────────────────────
       - name: Trigger validate-secrets workflow
-        if: steps.handle-deployment.outputs.trigger_validation == 'true'
+        if: steps.handle-deployment.outputs.trigger_validation == 'true' && ( env.DEPLOYMENT_TYPE == 'proxmox-single' || env.DEPLOYMENT_TYPE == 'install-k3s')
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         run: |
@@ -131,17 +129,6 @@ jobs:
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/actions/workflows/validate-secrets.yml/dispatches \
-            -d '{"ref":"main"}'
-
-      - name: Trigger create_k3s_vms workflow
-        if: steps.handle-deployment.outputs.trigger_validation == 'true' && env.DEPLOYMENT_TYPE == 'install-k3s-vms'
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
-        run: |
-          curl -X POST \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/actions/workflows/create_k3s_vms.yml/dispatches \
             -d '{"ref":"main"}'
 
       - name: Trigger validate-proxmox-inventory workflow
@@ -154,6 +141,7 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/actions/workflows/validate-proxmox-inventory.yml/dispatches \
             -d '{"ref":"main"}'
+
       - name: Prepare and preview values.yaml
         run: |
           USERNAME="${GITHUB_REPOSITORY%/*}"
@@ -167,6 +155,7 @@ jobs:
           echo "────────────────────────────────────────────"
           cat deploy/argocd/values.yaml.tmp
           echo "────────────────────────────────────────────"
+
       - name: Upload values.yaml using gh CLI (only if not exists)
         env:
           GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
@@ -196,6 +185,7 @@ jobs:
           else
             echo "deploy/argocd/values.yaml already exists, skipping upload."
           fi
+
       - name: Trigger install_k3s workflow
         if: steps.handle-deployment.outputs.trigger_validation == 'true' && env.DEPLOYMENT_TYPE == 'install-k3s'
         env:

@@ -194,7 +194,40 @@ jobs:
                 issue_number: onboarding.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: "✅ K3s has been installed successfully! starting workflow for argocd\n\n"
+                body:
+                  "✅ ArgoCD has been installed successfully!\n\n" +
+                  "### 🚀 Next Steps\n\n" +
+                  "1. **Download your kubeconfig:**\n" +
+                  "   - Go to the **Actions** tab in GitHub, select the latest `install_k3s` workflow run, and download the `kubeconfig` artifact.\n" +
+                  "   - Save it locally and set the environment variable:\n" +
+                  "     ```sh\n" +
+                  "     export KUBECONFIG=</path/to/your/kubeconfig>\n" +
+                  "     ```\n\n" +
+                  "2. **Login to ArgoCD:**\n" +
+                  "   - Get the ArgoCD admin password:\n" +
+                  "     ```sh\n" +
+                  "     kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath=\"{.data.password}\" | base64 -d && echo\n" +
+                  "     ```\n" +
+                  "   - Port-forward the ArgoCD API:\n" +
+                  "     ```sh\n" +
+                  "     kubectl port-forward -n argocd svc/argocd-server 8080:443\n" +
+                  "     ```\n" +
+                  "   - Open [https://localhost:8080](https://localhost:8080) in your browser.\n" +
+                  "   - Username: `admin`\n" +
+                  "   - Password: (the value you got from the previous command)\n\n" +
+                  "3. **Add missing secrets if needed:**\n" +
+                  "   - If the `Check Secrets` workflow reports missing secrets, you can add them as follows:\n" +
+                  "     ```sh\n" +
+                  "     cp data/example_credentials/<namespace>_<secret>.yaml data/credentials/mysecrets_unencrypted/<namespace>_<secret>.yaml\n" +
+                  "     cat data/credentials/mysecrets_unencrypted/<namespace>_<secret>.yaml | kubeseal > deploy/mysecrets/templates/<namespace>_<secret>.yaml\n" +
+                  "     ```\n" +
+                  "   - Commit and push the new sealed secrets to your repository:\n" +
+                  "     ```sh\n" +
+                  "     git add deploy/mysecrets/templates/<namespace>_<secret>.yaml\n" +
+                  "     git commit -m \"Add sealed secret <namespace>_<secret>\"\n" +
+                  "     git push\n" +
+                  "     ```\n\n" +
+                  "You're ready to manage your cluster with ArgoCD! 🎉"
               });
             } else {
               core.warning("No onboarding issue found.");

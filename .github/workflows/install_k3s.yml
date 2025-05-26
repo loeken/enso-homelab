@@ -35,7 +35,7 @@ jobs:
       - name: Generate and Upload SSH Key Pair
         if: env.key_exists == 'false'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         run: |
           # Generate SSH key pair
           ssh-keygen -t ed25519 -f deploy_key -N "" -C "argocd-deploy-key"
