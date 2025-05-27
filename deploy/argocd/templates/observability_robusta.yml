@@ -42,22 +42,22 @@ spec:
             - name: SIGNING_KEY
               valueFrom:
                 secretKeyRef:
-                  name: robusta-secret
+                  name: robusta
                   key: SIGNING_KEY
             - name: ACCOUNT_ID
               valueFrom:
                 secretKeyRef:
-                  name: robusta-secret
+                  name: robusta
                   key: ACCOUNT_ID
             - name: SLACK_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: robusta-secret
+                  name: robusta
                   key: SLACK_API_KEY
             - name: ROBUSTA_UI_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: robusta-secret
+                  name: robusta
                   key: ROBUSTA_UI_TOKEN
 
         enableHolmesGPT: false
