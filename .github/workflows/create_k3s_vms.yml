@@ -40,7 +40,7 @@ jobs:
 
           # --- Hardcoded values ---
           vm_count            = 1
-          vm_core_count       = 4
+          vm_core_count       = 8
           vm_memory_mb        = "28672"
           vm_disk_size_gb     = 100
           macaddr_first_five  = "8E:AB:AB:4C:CE"
