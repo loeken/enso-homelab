@@ -7,8 +7,8 @@ spec:
   project: default
   source:
     repoURL: https://charts.rook.io/release
-    targetRevision: v1.14.3
     chart: rook-ceph
+    targetRevision: v1.14.3
     helm:
       values: |
         crds:
@@ -26,13 +26,59 @@ spec:
         monitoring:
           enabled: false
 
-        resources:
-          limits:
-            cpu: 500m
-            memory: 512Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
+        cephClusterSpec:
+          cephVersion:
+            image: quay.io/ceph/ceph:v18.2.2
+          dataDirHostPath: /var/lib/rook
+          mon:
+            count: 1
+            allowMultiplePerNode: true
+          dashboard:
+            enabled: true
+          network:
+            hostNetwork: false
+          mgr:
+            modules:
+              - name: pg_autoscaler
+                enabled: true
+          storage:
+            useAllNodes: true
+            useAllDevices: false
+            config:
+              osdsPerDevice: "1"
+            nodes:
+              - name: k3s-enso-01
+                devices:
+                  - name: "vdb"
+
+        toolbox:
+          enabled: true
+
+        ingress:
+          dashboard:
+            enabled: false
+
+        storageClass:
+          create: true
+          name: rook-ceph-block
+          isDefault: true
+          reclaimPolicy: Delete
+          allowVolumeExpansion: true
+          volumeBindingMode: Immediate
+          # Required for CSI driver
+          annotations:
+            storageclass.kubernetes.io/is-default-class: "true"
+          parameters:
+            clusterID: rook-ceph
+            pool: replicapool
+            imageFormat: "2"
+            imageFeatures: layering
+            csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+            csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+            csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+            csi.storage.k8s.io/fstype: ext4
+          provisioner: rook-ceph.rbd.csi.ceph.com
 
   destination:
     server: https://kubernetes.default.svc
