@@ -9,6 +9,8 @@ certmanager:
   enabled: false
 externaldns:
   enabled: false
+nfsprovisioner:
+  enabled: false
 nginxingress:
   enabled: false
 observability:
