@@ -9,6 +9,8 @@ authelia:
   enabled: false
   filesystem:
     enabled: true
+  ingress:
+    enabled: true
   smtp:
     enabled: false
     host: mail.example.com

@@ -35,7 +35,7 @@ spec:
           mountPath: /config
 
         ingress:
-          enabled: {{ .Values.authelia.ingress.nginx.enabled }}
+          enabled: {{ .Values.authelia.ingress.enabled }}
           annotations:
             kubernetes.io/ingress.class: "nginx"
             cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
