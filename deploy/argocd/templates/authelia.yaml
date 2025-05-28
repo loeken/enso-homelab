@@ -106,7 +106,7 @@ spec:
             #         - email
             #       userinfo_signing_algorithm: none
             #     - id: nextcloud-client
-            #       secret: "{{ .Values.oidc.sharedsecret }}"
+            #       secret: " .Values.oidc.sharedsecret "
             #       redirect_uris:
             #         - https://nextcloud.{{ .Values.domain }}/apps/oidc_login/oidc
             #       grants:
@@ -122,7 +122,7 @@ spec:
             #       public: false
             #       authorization_policy: two_factor
             #     - id: jellyfin
-            #       secret: "{{ .Values.jellyfin.oidc.sharedsecret }}"
+            #       secret: " .Values.jellyfin.oidc.sharedsecret "
             #       authorization_policy: one_factor
             #       public: false
             #       require_pkce: true
