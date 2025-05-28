@@ -1,0 +1,193 @@
+{{ if .Values.authelia.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  name: authelia
+  namespace: argocd
+spec:
+  destination:
+    namespace: authelia
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://charts.authelia.com
+    targetRevision: 0.10.10
+    chart: authelia
+    helm:
+      values: |
+        domain: {{ .Values.domain }}
+        image:
+          repository: ghcr.io/authelia/authelia
+
+        secret:
+          existingSecret: authelia
+
+        persistence:
+          enabled: true
+          storageClass: local-path
+          accessModes:
+            - ReadWriteMany
+          size: 100Mi
+          mountPath: /config
+
+        ingress:
+          enabled: {{ .Values.authelia.ingress.nginx.enabled }}
+          annotations:
+            kubernetes.io/ingress.class: "nginx"
+            cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+            external-dns.alpha.kubernetes.io/hostname: "auth.{{ .Values.domain }}."
+            external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+            external-dns.alpha.kubernetes.io/ttl: "120"
+          hosts:
+            - host: auth.{{ .Values.domain }}
+              paths:
+                - path: /
+                  pathType: Prefix
+          tls:
+            enabled: true
+            secret: auth-tls
+
+        pod:
+          replicas: 1
+          kind: StatefulSet
+          revisionHistoryLimit: 2
+
+        configMap:
+          log:
+            level: info
+          default_redirection_url: https://auth.{{ .Values.domain }}
+          theme: dark
+          authentication_backend:
+            file:
+              enabled: true
+          session:
+            domain: {{ .Values.domain }}
+            expiration: 1h
+            inactivity: 5m
+          storage:
+            local:
+              enabled: true
+              path: /config/db.sqlite3
+          notifier:
+            filesystem:
+              enabled: {{ .Values.authelia.filesystem.enabled }}
+              filename: /config/notification.txt
+            smtp:
+              enabled: {{ .Values.authelia.smtp.enabled }}
+              address: {{ .Values.authelia.smtp.host }}:{{ .Values.authelia.smtp.port }}
+              username: {{ .Values.authelia.smtp.username }}
+              sender: {{ .Values.authelia.smtp.sender }}
+              identifier: {{ .Values.authelia.smtp.host }}
+              startup_check_address: {{ .Values.authelia.smtp.sender }}
+              subject: "[Authelia] {title}"
+              tls:
+                server_name: {{ .Values.authelia.smtp.host }}
+                skip_verify: false
+                minimum_version: TLS1.2
+          #identity_providers:
+            # oidc:
+            #   enabled: true
+            #   clients:
+            #     - id: grafana
+            #       description: Grafana
+            #       secret: "topsecret"
+            #       public: false
+            #       authorization_policy: two_factor
+            #       redirect_uris:
+            #         - https://grafana.{{ .Values.domain }}/login/generic_oauth
+            #       scopes:
+            #         - openid
+            #         - profile
+            #         - groups
+            #         - email
+            #       userinfo_signing_algorithm: none
+            #     - id: nextcloud-client
+            #       secret: "{{ .Values.oidc.sharedsecret }}"
+            #       redirect_uris:
+            #         - https://nextcloud.{{ .Values.domain }}/apps/oidc_login/oidc
+            #       grants:
+            #         - authorization_code
+            #       scopes:
+            #         - openid
+            #         - profile
+            #         - email
+            #         - groups
+            #       response_types:
+            #         - code
+            #       audience: []
+            #       public: false
+            #       authorization_policy: two_factor
+            #     - id: jellyfin
+            #       secret: "{{ .Values.jellyfin.oidc.sharedsecret }}"
+            #       authorization_policy: one_factor
+            #       public: false
+            #       require_pkce: true
+            #       pkce_challenge_method: S256
+            #       userinfo_signed_response_alg: none
+            #       token_endpoint_auth_method: client_secret_post
+            #       redirect_uris:
+            #         - https://jellyfin.{{ .Values.domain }}/sso/OID/redirect/authelia
+            #       scopes:
+            #         - openid
+            #         - profile
+            #         - groups
+            #         - email
+          access_control:
+            default_policy: deny
+            rules:
+              - domain: "*.{{ .Values.domain }}"
+                policy: bypass
+                networks:
+                  - 10.42.0.0/16
+              - domain: ['nextcloud.{{ .Values.domain }}', 'jellyfin.{{ .Values.domain }}']
+                policy: bypass
+              - domain: ['ha.{{ .Values.domain }}']
+                policy: bypass
+                resources:
+                  - ^/api.*
+                  - ^/auth/token.*
+                  - ^/.external_auth=.
+                  - ^/service_worker.js
+                  - ^/static.*
+                  - ^/local.*
+                  - ^/hacsfiles.*
+                  - ^/frontend_latest.*
+              - domain: ['sonarr.{{ .Values.domain }}', 'radarr.{{ .Values.domain }}', 'ha.{{ .Values.domain }}']
+                policy: bypass
+                resources:
+                  - ^/api.*
+                  - ^/signalr.*
+              - domain: ['vaultwarden.{{ .Values.domain }}']
+                policy: bypass
+                resources:
+                  - ^/api.*
+                  - ^/identity/connect/token.*
+                  - ^/identity/accounts/prelogin.*
+                  - ^/notifications/hub.*
+              - domain: 'rtorrent.{{ .Values.domain }}'
+                policy: bypass
+                resources:
+                  - ^/RPC2.*
+              - domain: ['requests.{{ .Values.domain }}', 'hub.{{ .Values.domain }}']
+                policy: one_factor
+                subject:
+                  - 'group:users'
+              - domain: ['sinusbot.{{ .Values.domain }}', 'ha.{{ .Values.domain }}', 'prowlarr.{{ .Values.domain }}', 'sonarr.{{ .Values.domain }}', 'radarr.{{ .Values.domain }}', 'rtorrent.{{ .Values.domain }}', 'nzbget.{{ .Values.domain }}']
+                policy: two_factor
+                subject:
+                  - 'group:admins'
+              - domain: ['whoami.{{ .Values.domain }}', 'harbor.{{ .Values.domain }}', 'ltb-passwd.{{ .Values.domain }}', 'vaultwarden.{{ .Values.domain }}']
+                policy: two_factor
+                subject:
+                  - 'group:users'
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{ end }}
