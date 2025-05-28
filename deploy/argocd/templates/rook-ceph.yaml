@@ -3,83 +3,18 @@ kind: Application
 metadata:
   name: rook-ceph
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   project: default
   source:
     repoURL: https://charts.rook.io/release
     chart: rook-ceph
-    targetRevision: v1.14.3
+    targetRevision: v1.17.2
     helm:
       values: |
         crds:
           enabled: true
-
-        csi:
-          enableCephFS: true
-          enableRBD: true
-          enableCSIHostNetwork: true
-          provisionerTolerations:
-            - operator: Exists
-          pluginTolerations:
-            - operator: Exists
-
-        monitoring:
-          enabled: false
-
-        cephClusterSpec:
-          cephVersion:
-            image: quay.io/ceph/ceph:v18.2.2
-          dataDirHostPath: /var/lib/rook
-          mon:
-            count: 1
-            allowMultiplePerNode: true
-          dashboard:
-            enabled: true
-          network:
-            hostNetwork: false
-          mgr:
-            modules:
-              - name: pg_autoscaler
-                enabled: true
-          storage:
-            useAllNodes: true
-            useAllDevices: false
-            config:
-              osdsPerDevice: "1"
-            nodes:
-              - name: k3s-enso-01
-                devices:
-                  - name: "vdb"
-
-        toolbox:
-          enabled: true
-
-        ingress:
-          dashboard:
-            enabled: false
-
-        storageClass:
-          create: true
-          name: rook-ceph-block
-          isDefault: true
-          reclaimPolicy: Delete
-          allowVolumeExpansion: true
-          volumeBindingMode: Immediate
-          # Required for CSI driver
-          annotations:
-            storageclass.kubernetes.io/is-default-class: "true"
-          parameters:
-            clusterID: rook-ceph
-            pool: replicapool
-            imageFormat: "2"
-            imageFeatures: layering
-            csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
-            csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
-            csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
-            csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
-            csi.storage.k8s.io/fstype: ext4
-          provisioner: rook-ceph.rbd.csi.ceph.com
-
   destination:
     server: https://kubernetes.default.svc
     namespace: rook-ceph
@@ -87,5 +22,5 @@ spec:
     syncOptions:
       - CreateNamespace=true
     automated:
-      selfHeal: true
       prune: true
+      selfHeal: true

@@ -5,6 +5,17 @@ githubUser: loeken
 githubRepo: enso-homelab
 
 # app specific
+authelia:
+  enabled: false
+  filesystem:
+    enabled: true
+  smtp:
+    enabled: false
+    host: mail.example.com
+    port: 587
+    sender: authelia@example.com
+    username: authelia@example.com
+  storageClass: local-path
 certmanager:
   enabled: false
 externaldns:
