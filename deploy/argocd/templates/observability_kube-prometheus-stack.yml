@@ -28,11 +28,11 @@ spec:
             storageSpec:
               volumeClaimTemplate:
                 spec:
-                  storageClassName: {{ .Values.prometheus.storageClassName }}
+                  storageClassName: {{ .Values.observability.prometheus.storageClassName }}
                   accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
-                      storage: {{ .Values.prometheus.size }}
+                      storage: {{ .Values.observability.prometheus.size }}
           ingress:
             enabled: true
             ingressClassName: nginx
@@ -73,11 +73,11 @@ spec:
             storage:
               volumeClaimTemplate:
                 spec:
-                  storageClassName: {{ .Values.alertmanager.storageClassName }}
+                  storageClassName: {{ .Values.observability.alertmanager.storageClassName }}
                   accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
-                      storage: {{ .Values.alertmanager.storageClassSize  }}
+                      storage: {{ .Values.observability.alertmanager.storageClassSize  }}
           ingress:
             enabled: true
             ingressClassName: nginx
