@@ -121,15 +121,26 @@ jobs:
   # ───────────────────────────────────────────────
   # 3. DISPATCH WORKFLOWS
   # ───────────────────────────────────────────────
-      - name: Trigger validate-secrets workflow
-        if: steps.handle-deployment.outputs.trigger_validation == 'true' && ( env.DEPLOYMENT_TYPE == 'proxmox-single' || env.DEPLOYMENT_TYPE == 'install-k3s')
+      - name: Trigger validate-secrets workflow proxmox
+        if: steps.handle-deployment.outputs.trigger_validation == 'true' && env.DEPLOYMENT_TYPE == 'proxmox-single'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         run: |
           curl -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/actions/workflows/validate-secrets.yml/dispatches \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/validate-secrets-proxmox.yml/dispatches \
+            -d '{"ref":"main"}'
+
+      - name: Trigger validate-secrets workflow k3s
+        if: steps.handle-deployment.outputs.trigger_validation == 'true' && env.DEPLOYMENT_TYPE == 'install-k3s'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        run: |
+          curl -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/validate-secrets-k3s.yml/dispatches \
             -d '{"ref":"main"}'
 
       - name: Trigger validate-proxmox-inventory workflow
