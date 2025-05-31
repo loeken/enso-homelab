@@ -23,13 +23,13 @@ spec:
 
         persistence:
           enabled: true
-          storageClassName: local-path
+          storageClassName: {{ .Values.observability.grafana.storageClassName}}
           accessModes:
             - ReadWriteOnce
-          size: 5Gi
+          size: {{ .Values.observability.grafana.storageClassName}}
         grafana.ini:
           server:
-            root_url: https://grafana{{ .Values.domain }}
+            root_url: https://grafana.{{ .Values.domain }}
             domain: aneralabs.lan
           users:
             auto_assign_org_role: Editor

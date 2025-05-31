@@ -33,11 +33,6 @@ variable "ssh_server_address" {
   default = "localhost"
   description = "The address of the server to connect to via SSH."
 }
-variable "storage" {
-  type = string
-  default = "local-path"
-  description = "the default storage class"
-}
 variable "hostname" {
   type        = string
   description = "Expected hostname of the server"

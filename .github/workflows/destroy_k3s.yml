@@ -54,7 +54,6 @@ jobs:
           internal_ip                 = "${{ secrets.SSH_INTERNAL_ADDRESS }}"
           external_ip                 = "${{ secrets.SSH_SERVER_ADDRESS }}"
           hostname                    = "${{ secrets.HOSTNAME }}"
-          storage                     = "local-path"
           argocd_deploy_private_key   = "${{ secrets.ARGOCD_DEPLOY_PRIVATE_KEY }}"
           argocd_repo_name            = "${{ github.repository }}"
           EOF

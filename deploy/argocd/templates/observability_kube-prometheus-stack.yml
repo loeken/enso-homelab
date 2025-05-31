@@ -28,11 +28,11 @@ spec:
             storageSpec:
               volumeClaimTemplate:
                 spec:
-                  storageClassName: local-path
+                  storageClassName: {{ .Values.prometheus.storageClassName }}
                   accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
-                      storage: 10Gi
+                      storage: {{ .Values.prometheus.size }}
           ingress:
             enabled: true
             ingressClassName: nginx
@@ -73,11 +73,11 @@ spec:
             storage:
               volumeClaimTemplate:
                 spec:
-                  storageClassName: local-path
+                  storageClassName: {{ .Values.alertmanager.storageClassName }}
                   accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
-                      storage: 2Gi
+                      storage: {{ .Values.alertmanager.storageClassSize  }}
           ingress:
             enabled: true
             ingressClassName: nginx

@@ -22,10 +22,10 @@ spec:
           replicas: 1
           persistence:
             enabled: true
-            storageClass: local-path
+            storageClass: {{ .Values.observability.loki.storageClassName }}
             accessModes:
               - ReadWriteOnce
-            size: 10Gi
+            size: {{ .Values.observability.loki.size }}
 
         # Required to avoid dual-mode conflict
         backend: { replicas: 0 }

@@ -193,7 +193,6 @@ jobs:
           internal_ip         = "${{ env.INTERNAL_IP }}"
           external_ip         = "${{ env.EXTERNAL_IP }}"
           hostname            = "${{ secrets.HOSTNAME }}"
-          storage             = "local-path"
           EOF
 
       - name: Terraform Init

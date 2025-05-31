@@ -17,7 +17,8 @@ authelia:
     port: 587
     sender: authelia@example.com
     username: authelia@example.com
-  storageClass: local-path
+  storageClassName: rook-ceph-block
+  size: 100Mi
 certmanager:
   enabled: false
 externaldns:
@@ -28,5 +29,17 @@ nginxingress:
   enabled: false
 observability:
   enabled: false
+  grafana:
+    storageClassName: rook-ceph-block
+    size: 10Gis
+  prometheus:
+    storageClassName: rook-ceph-block
+    size: 10Gi
+  alertmanager:
+    storageClassName: rook-ceph-block
+    size: 2Gi
+  loki:
+    storageClassName: rook-ceph-block
+    10Gi
 whoami:
   enabled: false

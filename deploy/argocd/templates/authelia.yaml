@@ -1,4 +1,3 @@
-{{ if .Values.authelia.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -23,15 +22,50 @@ spec:
         image:
           repository: ghcr.io/authelia/authelia
 
+        pod:
+          replicas: 1
+          kind: StatefulSet
+          revisionHistoryLimit: 2
+          # command:
+          #   - tail
+          # args:
+          #   - -f
+          #   - /dev/null
+          env:
+            - name: AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
+              value: /secrets/authelia/storage.encryption.key
+            - name: AUTHELIA_SESSION_ENCRYPTION_KEY_FILE
+              value: /secrets/authelia/session.encryption.key
         secret:
+          disabled: true
           existingSecret: authelia
+          mountPath: /secrets
 
+          additionalSecrets:
+            authelia:
+              items:
+                - key: oidc.sharedsecret
+                  path: oidc.sharedsecret
+                - key: identity_providers.oidc.jwks
+                  path: identity_providers.oidc.jwks
+                - key: identity_providers.oidc.issuer_private_key
+                  path: identity_providers.oidc.issuer_private_key
+                - key: session.encryption.key
+                  path: session.encryption.key
+                - key: storage.encryption.key
+                  path: storage.encryption.key
+                - key: oidc.sharedsecret.nextcloud
+                  path: oidc.sharedsecret.nextcloud
+                - key: oidc.sharedsecret.jellyfin
+                  path: oidc.sharedsecret.jellyfin
+                - key: oidc.sharedsecret.grafana
+                  path: oidc.sharedsecret.grafana
         persistence:
           enabled: true
-          storageClass: local-path
+          storageClass: {{ .Values.authelia.storageClassName }}
           accessModes:
-            - ReadWriteMany
-          size: 100Mi
+            - ReadWriteOnce
+          size: {{ .Values.authelia.size }}
           mountPath: /config
 
         ingress:
@@ -42,33 +76,39 @@ spec:
             external-dns.alpha.kubernetes.io/hostname: "auth.{{ .Values.domain }}."
             external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
             external-dns.alpha.kubernetes.io/ttl: "120"
-          hosts:
+          rulesOverride:
             - host: auth.{{ .Values.domain }}
-              paths:
-                - path: /
-                  pathType: Prefix
+              path: /
           tls:
             enabled: true
             secret: auth-tls
 
-        pod:
-          replicas: 1
-          kind: StatefulSet
-          revisionHistoryLimit: 2
-
         configMap:
           log:
             level: info
-          default_redirection_url: https://auth.{{ .Values.domain }}
           theme: dark
           authentication_backend:
             file:
               enabled: true
+            password_reset:
+              disable: true
           session:
+            encryption_key:
+              disabled: false
+              secret_name: authelia
+              path: session.encryption.key
             domain: {{ .Values.domain }}
             expiration: 1h
             inactivity: 5m
+            cookies:
+              - domain: {{ .Values.domain }}
+                name: authelia_session
           storage:
+            encryption_key:
+              disabled: false
+              secret_name: ~
+              value: ''
+              path: /secrets/authelia/storage.encryption.key
             local:
               enabled: true
               path: /config/db.sqlite3
@@ -88,54 +128,27 @@ spec:
                 server_name: {{ .Values.authelia.smtp.host }}
                 skip_verify: false
                 minimum_version: TLS1.2
-          #identity_providers:
-            # oidc:
-            #   enabled: true
-            #   clients:
-            #     - id: grafana
-            #       description: Grafana
-            #       secret: "topsecret"
-            #       public: false
-            #       authorization_policy: two_factor
-            #       redirect_uris:
-            #         - https://grafana.{{ .Values.domain }}/login/generic_oauth
-            #       scopes:
-            #         - openid
-            #         - profile
-            #         - groups
-            #         - email
-            #       userinfo_signing_algorithm: none
-            #     - id: nextcloud-client
-            #       secret: " .Values.oidc.sharedsecret "
-            #       redirect_uris:
-            #         - https://nextcloud.{{ .Values.domain }}/apps/oidc_login/oidc
-            #       grants:
-            #         - authorization_code
-            #       scopes:
-            #         - openid
-            #         - profile
-            #         - email
-            #         - groups
-            #       response_types:
-            #         - code
-            #       audience: []
-            #       public: false
-            #       authorization_policy: two_factor
-            #     - id: jellyfin
-            #       secret: " .Values.jellyfin.oidc.sharedsecret "
-            #       authorization_policy: one_factor
-            #       public: false
-            #       require_pkce: true
-            #       pkce_challenge_method: S256
-            #       userinfo_signed_response_alg: none
-            #       token_endpoint_auth_method: client_secret_post
-            #       redirect_uris:
-            #         - https://jellyfin.{{ .Values.domain }}/sso/OID/redirect/authelia
-            #       scopes:
-            #         - openid
-            #         - profile
-            #         - groups
-            #         - email
+          identity_providers:
+            oidc:
+              enabled: true
+              jwks:
+                - algorithm: RS256
+                  key:
+                    path: /secrets/authelia/identity_providers.oidc.jwks
+              clients:
+                - client_id: grafana
+                  client_name: Grafana
+                  client_secret:
+                    path: /secrets/authelia/oidc.sharedsecret.grafana
+                  public: false
+                  authorization_policy: two_factor
+                  redirect_uris:
+                    - https://grafana.{{ .Values.domain }}/login/generic_oauth
+                  scopes:
+                    - openid
+                    - profile
+                    - groups
+                    - email
           access_control:
             default_policy: deny
             rules:
@@ -143,8 +156,6 @@ spec:
                 policy: bypass
                 networks:
                   - 10.42.0.0/16
-              - domain: ['nextcloud.{{ .Values.domain }}', 'jellyfin.{{ .Values.domain }}']
-                policy: bypass
               - domain: ['ha.{{ .Values.domain }}']
                 policy: bypass
                 resources:
@@ -190,4 +201,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-{{ end }}
