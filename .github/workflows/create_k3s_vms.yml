@@ -37,7 +37,10 @@ jobs:
           external_ip         = "${{ env.EXTERNAL_IP }}"
           proxmox_api_url     = "${{ secrets.PROXMOX_API_URL }}"
           proxmox_api_token   = "${{ secrets.PROXMOX_API_TOKEN }}"
-
+          ssh_username        = "${{ secrets.SSH_USERNAME }}"
+          ssh_server_address  = "${{ secrets.SSH_SERVER_ADDRESS }}"
+          ssh_server_port     = "${{ secrets.SSH_SERVER_PORT }}"
+          ssh_private_key     = "${{ secrets.SSH_PRIVATE_KEY }}"
           # --- Hardcoded values ---
           vm_count            = 1
           vm_core_count       = 8

@@ -24,8 +24,8 @@ resource "proxmox_virtual_environment_vm" "k3s_vm" {
   }
 
   cpu {
-    type   = "host"
-    cores  = "${var.vm_core_count}"
+    type    = "host"
+    cores   = "${var.vm_core_count}"
     sockets = 1
   }
 
@@ -69,8 +69,38 @@ resource "proxmox_virtual_environment_vm" "k3s_vm" {
   }
 
   serial_device {}
-}
 
+  # Prevent autostart (we'll start it manually after post-creation setup)
+  started = false
+}
+resource "null_resource" "vm_post_setup" {
+  count = var.vm_count
+
+  depends_on = [proxmox_virtual_environment_vm.k3s_vm]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      echo '${var.ssh_private_key}' | base64 -d > /tmp/id_ed25519_vm${count.index}
+      chmod 600 /tmp/id_ed25519_vm${count.index}
+
+      echo "🔐 Testing SSH connectivity..."
+      ACTUAL_HOSTNAME=$(ssh -i /tmp/id_ed25519_vm${count.index} -p ${var.ssh_server_port} -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} 'hostname')
+      if [ "$ACTUAL_HOSTNAME" != "${var.hostname}" ]; then
+        echo "❌ Hostname mismatch. Expected '${var.hostname}', got '$ACTUAL_HOSTNAME'"
+        exit 1
+      fi
+
+      echo "⚙️  Setting vcpus and attaching /dev/sda to VM ID ${100 + count.index}..."
+      ssh -i /tmp/id_ed25519_vm${count.index} -p ${var.ssh_server_port} -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} \\
+        "qm set ${100 + count.index} --vcpus ${var.vm_core_count} && \\
+         qm set ${100 + count.index} --virtio1 /dev/sda && \\
+         qm start ${100 + count.index}"
+
+      echo "✅ VM ${100 + count.index} updated and started successfully."
+    EOT
+    interpreter = ["/bin/bash", "-c"]
+  }
+}
 # resource "null_resource" "upload_ips" {
 #   count       = var.vm_count
 #   depends_on  = [proxmox_virtual_environment_vm.k3s_vm]
