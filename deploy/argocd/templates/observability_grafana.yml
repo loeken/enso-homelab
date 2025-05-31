@@ -23,10 +23,10 @@ spec:
 
         persistence:
           enabled: true
-          storageClassName: {{ .Values.observability.grafana.storageClassName}}
+          storageClassName: {{ .Values.observability.grafana.storageClassName }}
           accessModes:
             - ReadWriteOnce
-          size: {{ .Values.observability.grafana.storageClassName}}
+          size: {{ .Values.observability.grafana.size }}
         grafana.ini:
           server:
             root_url: https://grafana.{{ .Values.domain }}

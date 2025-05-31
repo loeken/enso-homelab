@@ -23,8 +23,6 @@ certmanager:
   enabled: false
 externaldns:
   enabled: false
-nfsprovisioner:
-  enabled: false
 nginxingress:
   enabled: false
 observability:
@@ -43,7 +41,13 @@ observability:
     size: 10Gi
 vaultwarden:
   enabled: false
+  useAuthelia: false
   ingress:
     enabled: true
+  storageClassName: root-ceph-block
+  size: 1Gi
+  pg:
+    storageClassName: root-ceph-block
+    size: 1Gi
 whoami:
   enabled: false
