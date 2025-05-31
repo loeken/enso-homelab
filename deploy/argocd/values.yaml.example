@@ -40,6 +40,10 @@ observability:
     size: 2Gi
   loki:
     storageClassName: rook-ceph-block
-    10Gi
+    size: 10Gi
+vaultwarden:
+  enabled: false
+  ingress:
+    enabled: true
 whoami:
   enabled: false
