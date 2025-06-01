@@ -115,7 +115,7 @@
   ignore_errors: true
   when: "'pve' not in kernel_version.stdout"
 
-- name: Pause to let system start rebooting
+- name: Pause for 150seconds to let system start rebooting ( behind nat otherwise times out )
   ansible.builtin.pause:
     seconds: 150
   when: "'pve' not in kernel_version.stdout"

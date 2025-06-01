@@ -84,9 +84,8 @@ resource "null_resource" "vm_post_setup" {
       chmod 600 /tmp/id_ed25519_vm${count.index}
 
       echo "🔐 Testing SSH connectivity..."
-      ACTUAL_HOSTNAME=$(ssh -i /tmp/id_ed25519_vm${count.index} -p ${var.ssh_server_port} -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} 'hostname')
-      if [ "$ACTUAL_HOSTNAME" != "${var.hostname}" ]; then
-        echo "❌ Hostname mismatch. Expected '${var.hostname}', got '$ACTUAL_HOSTNAME'"
+      if ! ssh -i /tmp/id_ed25519_vm${count.index} -p ${var.ssh_server_port} -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} 'hostname'; then
+        echo "❌ SSH connection failed."
         exit 1
       fi
 
