@@ -1,4 +1,4 @@
-{{ if .Values.k10.enabled }}
+#{{ if .Values.k10.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -33,4 +33,4 @@ spec:
     syncOptions:
     - CreateNamespace=true
 
-{{ end }}
+#{{ end }}
