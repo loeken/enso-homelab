@@ -46,7 +46,7 @@ observability:
     size: 10Gi
 rookceph:
   enabled: false
-rookceph-cluster:
+rookcephcluster:
   enabled: false
 vaultwarden:
   enabled: false
