@@ -23,6 +23,10 @@ certmanager:
   enabled: false
 externaldns:
   enabled: false
+k10:
+  storageClassName: rook-ceph-block
+  sidecar:
+    enabled: false
 nginxingress:
   enabled: false
 observability:
