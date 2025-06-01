@@ -39,6 +39,10 @@ observability:
   loki:
     storageClassName: rook-ceph-block
     size: 10Gi
+rook-ceph:
+  enabled: false
+rook-ceph-cluster:
+  enabled: false
 vaultwarden:
   enabled: false
   useAuthelia: false

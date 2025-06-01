@@ -1,3 +1,4 @@
+{{ if .Values.authelia.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -44,8 +45,6 @@ spec:
           additionalSecrets:
             authelia:
               items:
-                - key: oidc.sharedsecret
-                  path: oidc.sharedsecret
                 - key: identity_providers.oidc.jwks
                   path: identity_providers.oidc.jwks
                 - key: identity_providers.oidc.issuer_private_key
@@ -201,3 +200,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+{{ end }}
