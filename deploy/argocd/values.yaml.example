@@ -24,6 +24,7 @@ certmanager:
 externaldns:
   enabled: false
 k10:
+  enabled: false
   storageClassName: rook-ceph-block
   sidecar:
     enabled: false
