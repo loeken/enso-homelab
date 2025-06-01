@@ -91,9 +91,9 @@ resource "null_resource" "vm_post_setup" {
 
       echo "⚙️  Setting vcpus and attaching /dev/sda to VM ID ${100 + count.index}..."
       ssh -i /tmp/id_ed25519_vm${count.index} -p ${var.ssh_server_port} -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} \\
-        "qm set ${100 + count.index} --vcpus ${var.vm_core_count} && \\
-         qm set ${100 + count.index} --virtio1 /dev/sda && \\
-         qm start ${100 + count.index}"
+        "sudo qm set ${100 + count.index} --vcpus ${var.vm_core_count} && \\
+         sudo qm set ${100 + count.index} --virtio1 /dev/sda && \\
+         sudo qm start ${100 + count.index}"
 
       echo "✅ VM ${100 + count.index} updated and started successfully."
     EOT
