@@ -1,24 +1,26 @@
-# apiVersion: argoproj.io/v1alpha1
-# kind: Application
-# metadata:
-#   name: rook-ceph-snapshot-controller
-#   namespace: argocd
-# spec:
-#   project: default
-#   source:
-#     repoURL: https://github.com/kubernetes-csi/external-snapshotter.git
-#     targetRevision: v8.2.0
-#     path: deploy/kubernetes/snapshot-controller
-#     kustomize:
-#       enabled: false
-#     directory:
-#       recurse: true
-#   destination:
-#     server: https://kubernetes.default.svc
-#     namespace: kube-system
-#   syncPolicy:
-#     automated:
-#       selfHeal: true
-#       prune: true
-#     syncOptions:
-#       - CreateNamespace=true
+{{ if .Values.certmanager.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"  # Ensure this runs after cert-manager is installed
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: snapshot-controller
+  namespace: argocd
+spec:
+  destination:
+    namespace: cert-manager
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: deploy/helm/snapshot-controller
+    repoURL: https://github.com/loeken/enso-homelab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=false
+{{ end }}
