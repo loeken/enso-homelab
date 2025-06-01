@@ -1,9 +1,6 @@
-#{{ if .Values.k10.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd.argoproj.io/sync-wave: "7"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: k10
@@ -25,12 +22,10 @@ spec:
         injectKanisterSidecar:
           enabled: {{ .Values.k10.sidecar.enabled }}
     repoURL: https://charts.kasten.io/
-    targetRevision: 7.0.14
+    targetRevision: 8.0.0
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
     - CreateNamespace=true
-
-#{{ end }}
