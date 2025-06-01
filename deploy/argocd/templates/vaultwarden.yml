@@ -97,7 +97,7 @@ spec:
         - secretRef:
             name: vaultwarden
     repoURL: https://loeken.github.io/helm-charts
-    targetRevision: 1.33.1
+    targetRevision: 1.34.1
   syncPolicy:
     automated:
       prune: true

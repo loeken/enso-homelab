@@ -29,7 +29,7 @@ observability:
   enabled: false
   grafana:
     storageClassName: rook-ceph-block
-    size: 10Gis
+    size: 10Gi
   prometheus:
     storageClassName: rook-ceph-block
     size: 10Gi
