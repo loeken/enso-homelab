@@ -48,10 +48,10 @@ vaultwarden:
   useAuthelia: false
   ingress:
     enabled: true
-  storageClassName: root-ceph-block
+  storageClassName: rook-ceph-block
   size: 1Gi
   pg:
-    storageClassName: root-ceph-block
+    storageClassName: rook-ceph-block
     size: 1Gi
 whoami:
   enabled: false
