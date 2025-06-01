@@ -99,6 +99,28 @@ spec:
                 csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
                 csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
                 csi.storage.k8s.io/fstype: ext4
+        csi:
+          enableRbdSnapshotter: true
+          enableCephfsSnapshotter: true
+
+        volumeSnapshotClasses:
+          - name: rook-ceph-block-snapshot
+            isDefault: true
+            driver: rook-ceph.rbd.csi.ceph.com
+            deletionPolicy: Delete
+            parameters:
+              clusterID: rook-ceph
+              csi.storage.k8s.io/snapshotter-secret-name: rook-csi-rbd-provisioner
+              csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph
+
+          - name: rook-cephfs-snapshot
+            isDefault: false
+            driver: rook-ceph.cephfs.csi.ceph.com
+            deletionPolicy: Delete
+            parameters:
+              clusterID: rook-ceph
+              csi.storage.k8s.io/snapshotter-secret-name: rook-csi-cephfs-provisioner
+              csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph
 
   destination:
     server: https://kubernetes.default.svc
