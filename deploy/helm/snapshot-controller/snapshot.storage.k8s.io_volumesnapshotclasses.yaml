@@ -6,6 +6,7 @@ metadata:
     api-approved.kubernetes.io: "https://github.com/kubernetes-csi/external-snapshotter/pull/814"
     controller-gen.kubebuilder.io/version: v0.15.0
     snapshot.storage.kubernetes.io/is-default-class: "true"
+    k10.kasten.io/is-snapshot-class: "true"
   name: volumesnapshotclasses.snapshot.storage.k8s.io
 spec:
   group: snapshot.storage.k8s.io
