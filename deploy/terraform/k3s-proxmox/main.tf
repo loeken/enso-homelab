@@ -80,26 +80,27 @@ resource "null_resource" "vm_post_setup" {
 
   provisioner "local-exec" {
     command = <<EOT
-      echo '${var.ssh_private_key}' | base64 -d > /tmp/id_ed25519_vm${count.index}
-      chmod 600 /tmp/id_ed25519_vm${count.index}
+echo '${var.ssh_private_key}' | base64 -d > /tmp/id_ed25519_vm${count.index}
+chmod 600 /tmp/id_ed25519_vm${count.index}
 
-      echo "🔐 Testing SSH connectivity..."
-      if ! ssh -i /tmp/id_ed25519_vm${count.index} -p ${var.ssh_server_port} -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} 'hostname'; then
-        echo "❌ SSH connection failed."
-        exit 1
-      fi
+echo "🔐 Testing SSH connectivity..."
+if ! ssh -i /tmp/id_ed25519_vm${count.index} -p ${var.ssh_server_port} -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} 'hostname'; then
+  echo "❌ SSH connection failed."
+  exit 1
+fi
 
-      echo "⚙️  Setting vcpus and attaching /dev/sda to VM ID ${100 + count.index}..."
-      ssh -i /tmp/id_ed25519_vm${count.index} -p ${var.ssh_server_port} -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} \\
-        "sudo qm set ${100 + count.index} --vcpus ${var.vm_core_count} && \\
-         sudo qm set ${100 + count.index} --virtio1 /dev/sda && \\
-         sudo qm start ${100 + count.index}"
+echo "⚙️  Setting vcpus and attaching /dev/sda to VM ID ${100 + count.index}..."
+ssh -i /tmp/id_ed25519_vm${count.index} -p ${var.ssh_server_port} -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} \
+  "sudo qm set ${100 + count.index} --vcpus ${var.vm_core_count} && \
+   sudo qm set ${100 + count.index} --virtio1 /dev/sda && \
+   sudo qm start ${100 + count.index}"
 
-      echo "✅ VM ${100 + count.index} updated and started successfully."
-    EOT
+echo "✅ VM ${100 + count.index} updated and started successfully."
+EOT
     interpreter = ["/bin/bash", "-c"]
   }
 }
+
 # resource "null_resource" "upload_ips" {
 #   count       = var.vm_count
 #   depends_on  = [proxmox_virtual_environment_vm.k3s_vm]
