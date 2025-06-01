@@ -9,6 +9,8 @@ spec:
     repoURL: https://github.com/kubernetes-csi/external-snapshotter.git
     targetRevision: v8.2.0
     path: deploy/kubernetes/snapshot-controller
+    kustomize:
+      enabled: false
     directory:
       recurse: true
   destination:
