@@ -23,7 +23,7 @@ spec:
         kanister:
           backupTimeout: 1440
         injectKanisterSidecar:
-          enabled: {{- if .Values.k10.sidecar.enabled }}
+          enabled: {{ .Values.k10.sidecar.enabled }}
     repoURL: https://charts.kasten.io/
     targetRevision: 7.0.14
   syncPolicy:
