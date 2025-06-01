@@ -98,7 +98,7 @@ spec:
           config:
             enabled: true
             readOnly: false
-            storageClass: {{ .Values.vaultwarden.storageClass }}
+            storageClass: {{ .Values.vaultwarden.storageClassName }}
             accessMode: ReadWriteOnce
             size: {{ .Values.vaultwarden.size }}
         postgresql:
@@ -115,7 +115,7 @@ spec:
           primary:
             persistence:
               enabled: true
-              storageClass: {{ .Values.vaultwarden.pg.storageClass }}
+              storageClass: {{ .Values.vaultwarden.pg.storageClassName }}
               size: {{ .Values.vaultwarden.pg.size }}
               accessModes:
                 - ReadWriteOnce
