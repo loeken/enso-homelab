@@ -46,7 +46,7 @@ jobs:
           data_disk_size_gb     = "${{ secrets.DATA_DISK_SIZE_GB  }}"
           macaddr_first_five  = "${{ secrets.MACADDR_FIRST_FIVE }}"
           proxmox_vm_name     = "${{ secrets.HOSTNAME }}"
-          node_names          = ["{{ secrets.HOSTNAME }}"]
+          node_names          = ${{ secrets.NODE_NAMES }}
           EOF
 
       - name: Start SSH tunnel to Proxmox API
