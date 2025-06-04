@@ -6,6 +6,10 @@ on:
 jobs:
   create-k3s-vms:
     runs-on: ubuntu-latest
+    env:
+      TF_CLOUD_ORGANIZATION: ${{ secrets.TF_CLOUD_ORGANIZATION }}
+      TF_WORKSPACE: kvms
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_app_terraform_io }}
 
     steps:
       - name: Checkout Repository
@@ -23,6 +27,81 @@ jobs:
             echo "EXTERNAL_IP=${{ secrets.SSH_SERVER_ADDRESS }}" >> "$GITHUB_ENV"
             echo "INTERNAL_IP=${{ secrets.SSH_INTERNAL_ADDRESS }}" >> "$GITHUB_ENV"
           fi
+
+      - name: Ensure Terraform Cloud workspace 'kvms' exists and set to local execution
+        run: |
+          export TF_WORKSPACE="kvms"
+          echo "Checking or creating workspace: ${TF_WORKSPACE}"
+
+          PAYLOAD=$(cat <<EOF
+          {
+            "data": {
+              "attributes": {
+                "name": "${TF_WORKSPACE}",
+                "auto-apply": true
+              },
+              "type": "workspaces"
+            }
+          }
+          EOF
+          )
+
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${TF_TOKEN_app_terraform_io}" \
+            -H "Content-Type: application/vnd.api+json" \
+            -d "$PAYLOAD" \
+            https://app.terraform.io/api/v2/organizations/${TF_CLOUD_ORGANIZATION}/workspaces)
+
+          if [[ "$RESPONSE" == "201" ]]; then
+            echo "✅ Workspace ${TF_WORKSPACE} created."
+          elif [[ "$RESPONSE" == "422" ]]; then
+            echo "ℹ️  Workspace ${TF_WORKSPACE} already exists."
+          else
+            echo "❌ Unexpected response from Terraform Cloud API: HTTP $RESPONSE"
+            exit 1
+          fi
+
+          WORKSPACE_ID=$(curl -s \
+            -H "Authorization: Bearer ${TF_TOKEN_app_terraform_io}" \
+            -H "Content-Type: application/vnd.api+json" \
+            https://app.terraform.io/api/v2/organizations/${TF_CLOUD_ORGANIZATION}/workspaces/${TF_WORKSPACE} | jq -r '.data.id')
+
+          echo "Workspace ID: $WORKSPACE_ID"
+
+          PATCH_PAYLOAD=$(cat <<EOF
+          {
+            "data": {
+              "type": "workspaces",
+              "attributes": {
+                "execution-mode": "local"
+              }
+            }
+          }
+          EOF
+          )
+
+          PATCH_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH \
+            -H "Authorization: Bearer ${TF_TOKEN_app_terraform_io}" \
+            -H "Content-Type: application/vnd.api+json" \
+            -d "$PATCH_PAYLOAD" \
+            https://app.terraform.io/api/v2/workspaces/${WORKSPACE_ID})
+
+          if [[ "$PATCH_RESPONSE" == "200" ]]; then
+            echo "✅ Workspace execution mode set to local."
+          else
+            echo "❌ Failed to set execution mode: HTTP $PATCH_RESPONSE"
+            exit 1
+          fi
+
+      - name: Configure Terraform local execution
+        working-directory: deploy/terraform/k3s-proxmox
+        run: |
+          cat <<EOF > ${{ github.workspace }}/.terraformrc
+          credentials "app.terraform.io" {
+            token = "${TF_TOKEN_app_terraform_io}"
+          }
+          EOF
+
       - name: Generate auto.tfvars from secrets and hardcoded values
         working-directory: deploy/terraform/k3s-proxmox
         run: |
@@ -146,4 +225,3 @@ jobs:
             }
         env:
           VM_COUNT: ${{ secrets.VM_COUNT }}
-
