@@ -38,11 +38,14 @@
 - name: Create primary partition
   command: parted -s /dev/{{ target_disk }} mkpart primary ext4 0% 100%
 
-- name: Format the partition
+- name: Format the partition as ext4
   filesystem:
     fstype: ext4
     dev: "/dev/{{ target_disk }}1"
-    label: "data"
+
+- name: Set ext4 volume label
+  command: e2label /dev/{{ target_disk }}1 data
+  when: ansible_facts.devices[target_disk].partitions is defined
 
 - name: Create mount point
   file:
