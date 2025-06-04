@@ -37,3 +37,14 @@ variable "hostname" {
   type        = string
   description = "Expected hostname of the server"
 }
+variable "is_primary" {
+  type        = bool
+  default     = true
+  description = "If true, installs a new K3s cluster. If false, joins an existing K3s cluster using k3s_primary_internal_ip."
+}
+
+variable "k3s_primary_internal_ip" {
+  type        = string
+  default     = ""
+  description = "The internal IP of the primary K3s server. Required when is_primary is false."
+}

@@ -86,39 +86,64 @@ jobs:
         with:
           github-token: ${{ secrets.PAT_GITHUB_TOKEN }}
           script: |
+            const vmCount = parseInt(process.env.VM_COUNT || "1", 10);
+            const baseIP = "192.168.1.202";
+            const sshPort = "60024";
+            const hostname = "k3s-enso-01";
+
+            let commentBody = "✅ K3s VMs have been created successfully!\n\n";
+
+            for (let i = 0; i < vmCount; i++) {
+              const isPrimary = i === 0;
+              const internalIP = `192.168.1.20${2 + i}`;
+              const externalIP = internalIP; // Adjust if different
+              const primaryIP = "192.168.1.202";
+
+              commentBody += `# for ${isPrimary ? "k3s primary" : `k3s node ${i + 1}`}\n`;
+              commentBody += "```sh\n";
+              commentBody += `# Update SSH port (default is 22 for the VM)\n`;
+              commentBody += `gh secret set SSH_SERVER_PORT --body "${sshPort}"\n\n`;
+
+              commentBody += `# Update internal IP address to the VM's IP\n`;
+              commentBody += `gh secret set SSH_INTERNAL_ADDRESS --body "${internalIP}"\n\n`;
+
+              commentBody += `# Update external IP if needed\n`;
+              commentBody += `gh secret set SSH_SERVER_ADDRESS --body "${externalIP}"\n\n`;
+
+              commentBody += `# Change hostname to k3s server\n`;
+              commentBody += `gh secret set HOSTNAME --body "${hostname}"\n\n`;
+
+              commentBody += `# Set if this node is primary\n`;
+              commentBody += `gh secret set IS_PRIMARY --body "${isPrimary}"\n\n`;
+
+              commentBody += `# Set the primary internal IP (used to join)\n`;
+              commentBody += `gh secret set K3S_PRIMARY_INTERNAL_IP --body "${primaryIP}"\n\n`;
+
+              commentBody += `/install-k3s\n`;
+              commentBody += "```\n\n";
+            }
+
             const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: "open",
               per_page: 10
             });
+
             const onboarding = issues.data.find(issue =>
               issue.title && issue.title.includes("Welcome! Let's deploy your homelab")
             );
+
             if (onboarding) {
               await github.rest.issues.createComment({
                 issue_number: onboarding.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: "✅ K3s VMs have been created successfully!\n\n" +
-                      "📝 **Update SSH credentials:**\n" +
-                      "```sh\n" +
-                      "# Update SSH port (default is 22 for the VM)\n" +
-                      "gh secret set SSH_SERVER_PORT --body \"22\"\n\n" +
-                      "# Update internal IP address to the VM's IP\n" +
-                      "gh secret set SSH_INTERNAL_ADDRESS --body \"<VM_INTERNAL_IP>\"\n\n" +
-                      "# Update external IP if needed\n" +
-                      "gh secret set SSH_SERVER_ADDRESS --body \"<VM_EXTERNAL_IP>\"\n\n" +
-                      "# Change hostname to k3s server\n" +
-                      "gh secret set HOSTNAME --body \"<k3s-enso-01>\"\n" +
-                      "```\n\n" +
-                      "▶️ **Then comment:**\n" +
-                      "```sh\n" +
-                      "/install-k3s\n" +
-                      "```\n" +
-                      "to continue with the installation."
+                body: commentBody
               });
             } else {
               core.warning("No onboarding issue found.");
             }
+        env:
+          VM_COUNT: ${{ secrets.VM_COUNT }}
 
