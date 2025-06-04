@@ -20,12 +20,12 @@ resource "proxmox_virtual_environment_vm" "k3s_vm" {
   }
 
   memory {
-    dedicated = "${var.vm_memory_mb}"
+    dedicated = var.vm_memory_mb
   }
 
   cpu {
     type    = "host"
-    cores   = "${var.vm_core_count}"
+    cores   = var.vm_core_count
     sockets = 1
   }
 
@@ -35,18 +35,18 @@ resource "proxmox_virtual_environment_vm" "k3s_vm" {
     down_delay = "60"
   }
 
-  disk {
-    file_format  = "raw"
-    datastore_id = "local"
-    size         = "${var.vm_disk_size_gb}"
-    interface    = "virtio0"
+  dynamic "disk" {
+    for_each = var.vm_count > 1 ? [1] : []
+    content {
+      file_format  = "raw"
+      datastore_id = "local"
+      size         = var.vm_disk_size_gb
+      interface    = "virtio0"
+    }
   }
-  disk {
-    file_format  = "raw"
-    datastore_id = "data" # matches /mnt/data
-    size         = "${var.data_disk_size_gb}"
-    interface    = "scsi1"
-  }
+
+  # For vm_count == 1, no disk block (disk will be added via post-setup)
+
   initialization {
     datastore_id = "local"
     interface    = "ide2"
@@ -75,34 +75,37 @@ resource "proxmox_virtual_environment_vm" "k3s_vm" {
 
   serial_device {}
 
+  # Only autostart for multi-node mode
+  started = var.vm_count > 1 ? true : false
 }
-# resource "null_resource" "vm_post_setup" {
-#   count = var.vm_count
 
-#   depends_on = [proxmox_virtual_environment_vm.k3s_vm]
+resource "null_resource" "vm_post_setup" {
+  count = var.vm_count == 1 ? 1 : 0
 
-#   provisioner "local-exec" {
-#     command = <<EOT
-# echo '${var.ssh_private_key}' | base64 -d > /tmp/id_ed25519_vm${count.index}
-# chmod 600 /tmp/id_ed25519_vm${count.index}
+  depends_on = [proxmox_virtual_environment_vm.k3s_vm]
 
-# echo "🔐 Testing SSH connectivity..."
-# if ! ssh -i /tmp/id_ed25519_vm${count.index} -p ${var.ssh_server_port} -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} 'hostname'; then
-#   echo "❌ SSH connection failed."
-#   exit 1
-# fi
+  provisioner "local-exec" {
+    command = <<EOT
+echo '${var.ssh_private_key}' | base64 -d > /tmp/id_ed25519_vm${count.index}
+chmod 600 /tmp/id_ed25519_vm${count.index}
 
-# echo "⚙️  Setting vcpus and attaching /dev/sda to VM ID ${100 + count.index}..."
-# ssh -i /tmp/id_ed25519_vm${count.index} -p ${var.ssh_server_port} -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} \
-#   "sudo qm set ${100 + count.index} --vcpus ${var.vm_core_count} && \
-#    sudo qm set ${100 + count.index} --virtio1 /dev/sda && \
-#    sudo qm start ${100 + count.index}"
+echo "🔐 Testing SSH connectivity..."
+if ! ssh -i /tmp/id_ed25519_vm${count.index} -p ${var.ssh_server_port} -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} 'hostname'; then
+  echo "❌ SSH connection failed."
+  exit 1
+fi
 
-# echo "✅ VM ${100 + count.index} updated and started successfully."
-# EOT
-#     interpreter = ["/bin/bash", "-c"]
-#   }
-# }
+echo "⚙️  Setting vcpus and attaching /dev/sda to VM ID ${100 + count.index}..."
+ssh -i /tmp/id_ed25519_vm${count.index} -p ${var.ssh_server_port} -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} \
+  "sudo qm set ${100 + count.index} --vcpus ${var.vm_core_count} && \
+   sudo qm set ${100 + count.index} --virtio1 /dev/sda && \
+   sudo qm start ${100 + count.index}"
+
+echo "✅ VM ${100 + count.index} updated and started successfully."
+EOT
+    interpreter = ["/bin/bash", "-c"]
+  }
+}
 
 # resource "null_resource" "upload_ips" {
 #   count       = var.vm_count
