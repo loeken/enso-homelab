@@ -1,0 +1,15 @@
+- name: Check for partitions on {{ item }}
+  command: lsblk -no NAME /dev/{{ item }}
+  register: part_check
+  changed_when: false
+
+- name: Check for filesystem signatures on {{ item }}
+  command: blkid /dev/{{ item }}
+  register: fs_check
+  failed_when: false
+  changed_when: false
+
+- name: Add disk {{ item }} to clean_disks if it is clean
+  set_fact:
+    clean_disks: "{{ clean_disks + [ item ] }}"
+  when: (part_check.stdout_lines | length == 1) and (fs_check.rc != 0)
