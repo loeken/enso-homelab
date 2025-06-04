@@ -1,3 +1,4 @@
+---
 - name: Check for partitions on {{ item }}
   command: lsblk -no NAME /dev/{{ item }}
   register: part_check
