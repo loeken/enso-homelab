@@ -20,6 +20,9 @@
 - name: Check if each disk is clean (no partitions, no blkid)
   vars:
     disk_path: "/dev/{{ item }}"
+  loop: "{{ candidate_disks }}"
+  loop_control:
+    loop_var: item
   block:
     - name: Check for partitions
       command: lsblk -no NAME /dev/{{ item }}
@@ -36,7 +39,6 @@
       set_fact:
         clean_disks: "{{ clean_disks + [ item ] }}"
       when: (part_check.stdout_lines | length == 1) and (fs_check.rc != 0)
-  loop: "{{ candidate_disks }}"
 
 - name: Fail if not exactly one clean disk is found
   fail:
