@@ -43,7 +43,7 @@ jobs:
           vm_core_count       = "${{ secrets.VM_CORE_COUNT }}"
           vm_memory_mb        = "${{ secrets.VM_MEMORY_MB }}"
           vm_disk_size_gb     = "${{ secrets.VM_DISK_SIZE_GB  }}"
-          data_disk_size_gb     = "${{ secrets.DATA_DISK_SIZE_GB  }}"
+          data_disk_size_gb     = ${{ secrets.DATA_DISK_SIZE_GB  }}
           macaddr_first_five  = "${{ secrets.MACADDR_FIRST_FIVE }}"
           proxmox_vm_name     = "${{ secrets.HOSTNAME }}"
           node_names          = ["{{ secrets.HOSTNAME }}"]
