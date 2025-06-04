@@ -1,33 +1,31 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-required_secrets=(
-  SSH_USERNAME
-  SSH_SERVER_ADDRESS
-  SSH_INTERNAL_ADDRESS
-  SSH_SERVER_PORT
-  SSH_PRIVATE_KEY
-  TF_TOKEN_app_terraform_io
-  HOSTNAME
-  TF_CLOUD_ORGANIZATION
-  PAT_GITHUB_TOKEN
-  RENOVATE_TOKEN
-  DEPLOYMENT_TYPE
-)
+echo "🔍 Validating all provided environment variables..."
 
-echo "🔍 Validating required GitHub secrets..."
+# Filter out known non-user env vars
+ignore_prefixes=("GITHUB_" "RUNNER_" "CI" "HOME" "PATH" "PWD" "OLDPWD" "SHLVL")
 
 missing=0
-for var in "${required_secrets[@]}"; do
-  if [ -z "${!var}" ]; then
-    echo "❌ $var is not set"
+
+# Loop through all current env vars
+while IFS='=' read -r key _; do
+  # Skip ignored system vars
+  for prefix in "${ignore_prefixes[@]}"; do
+    if [[ "$key" == "$prefix"* ]]; then
+      continue 2
+    fi
+  done
+
+  if [ -z "${!key}" ]; then
+    echo "❌ $key is not set!"
     missing=1
   fi
-done
+done < <(env)
 
 if [ "$missing" -eq 1 ]; then
-  echo "🚫 One or more required secrets are missing."
+  echo "🚫 One or more required env vars are missing."
   exit 1
 fi
 
-echo "✅ All required secrets are present."
+echo "✅ All required env vars are present."
