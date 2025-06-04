@@ -61,12 +61,14 @@
     state: mounted
 
 - name: Check if storage already exists
-  command: pvesh get /storage
+  command: pvesh get /storage --output-format json
   register: existing_storage
   changed_when: false
 
 - name: Register Proxmox storage as 'data' if not already present
-  when: "'data' not in (existing_storage.stdout | from_json | map(attribute='storage') | list)"
+  when: >
+    existing_storage.stdout | length > 0 and
+    'data' not in (existing_storage.stdout | from_json | map(attribute='storage') | list)
   command: >
     pvesh create /storage
     -storage data
