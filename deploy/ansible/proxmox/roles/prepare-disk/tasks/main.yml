@@ -1,0 +1,88 @@
+---
+- name: Get all block devices of type 'disk'
+  command: lsblk -dn -o NAME,TYPE
+  register: raw_disks_output
+  changed_when: false
+
+- name: Extract all disk device names (no filtering)
+  set_fact:
+    candidate_disks: >-
+      {{ raw_disks_output.stdout_lines
+         | map('split')
+         | selectattr('1', 'equalto', 'disk')
+         | map('first')
+         | list }}
+
+- name: Initialize list of clean disks
+  set_fact:
+    clean_disks: []
+
+- name: Check if each disk is clean (no partitions, no blkid)
+  vars:
+    disk_path: "/dev/{{ item }}"
+  block:
+    - name: Check for partitions
+      command: lsblk -no NAME /dev/{{ item }}
+      register: part_check
+      changed_when: false
+
+    - name: Check for filesystem signatures
+      command: blkid /dev/{{ item }}
+      register: fs_check
+      failed_when: false
+      changed_when: false
+
+    - name: Add disk to clean_disks if it is clean
+      set_fact:
+        clean_disks: "{{ clean_disks + [ item ] }}"
+      when: (part_check.stdout_lines | length == 1) and (fs_check.rc != 0)
+  loop: "{{ candidate_disks }}"
+
+- name: Fail if not exactly one clean disk is found
+  fail:
+    msg: "Expected exactly one clean disk, found {{ clean_disks | length }}."
+  when: clean_disks | length != 1
+
+- name: Set target disk fact
+  set_fact:
+    target_disk: "{{ clean_disks[0] }}"
+
+- name: Create GPT partition table
+  command: parted -s /dev/{{ target_disk }} mklabel gpt
+
+- name: Create primary partition
+  command: parted -s /dev/{{ target_disk }} mkpart primary ext4 0% 100%
+
+- name: Format the partition
+  filesystem:
+    fstype: ext4
+    dev: "/dev/{{ target_disk }}1"
+    label: "data"
+
+- name: Create mount point
+  file:
+    path: "/mnt/data"
+    state: directory
+    mode: '0755'
+
+- name: Mount partition
+  mount:
+    path: "/mnt/data"
+    src: "/dev/{{ target_disk }}1"
+    fstype: ext4
+    state: mounted
+
+- name: Check if storage already exists
+  command: pvesh get /storage
+  register: existing_storage
+  changed_when: false
+
+- name: Register Proxmox storage as 'data' if not already present
+  when: "'data' not in (existing_storage.stdout | from_json | map(attribute='storage') | list)"
+  command: >
+    pvesh create /storage
+    -storage data
+    -type dir
+    -path /mnt/data
+    -content images,rootdir
+    -disable 0

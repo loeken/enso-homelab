@@ -49,6 +49,13 @@ jobs:
                 "- `TF_CLOUD_ORGANIZATION`\n" +
                 "- `PAT_GITHUB_TOKEN`\n" +
                 "- `RENOVATE_TOKEN`\n\n" +
+                "### Additional secrets required **only for `/proxmox-single`**:\n" +
+                "- `VM_COUNT` (default: 3)\n" +
+                "- `VM_CORE_COUNT` (default: 3)\n" +
+                "- `VM_MEMORY_MB` (default: 8192)\n" +
+                "- `VM_DISK_SIZE_GB` (default: 100)\n" +
+                "- `VM_DISK_SIZE_GB` (default: 1000)\n" +
+                "- `MACADDR_FIRST_FIVE`\n\n" +
                 "**Example:**\n" +
                 "```sh\n" +
                 "gh secret set DEPLOYMENT_TYPE --body \"your-deployment-type\"\n" +
@@ -62,6 +69,13 @@ jobs:
                 "gh secret set TF_CLOUD_ORGANIZATION --body \"your-tf-org\"\n" +
                 "gh secret set PAT_GITHUB_TOKEN --body \"your-github-token\"\n" +
                 "gh secret set RENOVATE_TOKEN --body \"your-renovate-token\"\n" +
+                "# Only for /proxmox-single:\n" +
+                "gh secret set VM_COUNT --body \"3\"\n" +
+                "gh secret set VM_CORE_COUNT --body \"3\"\n" +
+                "gh secret set VM_MEMORY_MB --body \"8192\"\n" +
+                "gh secret set VM_DISK_SIZE_GB --body \"100\"\n" +
+                "gh secret set VM_DISK_SIZE_GB --body \"1000\"\n" +
+                "gh secret set MACADDR_FIRST_FIVE --body \"00:11:22:33:44\"\n" +
                 "```\n\n" +
                 "---\n\n" +
                 "## 🚦 Choose your deployment path\n\n" +

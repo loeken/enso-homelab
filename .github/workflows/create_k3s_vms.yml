@@ -39,13 +39,14 @@ jobs:
           ssh_server_port     = "${{ secrets.SSH_SERVER_PORT }}"
           ssh_private_key     = "${{ secrets.SSH_PRIVATE_KEY }}"
           # --- Hardcoded values ---
-          vm_count            = 1
-          vm_core_count       = 8
-          vm_memory_mb        = "28672"
-          vm_disk_size_gb     = 100
-          macaddr_first_five  = "8E:AB:AB:4C:CE"
-          proxmox_vm_name     = "k3s-enso"
-          node_names          = ["homelab"]
+          vm_count            = "${{ secrets.VM_COUNT }}"
+          vm_core_count       = "${{ secrets.VM_CORE_COUNT }}"
+          vm_memory_mb        = "${{ secrets.VM_MEMORY_MB }}"
+          vm_disk_size_gb     = "${{ secrets.VM_DISK_SIZE_GB  }}"
+          data_disk_size_gb     = "${{ secrets.DATA_DISK_SIZE_GB  }}"
+          macaddr_first_five  = "${{ secrets.MACADDR_FIRST_FIVE }}"
+          proxmox_vm_name     = "${{ secrets.HOSTNAME }}"
+          node_names          = ["{{ secrets.HOSTNAME }}"]
           EOF
 
       - name: Start SSH tunnel to Proxmox API
