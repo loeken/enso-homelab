@@ -50,14 +50,14 @@ variable "vm_memory_mb" {
 }
 
 variable "vm_disk_size_gb" {
-  type        = number
-  default     = 50
+  type        = string
+  default     = "50"
   description = "Defines the total size for the virtual disk in GB."
 }
 
 variable "data_disk_size_gb" {
-  type        = number
-  default     = 1000
+  type        = string
+  default     = "1000"
   description = "Defines the total size for the data disk in GB. attached to each vm"
 }
 variable "root_password" {

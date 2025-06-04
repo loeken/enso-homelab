@@ -44,7 +44,7 @@ resource "proxmox_virtual_environment_vm" "k3s_vm" {
   disk {
     file_format  = "raw"
     datastore_id = "data" # matches /mnt/data
-    size         = var.data_disk_size_gb
+    size         = "${var.data_disk_size_gb}"
     interface    = "scsi1"
   }
   initialization {
