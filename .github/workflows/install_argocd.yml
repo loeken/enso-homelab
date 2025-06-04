@@ -1,11 +1,11 @@
 name: Install ArgoCD
 
 on:
-  workflow_run:
-    workflows:
-      - Install k3s
-    types:
-      - completed
+  # workflow_run:
+  #   workflows:
+  #     - Install k3s
+  #   types:
+  #     - completed
   workflow_dispatch:
 
 permissions:
