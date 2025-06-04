@@ -75,8 +75,6 @@ resource "proxmox_virtual_environment_vm" "k3s_vm" {
 
   serial_device {}
 
-  # Prevent autostart (we'll start it manually after post-creation setup)
-  started = false
 }
 # resource "null_resource" "vm_post_setup" {
 #   count = var.vm_count
