@@ -30,15 +30,11 @@ spec:
           logCollector:
             enabled: true
           storage:
-            useAllNodes: false
-            useAllDevices: false
+            useAllNodes: true
+            useAllDevices: true
             config:
               osdsPerDevice: "1"
               forceUseDisallowedDevice: "true"
-            nodes:
-              - name: k3s-enso-01
-                devices:
-                  - name: "vdb"
 
         toolbox:
           enabled: true
