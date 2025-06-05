@@ -59,7 +59,6 @@ resource "proxmox_virtual_environment_vm" "k3s_vm" {
       server = "8.8.8.8 1.1.1.1"
     }
 
-    hostname = "k3snode${format("%02d", count.index+1)}"
     user_account {
       keys     = [trimspace(file("~/.ssh/id_ed25519.pub"))]
       username = var.user_name
