@@ -35,13 +35,19 @@ resource "proxmox_virtual_environment_vm" "k3s_vm" {
     down_delay = "60"
   }
 
+  disk {
+    file_format  = "raw"
+    datastore_id = "local"
+    size         = var.vm_disk_size_gb
+    interface    = "virtio0"
+  }
   dynamic "disk" {
-    for_each = var.vm_count > 1 ? [1] : []
+    for_each = var.vm_count == 1 ? [1] : []
     content {
       file_format  = "raw"
-      datastore_id = "local"
-      size         = var.vm_disk_size_gb
-      interface    = "virtio0"
+      datastore_id = "data"
+      size         = var.data_disk_size_gb
+      interface    = "virtio1"
     }
   }
 
