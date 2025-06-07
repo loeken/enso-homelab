@@ -18,6 +18,10 @@ spec:
     helm:
       values: |
         operatorNamespace: rook-ceph
+        monitoring:
+          enabled: true
+          createPrometheusRules: true
+          rulesNamespace: rook-ceph
         cephClusterSpec:
           dataDirHostPath: /var/lib/rook
           mon:
