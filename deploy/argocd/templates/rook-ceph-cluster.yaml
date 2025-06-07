@@ -23,6 +23,9 @@ spec:
           metricsDisabled: false
           createPrometheusRules: true
           rulesNamespaceOverride: rook-ceph
+          prometheusRule:
+            labels:
+              release: prometheus
         cephClusterSpec:
           dataDirHostPath: /var/lib/rook
           mon:
