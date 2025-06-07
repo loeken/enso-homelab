@@ -7,7 +7,7 @@ globalReplicaCount: 0
 
 # app specific
 authelia:
-  enabled: true
+  enabled: false
   filesystem:
     enabled: true
   ingress:
@@ -25,7 +25,7 @@ certmanager:
 externaldns:
   enabled: true
 k10:
-  enabled: false
+  enabled: true
   storageClassName: rook-ceph-block
   sidecar:
     enabled: false
@@ -50,7 +50,7 @@ rookceph:
 rookcephcluster:
   enabled: true
 vaultwarden:
-  enabled: true
+  enabled: false
   useAuthelia: false
   ingress:
     enabled: true
