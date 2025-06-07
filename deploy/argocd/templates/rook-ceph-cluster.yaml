@@ -20,8 +20,9 @@ spec:
         operatorNamespace: rook-ceph
         monitoring:
           enabled: true
+          metricsDisabled: false
           createPrometheusRules: true
-          rulesNamespace: rook-ceph
+          rulesNamespaceOverride: rook-ceph
         cephClusterSpec:
           dataDirHostPath: /var/lib/rook
           mon:
