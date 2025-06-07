@@ -8,6 +8,12 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
+
+  # legacy field still required (any source is fine)
+  source:
+    repoURL: ''
+    path: '.'
+
   sources:
     - repoURL: https://argoproj.github.io/argo-helm
       chart: argo-cd
@@ -15,10 +21,11 @@ spec:
     - repoURL: git@github.com:loeken/enso-homelab-prod
       targetRevision: HEAD
       ref: values
-  source:
-    helm:
-      valueFiles:
-        - $values/deploy/helm/cluster_issuer/argocd-values.yaml
+
+  helm:
+    valueFiles:
+      - $values/deploy/helm/cluster_issuer/argocd-values.yaml
+
   syncPolicy:
     automated:
       prune: true
