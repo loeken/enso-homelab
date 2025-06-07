@@ -4,13 +4,12 @@ metadata:
   name: argocd
   namespace: argocd
 spec:
-  project: default
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
+  project: default
 
-  # legacy field still required (any source is fine)
-  source:
+  source:   # still required for legacy validation; must be dummy
     repoURL: ''
     path: '.'
 
