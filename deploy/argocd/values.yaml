@@ -49,7 +49,7 @@ rookceph:
 rookcephcluster:
   enabled: true
 vaultwarden:
-  enabled: false
+  enabled: true
   useAuthelia: false
   ingress:
     enabled: true
