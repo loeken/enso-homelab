@@ -78,18 +78,18 @@ spec:
                       port: 80
                       name: vaultwarden
                       identifier: vaultwarden
-                  - path: /notifications/hub/negotiate
-                    pathType: Prefix
-                    service:
-                      port: 80
-                      name: vaultwarden
-                      identifier: vaultwarden
-                  - path: /notifications/hub
-                    pathType: Prefix
-                    service:
-                      port: 80
-                      name: vaultwarden
-                      identifier: vaultwarden
+                  # - path: /notifications/hub/negotiate
+                  #   pathType: Prefix
+                  #   service:
+                  #     port: 80
+                  #     name: vaultwarden
+                  #     identifier: vaultwarden
+                  # - path: /notifications/hub
+                  #   pathType: Prefix
+                  #   service:
+                  #     port: 80
+                  #     name: vaultwarden
+                  #     identifier: vaultwarden
             tls:
             - secretName: vaultwarden-tls
               hosts:
