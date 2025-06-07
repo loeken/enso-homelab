@@ -24,7 +24,7 @@ spec:
       targetRevision: 8.0.15
       helm:
         valueFiles:
-          - $values/deploy/helm/cluster_issuer/argocd-values.yaml
+          - $values/deploy/terraform/argocd/argocd-values.yaml
 
     - repoURL: git@github.com:loeken/enso-homelab-prod
       targetRevision: HEAD
