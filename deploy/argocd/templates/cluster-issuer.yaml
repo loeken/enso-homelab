@@ -5,7 +5,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "3"  # Ensure this runs after cert-manager is installed
   finalizers:
-  - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argoproj.io
   name: cluster-issuer
   namespace: argocd
 spec:

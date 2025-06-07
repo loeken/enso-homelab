@@ -2,12 +2,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: observability-grafana
-  namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "15"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+  name: observability-grafana
+  namespace: argocd
 spec:
   project: default
   source:
