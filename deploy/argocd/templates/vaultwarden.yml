@@ -37,6 +37,10 @@ spec:
                   # -- Set the container timezone
                   - name: TZ
                     value: UTC
+                  - name: WEBSOCKET_ENABLED
+                    value: "true"
+                  - name: WEBSOCKET_PORT
+                    value: "3012"
                 envFrom:
                 - secretRef:
                     name: vaultwarden
