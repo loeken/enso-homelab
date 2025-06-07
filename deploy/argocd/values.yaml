@@ -20,16 +20,16 @@ authelia:
   storageClassName: rook-ceph-block
   size: 100Mi
 certmanager:
-  enabled: true
+  enabled: false
 externaldns:
-  enabled: true
+  enabled: false
 k10:
   enabled: false
   storageClassName: rook-ceph-block
   sidecar:
     enabled: false
 nginxingress:
-  enabled: true
+  enabled: false
 observability:
   enabled: false
   grafana:
@@ -45,9 +45,9 @@ observability:
     storageClassName: rook-ceph-block
     size: 10Gi
 rookceph:
-  enabled: true
+  enabled: false
 rookcephcluster:
-  enabled: true
+  enabled: false
 vaultwarden:
   enabled: false
   useAuthelia: false
