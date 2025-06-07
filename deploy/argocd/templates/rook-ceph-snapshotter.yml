@@ -1,4 +1,4 @@
-{{ if .Values.certmanager.enabled }}
+{{ if .Values.rookceph.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -10,7 +10,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: cert-manager
+    namespace: rook-ceph
     server: https://kubernetes.default.svc
   project: default
   source:
