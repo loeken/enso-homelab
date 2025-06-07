@@ -23,6 +23,7 @@ spec:
             type: deployment
             containers:
               main:
+                replicas: {{ .Values.globalReplicaCount }}
                 image:
                   # -- image repository
                   repository: loeken/vaultwarden

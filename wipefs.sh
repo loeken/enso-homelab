@@ -1,5 +1,7 @@
 DISK="/dev/sdX"
 
+apt update
+apt install gdisk parted -y
 # Zap the GPT and partition table
 sgdisk --zap-all $DISK
 
