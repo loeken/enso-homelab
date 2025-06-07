@@ -6,17 +6,17 @@ githubRepo: enso-homelab-prod
 
 # app specific
 authelia:
-  enabled: false
+  enabled: true
   filesystem:
     enabled: true
   ingress:
     enabled: true
   smtp:
     enabled: false
-    host: mail.example.com
+    host: mail.internetz.me
     port: 587
-    sender: authelia@example.com
-    username: authelia@example.com
+    sender: auth@internetz.me
+    username: auth@internetz.me
   storageClassName: rook-ceph-block
   size: 100Mi
 certmanager:
