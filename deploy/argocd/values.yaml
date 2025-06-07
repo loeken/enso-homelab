@@ -7,7 +7,7 @@ globalReplicaCount: 0
 
 # app specific
 authelia:
-  enabled: false
+  enabled: true
   filesystem:
     enabled: true
   ingress:
@@ -50,7 +50,7 @@ rookceph:
 rookcephcluster:
   enabled: true
 vaultwarden:
-  enabled: false
+  enabled: true
   useAuthelia: false
   ingress:
     enabled: true
