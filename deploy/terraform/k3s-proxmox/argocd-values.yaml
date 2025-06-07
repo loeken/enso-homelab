@@ -1,5 +1,5 @@
-server:
-  config:
+configs:
+  cm:
     application.instanceLabelKey: argocd.argoproj.io/instance
     resource.customizations.health.argoproj.io_Application: |
       hs = {}
@@ -18,10 +18,7 @@ server:
       hs = {}
       hs.status = "Healthy"
       return hs
-
-controller:
-  config:
-    repositories: |
-      - url: https://charts.bitnami.com/bitnami
-        name: bitnami
-        type: helm
+  repositories:
+    bitnami:
+      url: https://charts.bitnami.com/bitnami
+      type: helm
