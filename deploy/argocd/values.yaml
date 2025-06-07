@@ -32,7 +32,7 @@ k10:
 nginxingress:
   enabled: true
 observability:
-  enabled: false
+  enabled: true
   grafana:
     storageClassName: rook-ceph-block
     size: 10Gi
