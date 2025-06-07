@@ -20,9 +20,9 @@ authelia:
   storageClassName: rook-ceph-block
   size: 100Mi
 certmanager:
-  enabled: false
+  enabled: true
 externaldns:
-  enabled: false
+  enabled: true
 k10:
   enabled: false
   storageClassName: rook-ceph-block
