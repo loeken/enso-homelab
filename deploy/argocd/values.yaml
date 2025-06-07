@@ -1,0 +1,62 @@
+domain: loeken.xyz
+clusterIssuer: letsencrypt-prod
+clusterName: enso-homelab-prod
+githubUser: loeken
+githubRepo: enso-homelab-prod
+
+# app specific
+authelia:
+  enabled: false
+  filesystem:
+    enabled: true
+  ingress:
+    enabled: true
+  smtp:
+    enabled: false
+    host: mail.example.com
+    port: 587
+    sender: authelia@example.com
+    username: authelia@example.com
+  storageClassName: rook-ceph-block
+  size: 100Mi
+certmanager:
+  enabled: false
+externaldns:
+  enabled: false
+k10:
+  enabled: false
+  storageClassName: rook-ceph-block
+  sidecar:
+    enabled: false
+nginxingress:
+  enabled: false
+observability:
+  enabled: false
+  grafana:
+    storageClassName: rook-ceph-block
+    size: 10Gi
+  prometheus:
+    storageClassName: rook-ceph-block
+    size: 10Gi
+  alertmanager:
+    storageClassName: rook-ceph-block
+    size: 2Gi
+  loki:
+    storageClassName: rook-ceph-block
+    size: 10Gi
+rookceph:
+  enabled: false
+rookcephcluster:
+  enabled: false
+vaultwarden:
+  enabled: false
+  useAuthelia: false
+  ingress:
+    enabled: true
+  storageClassName: rook-ceph-block
+  size: 1Gi
+  pg:
+    storageClassName: rook-ceph-block
+    size: 1Gi
+whoami:
+  enabled: false
