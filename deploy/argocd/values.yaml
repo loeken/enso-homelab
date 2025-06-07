@@ -3,6 +3,7 @@ clusterIssuer: letsencrypt-prod
 clusterName: enso-homelab-prod
 githubUser: loeken
 githubRepo: enso-homelab-prod
+globalReplicaCount: 1
 
 # app specific
 authelia:
