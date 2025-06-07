@@ -70,3 +70,21 @@
     regexp: "^127\\.0\\.1\\.1"
     line: "127.0.1.1 {{ inventory_hostname }} {{ inventory_hostname.split('.')[0] }}"
     state: present
+
+- name: Create sysctl config for Promtail
+  copy:
+    dest: /etc/sysctl.d/99-promtail.conf
+    content: |
+      fs.inotify.max_user_instances=8192
+      fs.inotify.max_user_watches=524288
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Reload sysctl to apply Promtail limits immediately
+  command: sysctl --system
+  register: sysctl_reload
+
+- name: Show sysctl output
+  debug:
+    var: sysctl_reload.stdout_lines
