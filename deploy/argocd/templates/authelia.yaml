@@ -24,7 +24,7 @@ spec:
           repository: ghcr.io/authelia/authelia
 
         pod:
-          replicas: 1
+          replicas: {{ .Values.globalReplicaCount }}
           kind: StatefulSet
           revisionHistoryLimit: 2
           # command:
