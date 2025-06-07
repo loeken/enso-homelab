@@ -3,27 +3,32 @@ kind: Application
 metadata:
   name: argocd
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
+  project: default
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
-  project: default
 
-  source:   # still required for legacy validation; must be dummy
-    repoURL: ''
-    path: '.'
+  # # dummy 'source' still required for CRD validation
+  # source:
+  #   repoURL: ''
+  #   path: '.'
 
   sources:
     - repoURL: https://argoproj.github.io/argo-helm
       chart: argo-cd
       targetRevision: 8.0.15
+      helm:
+        valueFiles:
+          - $values/deploy/helm/cluster_issuer/argocd-values.yaml
+
     - repoURL: git@github.com:loeken/enso-homelab-prod
       targetRevision: HEAD
       ref: values
-
-  helm:
-    valueFiles:
-      - $values/deploy/helm/cluster_issuer/argocd-values.yaml
 
   syncPolicy:
     automated:
