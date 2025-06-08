@@ -26,7 +26,13 @@ spec:
             accessModes:
               - ReadWriteOnce
             size: {{ .Values.observability.loki.size }}
-
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 200m
+              memory: 512Mi
         # Required to avoid dual-mode conflict
         backend: { replicas: 0 }
         read: { replicas: 0 }
