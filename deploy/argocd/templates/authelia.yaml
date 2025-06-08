@@ -27,11 +27,11 @@ spec:
           replicas: {{ .Values.globalReplicaCount }}
           kind: StatefulSet
           revisionHistoryLimit: 2
-          command:
-            - tail
-          args:
-            - -f
-            - /dev/null
+          # command:
+          #   - tail
+          # args:
+          #   - -f
+          #   - /dev/null
           env:
             - name: AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
               value: /secrets/authelia/storage.encryption.key
