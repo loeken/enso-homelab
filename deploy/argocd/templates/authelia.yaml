@@ -27,11 +27,11 @@ spec:
           replicas: {{ .Values.globalReplicaCount }}
           kind: StatefulSet
           revisionHistoryLimit: 2
-          # command:
-          #   - tail
-          # args:
-          #   - -f
-          #   - /dev/null
+          command:
+            - tail
+          args:
+            - -f
+            - /dev/null
         secret:
           disabled: true
           existingSecret: authelia
