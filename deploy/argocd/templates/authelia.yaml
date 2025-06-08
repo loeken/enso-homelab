@@ -196,7 +196,7 @@ spec:
               - domain: ['nextcloud.{{ .Values.domain }}']
                 policy: two_factor
                 subject:
-                  - 'group:users''
+                  - 'group:users'
               - domain: ['ha.{{ .Values.domain }}']
                 policy: bypass
                 resources:
