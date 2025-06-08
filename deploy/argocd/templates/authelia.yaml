@@ -32,11 +32,6 @@ spec:
           # args:
           #   - -f
           #   - /dev/null
-          env:
-            - name: AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
-              value: /secrets/authelia/storage.encryption.key
-            - name: AUTHELIA_SESSION_ENCRYPTION_KEY_FILE
-              value: /secrets/authelia/session.encryption.key
         secret:
           disabled: true
           existingSecret: authelia
