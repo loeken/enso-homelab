@@ -51,7 +51,7 @@ rookcephcluster:
   enabled: true
 vaultwarden:
   enabled: true
-  useAuthelia: false
+  useAuthelia: true
   ingress:
     enabled: true
   storageClassName: rook-ceph-block
