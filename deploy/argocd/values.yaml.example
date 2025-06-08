@@ -29,6 +29,27 @@ k10:
   storageClassName: rook-ceph-block
   sidecar:
     enabled: false
+nextcloud:
+  data:
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    storageClass: rook-ceph-block
+  enabled: false
+  ingress:
+    nginx:
+      enabled: true
+  securityContext:
+    runAsNonRoot: false
+    runAsUser: 1000
+    runAsGroup: 1000
+  smtp:
+    domain: internetz.me
+    host: mail.internetz.me
+    port: 587
+    sender: nextcloud@internetz.me
+    username: nextcloud@internetz.me
+  storageClass: rook-ceph-block
+  useAuthelia: false
 nginxingress:
   enabled: false
 observability:

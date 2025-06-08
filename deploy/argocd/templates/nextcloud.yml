@@ -1,0 +1,174 @@
+{{ if .Values.nextcloud.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: nextcloud
+  namespace: argocd
+spec:
+  destination:
+    namespace: nextcloud
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: nextcloud
+    helm:
+      values: |
+        image:
+          tag: production-fpm-alpine
+
+        nginx:
+          enabled: true
+          image:
+            repository: nginx
+            tag: alpine
+            pullPolicy: IfNotPresent
+
+        internalDatabase:
+          enabled: false
+
+        externalDatabase:
+          enabled: true
+          type: "pgsql"
+          host: nextcloud-postgresql
+          port: 5432
+          database: nextcloud
+          existingSecret:
+            enabled: true
+            secretName: nextcloud
+            usernameKey: postgres-username
+            passwordKey: postgres-password
+
+        postgresql:
+          enabled: true
+          global:
+            postgresql:
+              auth:
+                existingSecret: nextcloud
+                username: nextcloud
+                database: nextcloud
+                secretKeys:
+                  userPasswordKey: postgres-password
+                  adminPasswordKey: postgres-admin-password
+                  replicationPasswordKey: postgresql-replication-password
+          primary:
+            persistence:
+              enabled: true
+              storageClass: {{ .Values.nextcloud.storageClass }}
+              accessModes:
+                - ReadWriteOnce
+
+        nextcloud:
+          existingSecret:
+            enabled: true
+            secretName: nextcloud
+            usernameKey: nextcloud-username
+            passwordKey: nextcloud-password
+            smtpUsernameKey: smtp_username
+            smtpPasswordKey: smtp_password
+          host: nextcloud.{{ .Values.domain }}
+          mail:
+            enabled: true
+            fromAddress: {{ .Values.nextcloud.smtp.sender }}
+            domain: {{ .Values.nextcloud.smtp.domain }}
+            smtp:
+              host: {{ .Values.nextcloud.smtp.host }}
+              secure: ssl
+              port: {{ .Values.nextcloud.smtp.port }}
+              authtype: LOGIN
+          configs:
+            trusted_domains.config.php: |-
+              <?php
+              $CONFIG = [
+                'overwriteprotocol' => 'https',
+                'trusted_domains' => [
+                  0 => 'localhost',
+                  1 => 'nextcloud.kube.home',
+                  2 => 'nextcloud.{{ .Values.domain }}'
+                ],
+                'allow_user_to_change_display_name' => false,
+                'lost_password_link' => 'disabled',
+                'oidc_login_provider_url' => 'https://auth.{{ .Values.domain }}',
+                'oidc_login_client_id' => 'nextcloud-client',
+                'oidc_login_client_secret' => getenv('OIDC_AUTHELIA_SHAREDKEY'),
+                'oidc_login_auto_redirect' => true,
+                'oidc_login_end_session_redirect' => false,
+                'oidc_login_button_text' => 'Log in with Authelia',
+                'oidc_login_hide_password_form' => false,
+                'oidc_login_use_id_token' => true,
+                'oidc_login_attributes' => array (
+                    'id' => 'preferred_username',
+                    'name' => 'name',
+                    'mail' => 'email',
+                    'groups' => 'groups',
+                ),
+                'oidc_login_default_group' => 'oidc',
+                'oidc_login_use_external_storage' => false,
+                'oidc_login_scope' => 'openid profile email groups',
+                'oidc_login_proxy_ldap' => false,
+                'oidc_login_disable_registration' => true,
+                'oidc_login_redir_fallback' => false,
+                'oidc_login_alt_login_page' => 'assets/login.php',
+                'oidc_login_tls_verify' => true,
+                'oidc_create_groups' => false,
+                'oidc_login_webdav_enabled' => false,
+                'oidc_login_password_authentication' => false,
+                'oidc_login_public_key_caching_time' => 86400,
+                'oidc_login_min_time_between_jwks_requests' => 10,
+                'oidc_login_well_known_caching_time' => 86400,
+                'oidc_login_update_avatar' => false,
+              ];
+            trusted_proxies.config.php: |-
+              <?php
+              $CONFIG = [
+                'trusted_proxies' => array('0.0.0.0/0')
+              ];
+
+        ingress:
+          annotations:
+            kubernetes.io/ingress.class: nginx
+            cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+            external-dns.alpha.kubernetes.io/hostname: "nextcloud.{{ .Values.domain }}."
+            external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+            external-dns.alpha.kubernetes.io/ttl: "120"
+            {{- if .Values.nextcloud.useAuthelia }}
+            nginx.ingress.kubernetes.io/auth-url: http://authelia.authelia.svc.cluster.local/api/verify
+            nginx.ingress.kubernetes.io/auth-signin: https://auth.{{ .Values.domain }}
+            {{- end }}
+            nginx.ingress.kubernetes.io/proxy-body-size: 4G
+          enabled: {{ .Values.nextcloud.ingress.nginx.enabled }}
+          hosts:
+            - host: nextcloud.{{ .Values.domain }}
+              paths:
+                - path: /
+                  pathType: Prefix
+                  service:
+                    port: 8080
+          tls:
+            - secretName: nextcloud-tls
+              hosts:
+                - nextcloud.{{ .Values.domain }}
+
+        persistence:
+          enabled: true
+          accessMode: ReadWriteOnce
+          storageClass: "local-path"
+          size: 8Gi
+          nextcloudData:
+            enabled: true
+            storageClass: {{ .Values.nextcloud.data.storageClass }}
+            size: {{ .Values.nextcloud.data.size }}
+            accessMode: {{ .Values.nextcloud.data.accessMode }}
+    repoURL: https://nextcloud.github.io/helm/
+    targetRevision: 6.6.5
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+
+{{ end }}
