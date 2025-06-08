@@ -48,6 +48,14 @@ spec:
         bloomCompactor: { replicas: 0 }
         bloomGateway: { replicas: 0 }
 
+        chunksCache:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 200m
+              memory: 512Mi
         loki:
           storage:
             type: filesystem
@@ -55,14 +63,6 @@ spec:
               chunks: dummy
               ruler: dummy
               admin: dummy
-          chunksCache:
-            resources:
-              requests:
-                cpu: 100m
-                memory: 256Mi
-              limits:
-                cpu: 200m
-                memory: 512Mi
 
           structuredConfig:
             auth_enabled: false
