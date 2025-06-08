@@ -49,7 +49,7 @@ nextcloud:
     sender: nextcloud@internetz.me
     username: nextcloud@internetz.me
   storageClass: rook-ceph-block
-  useAuthelia: false
+  useAuthelia: true
 nginxingress:
   enabled: true
 observability:
