@@ -213,7 +213,7 @@ spec:
                 policy: two_factor
                 subject:
                   - 'group:admins'
-              - domain: ['whoami.{{ .Values.domain }}', 'harbor.{{ .Values.domain }}', 'ltb-passwd.{{ .Values.domain }}', 'vaultwarden.{{ .Values.domain }}']
+              - domain: ['nextcloud.{{ .Values.domain }}', 'whoami.{{ .Values.domain }}', 'harbor.{{ .Values.domain }}', 'ltb-passwd.{{ .Values.domain }}', 'vaultwarden.{{ .Values.domain }}']
                 policy: two_factor
                 subject:
                   - 'group:users'
