@@ -162,7 +162,7 @@ spec:
                   pkce_challenge_method: S256
                   #claims_policy: nextcloud_userinfo
                   redirect_uris:
-                    - https://nextcloud.{{ .Values.domain }}/apps/oidc_login/oidc
+                    - https://nextcloud.{{ .Values.domain }}/apps/user_oidc/code
                   scopes:
                     - openid
                     - profile
