@@ -180,11 +180,23 @@ spec:
                   - ^/remote\.php/webdav.*
                   - ^/remote\.php/dav.*
                   - ^/ocs/v.*\.php/cloud.*
-                methods: ['GET', 'POST', 'PROPFIND', 'REPORT']
+                methods:
+                  - GET
+                  - POST
+                  - PROPFIND
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                  - MKCOL
+                  - COPY
+                  - MOVE
+                  - LOCK
+                  - UNLOCK
+                  - PROPPATCH
               - domain: ['nextcloud.{{ .Values.domain }}']
                 policy: two_factor
                 subject:
-                  - 'group:users'
+                  - 'group:users''
               - domain: ['ha.{{ .Values.domain }}']
                 policy: bypass
                 resources:
