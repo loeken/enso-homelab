@@ -25,7 +25,24 @@ spec:
           prometheusRule:
             labels:
               release: prometheus
+        csi:
+          rbdPlugin:
+            resources:
+              requests:
+                cpu: 100m
         cephClusterSpec:
+          resources:
+            mgr:
+              requests:
+                cpu: 100m
+            mon:
+              requests:
+                cpu: 100m
+            osd:
+              requests:
+                cpu: 100m
+              limits:
+                cpu: 300m
           dataDirHostPath: /var/lib/rook
           mon:
             count: 1
