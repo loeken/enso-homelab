@@ -124,6 +124,8 @@ spec:
                 'oidc_login_update_avatar' => false,
                 'oidc_login_code_challenge_method' => 'S256',
                 'oidc_login_client_auth_method' => 'client_secret_post',
+                'oidc_login_token_endpoint_auth_method' => 'client_secret_post',
+                'oidc_login_use_pkce' => true,
               ];
             trusted_proxies.config.php: |-
               <?php
