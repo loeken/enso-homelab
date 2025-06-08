@@ -94,7 +94,7 @@ spec:
                 'allow_user_to_change_display_name' => false,
                 'lost_password_link' => 'disabled',
                 'oidc_login_provider_url' => 'https://auth.{{ .Values.domain }}',
-                'oidc_login_client_id' => 'nextcloud-client',
+                'oidc_login_client_id' => 'nextcloud',
                 'oidc_login_client_secret' => getenv('OIDC_AUTHELIA_SHAREDKEY'),
                 'oidc_login_auto_redirect' => true,
                 'oidc_login_end_session_redirect' => false,
