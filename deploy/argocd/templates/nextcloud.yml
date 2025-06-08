@@ -130,7 +130,8 @@ spec:
             trusted_proxies.config.php: |-
               <?php
               $CONFIG = [
-                'trusted_proxies' => array('0.0.0.0/0')
+                'trusted_proxies' => array('0.0.0.0/0'),
+                'forwarded_for_headers' => ['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP']
               ];
 
         ingress:
@@ -144,6 +145,9 @@ spec:
             nginx.ingress.kubernetes.io/auth-url: http://authelia.authelia.svc.cluster.local/api/verify
             nginx.ingress.kubernetes.io/auth-signin: https://auth.{{ .Values.domain }}
             {{- end }}
+            nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+            nginx.ingress.kubernetes.io/proxy-real-ip-cidr: "10.42.0.0/24"
+            nginx.ingress.kubernetes.io/forwarded-for-header: "X-Forwarded-For"
             nginx.ingress.kubernetes.io/proxy-body-size: 4G
           enabled: {{ .Values.nextcloud.ingress.nginx.enabled }}
           hosts:
