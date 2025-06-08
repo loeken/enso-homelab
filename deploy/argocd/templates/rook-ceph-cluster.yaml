@@ -32,22 +32,68 @@ spec:
                 cpu: 100m
         cephClusterSpec:
           resources:
-            prepareosd:
-              requests:
-                cpu: 50m
-              limits:
-                cpu: 200m
             mgr:
-              requests:
-                cpu: 100m
-            mon:
-              requests:
-                cpu: 100m
-            osd:
-              requests:
-                cpu: 100m
               limits:
-                cpu: 300m
+                memory: "512Mi"
+              requests:
+                cpu: "100m"
+                memory: "256Mi"
+
+            mon:
+              limits:
+                memory: "1Gi"
+              requests:
+                cpu: "100m"
+                memory: "512Mi"
+
+            osd:
+              limits:
+                memory: "2Gi"
+              requests:
+                cpu: "250m"
+                memory: "1Gi"
+
+            prepareosd:
+              # No limits recommended (see chart comment)
+              requests:
+                cpu: "100m"
+                memory: "100Mi"
+
+            mgr-sidecar:
+              limits:
+                memory: "64Mi"
+              requests:
+                cpu: "50m"
+                memory: "32Mi"
+
+            crashcollector:
+              limits:
+                memory: "40Mi"
+              requests:
+                cpu: "10m"
+                memory: "30Mi"
+
+            logcollector:
+              limits:
+                memory: "256Mi"
+              requests:
+                cpu: "50m"
+                memory: "64Mi"
+
+            cleanup:
+              limits:
+                memory: "512Mi"
+              requests:
+                cpu: "100m"
+                memory: "64Mi"
+
+            exporter:
+              limits:
+                memory: "64Mi"
+              requests:
+                cpu: "10m"
+                memory: "32Mi"
+
           dataDirHostPath: /var/lib/rook
           mon:
             count: 1
