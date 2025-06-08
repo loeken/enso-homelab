@@ -49,6 +49,7 @@ spec:
         toolbox:
           enabled: true
 
+        cephObjectStores: []
         cephBlockPools:
           - name: ceph-blockpool
             spec:
