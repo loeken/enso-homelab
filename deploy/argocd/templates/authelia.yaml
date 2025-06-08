@@ -177,22 +177,11 @@ spec:
               - domain: ['nextcloud.{{ .Values.domain }}']
                 policy: bypass
                 resources:
-                  - ^/remote\.php/webdav.*
-                  - ^/remote\.php/dav.*
-                  - ^/ocs/v.*\.php/cloud.*
+                  - ^/apps/user_oidc/.*
+                  - ^/index.php/login/oidc.*
                 methods:
                   - GET
                   - POST
-                  - PROPFIND
-                  - PUT
-                  - DELETE
-                  - OPTIONS
-                  - MKCOL
-                  - COPY
-                  - MOVE
-                  - LOCK
-                  - UNLOCK
-                  - PROPPATCH
               - domain: ['nextcloud.{{ .Values.domain }}']
                 policy: two_factor
                 subject:
