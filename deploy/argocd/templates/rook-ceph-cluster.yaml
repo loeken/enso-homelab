@@ -32,6 +32,11 @@ spec:
                 cpu: 100m
         cephClusterSpec:
           resources:
+            prepareosd:
+              requests:
+                cpu: 50m
+              limits:
+                cpu: 200m
             mgr:
               requests:
                 cpu: 100m
