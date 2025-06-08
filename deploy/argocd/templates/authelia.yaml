@@ -100,8 +100,7 @@ spec:
           storage:
             encryption_key:
               disabled: false
-              secret_name: authelia
-              path: storage.encryption.key
+              path: /secrets/authelia/storage.encryption.key
             local:
               enabled: true
               path: /config/db.sqlite3
