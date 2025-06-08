@@ -43,11 +43,11 @@ nextcloud:
     runAsUser: 1000
     runAsGroup: 1000
   smtp:
-    domain: internetz.me
-    host: mail.internetz.me
+    domain: example.com
+    host: mail.example.com
     port: 587
-    sender: nextcloud@internetz.me
-    username: nextcloud@internetz.me
+    sender: nextcloud@example.com
+    username: nextcloud@example.com
   storageClass: rook-ceph-block
   useAuthelia: false
 nginxingress:
