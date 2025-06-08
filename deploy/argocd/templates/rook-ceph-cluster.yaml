@@ -63,8 +63,8 @@ spec:
               reclaimPolicy: Delete
               allowVolumeExpansion: true
               volumeBindingMode: "Immediate"
-              annotations:
-                storageclass.kubernetes.io/is-default-class: "true"
+              # annotations:
+              #   storageclass.kubernetes.io/is-default-class: "true"
               parameters:
                 imageFormat: "2"
                 imageFeatures: layering
