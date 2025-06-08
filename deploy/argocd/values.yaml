@@ -30,11 +30,11 @@ k10:
   sidecar:
     enabled: false
 nextcloud:
+  enabled: true
   data:
     accessMode: ReadWriteOnce
     size: 10Gi
     storageClass: rook-ceph-block
-  enabled: false
   ingress:
     nginx:
       enabled: true
