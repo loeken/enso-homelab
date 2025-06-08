@@ -174,10 +174,17 @@ spec:
           access_control:
             default_policy: deny
             rules:
-              - domain: "*.{{ .Values.domain }}"
+              - domain: ['nextcloud.{{ .Values.domain }}']
                 policy: bypass
-                networks:
-                  - 10.42.0.0/16
+                resources:
+                  - ^/remote\.php/webdav.*
+                  - ^/remote\.php/dav.*
+                  - ^/ocs/v.*\.php/cloud.*
+                methods: ['GET', 'POST', 'PROPFIND', 'REPORT']
+              - domain: ['nextcloud.{{ .Values.domain }}']
+                policy: two_factor
+                subject:
+                  - 'group:users'
               - domain: ['ha.{{ .Values.domain }}']
                 policy: bypass
                 resources:
@@ -213,7 +220,7 @@ spec:
                 policy: two_factor
                 subject:
                   - 'group:admins'
-              - domain: ['nextcloud.{{ .Values.domain }}', 'whoami.{{ .Values.domain }}', 'harbor.{{ .Values.domain }}', 'ltb-passwd.{{ .Values.domain }}', 'vaultwarden.{{ .Values.domain }}']
+              - domain: ['whoami.{{ .Values.domain }}', 'harbor.{{ .Values.domain }}', 'ltb-passwd.{{ .Values.domain }}', 'vaultwarden.{{ .Values.domain }}']
                 policy: two_factor
                 subject:
                   - 'group:users'
