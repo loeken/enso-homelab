@@ -100,25 +100,6 @@ spec:
               'trusted_proxies' => array('0.0.0.0/0'),
               'forwarded_for_headers' => ['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP']
             ];
-          user_oidc.config.php: |-
-            <?php
-            $CONFIG = [
-              'user_oidc' => [
-                'client_id' => 'nextcloud',
-                'client_secret' => getenv('OIDC_AUTHELIA_SHAREDKEY'),
-                'discovery_url' => 'https://auth.{{ .Values.domain }}/.well-known/openid-configuration',
-                'scopes' => 'openid profile email groups',
-                'default_group' => 'oidc',
-                'auto_provision' => true,
-                'mode' => 'redirect',
-                'attributes' => [
-                  'id' => 'preferred_username',
-                  'email' => 'email',
-                  'displayName' => 'name',
-                  'groups' => 'groups'
-                ]
-              ]
-            ];
 
         ingress:
           annotations:
