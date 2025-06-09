@@ -68,8 +68,10 @@ observability:
     size: 10Gi
 rookceph:
   enabled: true
+  monitoring: false
 rookcephcluster:
   enabled: true
+  monitoring: false
 vaultwarden:
   enabled: false
   useAuthelia: true
