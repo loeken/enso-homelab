@@ -67,9 +67,9 @@ observability:
     storageClassName: rook-ceph-block
     size: 10Gi
 rookceph:
-  enabled: true
+  enabled: false
 rookcephcluster:
-  enabled: true
+  enabled: false
 vaultwarden:
   enabled: false
   useAuthelia: true
