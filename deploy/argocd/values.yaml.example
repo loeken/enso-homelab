@@ -71,7 +71,8 @@ rookceph:
   monitoring: false
 rookcephcluster:
   enabled: false
-  monitoring: false
+  monitoring: true
+  createPrometheusRules: false
 vaultwarden:
   enabled: false
   useAuthelia: false
