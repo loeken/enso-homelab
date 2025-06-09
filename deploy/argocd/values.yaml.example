@@ -30,6 +30,8 @@ k10:
   sidecar:
     enabled: false
 nextcloud:
+  size: 10Gi
+  storageClass: rook-ceph-block
   data:
     accessMode: ReadWriteOnce
     size: 10Gi
