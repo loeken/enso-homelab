@@ -33,7 +33,7 @@ nextcloud:
   enabled: true
   data:
     accessMode: ReadWriteOnce
-    size: 10Gi
+    size: 500Gi
     storageClass: rook-ceph-block
   ingress:
     nginx:
