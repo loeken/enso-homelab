@@ -18,9 +18,9 @@ spec:
       values: |
         operatorNamespace: rook-ceph
         monitoring:
-          enabled: true
+          enabled: {{ .Values.rookcephcluster.monitoring }}
           metricsDisabled: false
-          createPrometheusRules: true
+          createPrometheusRules: {{ .Values.rookcephcluster.createPrometheusRules }}
           rulesNamespaceOverride: rook-ceph
           prometheusRule:
             labels:
@@ -118,6 +118,7 @@ spec:
           enabled: true
 
         cephObjectStores: []
+        cephBlockPools:
         cephBlockPools:
           - name: ceph-blockpool
             spec:

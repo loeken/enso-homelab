@@ -68,8 +68,11 @@ observability:
     size: 10Gi
 rookceph:
   enabled: false
+  monitoring: false
 rookcephcluster:
   enabled: false
+  monitoring: true
+  createPrometheusRules: false
 vaultwarden:
   enabled: false
   useAuthelia: false
