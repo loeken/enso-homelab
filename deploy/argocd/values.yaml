@@ -9,11 +9,11 @@ globalReplicaCount: 0
 authelia:
   enabled: true
   filesystem:
-    enabled: true
+    enabled: false
   ingress:
     enabled: true
   smtp:
-    enabled: false
+    enabled: true
     host: mail.internetz.me
     port: 587
     sender: auth@internetz.me
