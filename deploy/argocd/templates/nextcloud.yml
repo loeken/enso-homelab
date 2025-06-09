@@ -165,8 +165,8 @@ spec:
         persistence:
           enabled: true
           accessMode: ReadWriteOnce
-          storageClass: "local-path"
-          size: 8Gi
+          storageClass: {{ .Values.nextcloud.storageClass }}
+          size: {{ .Values.nextcloud.size }}
           nextcloudData:
             enabled: true
             storageClass: {{ .Values.nextcloud.data.storageClass }}
