@@ -7,7 +7,7 @@ globalReplicaCount: 0
 
 # app specific
 authelia:
-  enabled: false
+  enabled: true
   filesystem:
     enabled: true
   ingress:
@@ -30,7 +30,9 @@ k10:
   sidecar:
     enabled: false
 nextcloud:
-  enabled: false
+  enabled: true
+  size: 10Gi
+  storageClass: rook-ceph-block
   data:
     accessMode: ReadWriteOnce
     size: 500Gi
@@ -51,7 +53,7 @@ nextcloud:
   storageClass: rook-ceph-block
   useAuthelia: false
 nginxingress:
-  enabled: false
+  enabled: true
 observability:
   enabled: false
   grafana:
@@ -71,10 +73,10 @@ rookceph:
   monitoring: false
 rookcephcluster:
   enabled: true
-  monitoring: false
-  createPrometheusRules: false
+  monitoring: true
+  createPrometheusRules: true
 vaultwarden:
-  enabled: false
+  enabled: true
   useAuthelia: true
   ingress:
     enabled: true
