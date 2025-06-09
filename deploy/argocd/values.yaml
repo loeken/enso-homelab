@@ -70,7 +70,7 @@ rookceph:
   enabled: true
   monitoring: false
 rookcephcluster:
-  enabled: false
+  enabled: true
   monitoring: false
 vaultwarden:
   enabled: false
