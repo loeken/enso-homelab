@@ -26,7 +26,23 @@ spec:
             repository: nginx
             tag: alpine
             pullPolicy: IfNotPresent
-
+        cronjob:
+          enabled: true
+          schedule: "*/5 * * * *"  # every 5 minutes
+          annotations: {}
+          concurrencyPolicy: "Forbid"
+          failedJobsHistoryLimit: 1
+          successfulJobsHistoryLimit: 1
+          startingDeadlineSeconds: 200
+          command: null
+          args: null
+          extraEnv: []
+          extraEnvFrom: []
+          resources: {}
+          securityContext: {}
+          nodeSelector: {}
+          affinity: {}
+          tolerations: []
         internalDatabase:
           enabled: false
 
