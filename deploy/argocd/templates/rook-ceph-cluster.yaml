@@ -128,7 +128,7 @@ spec:
             storageClass:
               enabled: true
               name: rook-ceph-block
-              isDefault: false
+              isDefault: true
               reclaimPolicy: Delete
               allowVolumeExpansion: true
               volumeBindingMode: "Immediate"
