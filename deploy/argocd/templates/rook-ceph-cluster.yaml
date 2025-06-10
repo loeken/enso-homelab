@@ -119,7 +119,6 @@ spec:
 
         cephObjectStores: []
         cephBlockPools:
-        cephBlockPools:
           - name: ceph-blockpool
             spec:
               failureDomain: host
@@ -132,8 +131,8 @@ spec:
               reclaimPolicy: Delete
               allowVolumeExpansion: true
               volumeBindingMode: "Immediate"
-              # annotations:
-              #   storageclass.kubernetes.io/is-default-class: "true"
+              annotations:
+                storageclass.kubernetes.io/is-default-class: "true"
               parameters:
                 imageFormat: "2"
                 imageFeatures: layering
@@ -149,7 +148,7 @@ spec:
           enabled: true
           name: rook-ceph-block-snapshot
           isDefault: true
-          deletionPolicy: Retain
+          deletionPolicy: Delete
           annotations:
             k10.kasten.io/is-snapshot-class: "true"
           parameters:
