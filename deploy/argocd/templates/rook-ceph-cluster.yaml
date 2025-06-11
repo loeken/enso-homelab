@@ -146,6 +146,7 @@ spec:
 
         cephObjectStores: []
         cephFileSystems:
+        cephFileSystems:
           - name: ceph-filesystem
             namespace: rook-ceph
             activeCount: 1
@@ -172,7 +173,9 @@ spec:
                 csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
                 csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
                 csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
-
+            metadataServer:
+              activeCount: 1
+              activeStandby: true
         cephBlockPools:
           - name: ceph-blockpool
             spec:
