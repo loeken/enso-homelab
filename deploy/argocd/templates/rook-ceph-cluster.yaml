@@ -61,50 +61,59 @@ spec:
           resources:
             mgr:
               limits:
+                memory: "512Mi"
+              requests:
+                cpu: "100m"
+                memory: "256Mi"
+
+            mon:
+              limits:
                 memory: "1Gi"
               requests:
-                cpu: "500m"
+                cpu: "250m"
                 memory: "512Mi"
-            mon:
+
+            osd:
               limits:
                 memory: "2Gi"
               requests:
-                cpu: "1000m"
-                memory: "1Gi"
-            osd:
-              limits:
-                memory: "4Gi"
-              requests:
-                cpu: "1000m"
-                memory: "4Gi"
+                cpu: "500m"
+                memory: "2Gi"
+
             prepareosd:
               requests:
-                cpu: "500m"
-                memory: "50Mi"
+                cpu: "100m"
+                memory: "100Mi"
+              # No limits per Ceph recommendation
+
             mgr-sidecar:
               limits:
-                memory: "100Mi"
+                memory: "64Mi"
               requests:
-                cpu: "100m"
-                memory: "40Mi"
+                cpu: "50m"
+                memory: "32Mi"
+
             crashcollector:
               limits:
-                memory: "60Mi"
+                memory: "64Mi"
               requests:
-                cpu: "100m"
-                memory: "60Mi"
+                cpu: "50m"
+                memory: "32Mi"
+
             logcollector:
               limits:
-                memory: "1Gi"
+                memory: "256Mi"
               requests:
-                cpu: "100m"
-                memory: "100Mi"
+                cpu: "50m"
+                memory: "64Mi"
+
             cleanup:
               limits:
-                memory: "1Gi"
+                memory: "512Mi"
               requests:
-                cpu: "500m"
-                memory: "100Mi"
+                cpu: "100m"
+                memory: "64Mi"
+
             exporter:
               limits:
                 memory: "128Mi"
