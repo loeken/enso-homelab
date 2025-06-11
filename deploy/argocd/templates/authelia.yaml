@@ -121,7 +121,7 @@ spec:
                 key: notifier.smtp.password
               enabled: {{ .Values.authelia.smtp.enabled }}
               address: submission://{{ .Values.authelia.smtp.host }}:{{ .Values.authelia.smtp.port }}
-              sender: {{ .Values.authelia.smtp.sender }}
+              sender: 'Authelia <{{ .Values.authelia.smtp.sender }}>'
               identifier: {{ .Values.authelia.smtp.host }}
               startup_check_address: {{ .Values.authelia.smtp.sender }}
               subject: "[Authelia] {title}"
