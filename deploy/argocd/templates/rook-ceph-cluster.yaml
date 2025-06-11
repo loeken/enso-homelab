@@ -29,70 +29,88 @@ spec:
           rbdPlugin:
             resources:
               requests:
-                cpu: 250m
+                cpu: "100m"
+                memory: "512Mi"
+              limits:
+                memory: "1024Mi"
+
+          rbdProvisioner:
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "512Mi"
+              limits:
+                memory: "1024Mi"
+
+          cephFSPlugin:
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "512Mi"
+              limits:
+                memory: "1024Mi"
+
+          cephFSProvisioner:
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "512Mi"
+              limits:
+                memory: "1024Mi"
         cephClusterSpec:
           resources:
             mgr:
               limits:
-                memory: "512Mi"
-              requests:
-                cpu: "100m"
-                memory: "256Mi"
-
-            mon:
-              limits:
                 memory: "1Gi"
               requests:
-                cpu: "100m"
+                cpu: "500m"
                 memory: "512Mi"
-
-            osd:
+            mon:
               limits:
                 memory: "2Gi"
               requests:
-                cpu: "250m"
+                cpu: "1000m"
                 memory: "1Gi"
-
+            osd:
+              limits:
+                memory: "4Gi"
+              requests:
+                cpu: "1000m"
+                memory: "4Gi"
             prepareosd:
-              # No limits recommended (see chart comment)
+              requests:
+                cpu: "500m"
+                memory: "50Mi"
+            mgr-sidecar:
+              limits:
+                memory: "100Mi"
+              requests:
+                cpu: "100m"
+                memory: "40Mi"
+            crashcollector:
+              limits:
+                memory: "60Mi"
+              requests:
+                cpu: "100m"
+                memory: "60Mi"
+            logcollector:
+              limits:
+                memory: "1Gi"
               requests:
                 cpu: "100m"
                 memory: "100Mi"
-
-            mgr-sidecar:
-              limits:
-                memory: "64Mi"
-              requests:
-                cpu: "50m"
-                memory: "32Mi"
-
-            crashcollector:
-              limits:
-                memory: "40Mi"
-              requests:
-                cpu: "10m"
-                memory: "30Mi"
-
-            logcollector:
-              limits:
-                memory: "256Mi"
-              requests:
-                cpu: "50m"
-                memory: "64Mi"
-
             cleanup:
               limits:
-                memory: "512Mi"
+                memory: "1Gi"
               requests:
-                cpu: "100m"
-                memory: "64Mi"
-
+                cpu: "500m"
+                memory: "100Mi"
             exporter:
               limits:
-                memory: "64Mi"
+                memory: "128Mi"
               requests:
-                cpu: "10m"
-                memory: "32Mi"
+                cpu: "50m"
+                memory: "50Mi"
 
           dataDirHostPath: /var/lib/rook
           mon:
