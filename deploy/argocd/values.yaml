@@ -47,7 +47,7 @@ nextcloud:
   smtp:
     domain: internetz.me
     host: mail.internetz.me
-    port: 587
+    port: 465
     sender: nextcloud@internetz.me
     username: nextcloud@internetz.me
   storageClass: rook-ceph-block
