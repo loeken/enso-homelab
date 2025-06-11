@@ -116,8 +116,14 @@ spec:
               enabled: {{ .Values.authelia.filesystem.enabled }}
               filename: /config/notification.txt
             smtp:
-              username: /secrets/authelia/notifier.smtp.username
-              password: /secrets/authelia/notifier.smtp.password
+              username:
+                disabled: false
+                secret_name: authelia
+                key: notifier.smtp.username
+              password:
+                disabled: false
+                secret_name: authelia
+                key: notifier.smtp.password
               enabled: {{ .Values.authelia.smtp.enabled }}
               address: {{ .Values.authelia.smtp.host }}:{{ .Values.authelia.smtp.port }}
               sender: {{ .Values.authelia.smtp.sender }}
