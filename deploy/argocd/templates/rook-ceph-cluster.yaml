@@ -29,34 +29,7 @@ spec:
           rbdPlugin:
             resources:
               requests:
-                cpu: "100m"
-                memory: "512Mi"
-              limits:
-                memory: "1024Mi"
-
-          rbdProvisioner:
-            resources:
-              requests:
-                cpu: "100m"
-                memory: "512Mi"
-              limits:
-                memory: "1024Mi"
-
-          cephFSPlugin:
-            resources:
-              requests:
-                cpu: "100m"
-                memory: "512Mi"
-              limits:
-                memory: "1024Mi"
-
-          cephFSProvisioner:
-            resources:
-              requests:
-                cpu: "100m"
-                memory: "512Mi"
-              limits:
-                memory: "1024Mi"
+                cpu: 250m
         cephClusterSpec:
           resources:
             mgr:
@@ -146,7 +119,6 @@ spec:
 
         cephObjectStores: []
         cephFileSystems:
-        cephFileSystems:
           - name: ceph-filesystem
             namespace: rook-ceph
             activeCount: 1
@@ -173,9 +145,7 @@ spec:
                 csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
                 csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
                 csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
-            metadataServer:
-              activeCount: 1
-              activeStandby: true
+
         cephBlockPools:
           - name: ceph-blockpool
             spec:
