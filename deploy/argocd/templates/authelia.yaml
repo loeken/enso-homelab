@@ -57,6 +57,10 @@ spec:
                   path: oidc.sharedsecret.jellyfin
                 - key: oidc.sharedsecret.grafana
                   path: oidc.sharedsecret.grafana
+                - key: notifier.smtp.username
+                  path: notifier.smtp.username
+                - key: notifier.smtp.password
+                  path: notifier.smtp.password
         persistence:
           enabled: true
           storageClass: {{ .Values.authelia.storageClassName }}
@@ -112,6 +116,8 @@ spec:
               enabled: {{ .Values.authelia.filesystem.enabled }}
               filename: /config/notification.txt
             smtp:
+              username: /secrets/authelia/notifier.smtp.username
+              password: /secrets/authelia/notifier.smtp.password
               enabled: {{ .Values.authelia.smtp.enabled }}
               address: {{ .Values.authelia.smtp.host }}:{{ .Values.authelia.smtp.port }}
               username: {{ .Values.authelia.smtp.username }}
