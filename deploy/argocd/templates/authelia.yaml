@@ -125,6 +125,7 @@ spec:
               identifier: {{ .Values.authelia.smtp.host }}
               startup_check_address: {{ .Values.authelia.smtp.sender }}
               subject: "[Authelia] {title}"
+              require_starttls: true
               tls:
                 server_name: {{ .Values.authelia.smtp.host }}
                 skip_verify: false
