@@ -57,8 +57,6 @@ spec:
                   path: oidc.sharedsecret.jellyfin
                 - key: oidc.sharedsecret.grafana
                   path: oidc.sharedsecret.grafana
-                - key: notifier.smtp.username
-                  path: notifier.smtp.username
                 - key: notifier.smtp.password
                   path: notifier.smtp.password
         persistence:
@@ -116,10 +114,7 @@ spec:
               enabled: {{ .Values.authelia.filesystem.enabled }}
               filename: /config/notification.txt
             smtp:
-              username:
-                disabled: false
-                secret_name: authelia
-                key: notifier.smtp.username
+              username: {{ .Values.authelia.smtp.username }}
               password:
                 disabled: false
                 secret_name: authelia
