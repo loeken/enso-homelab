@@ -70,10 +70,10 @@ observability:
     size: 10Gi
 rookceph:
   enabled: true
-  monitoring: true
+  monitoring: false
 rookcephcluster:
   enabled: true
-  monitoring: true
+  monitoring: false
   createPrometheusRules: false
 vaultwarden:
   enabled: false
