@@ -86,7 +86,7 @@ spec:
 
         configMap:
           log:
-            level: info
+            level: debug
           theme: dark
           authentication_backend:
             file:
