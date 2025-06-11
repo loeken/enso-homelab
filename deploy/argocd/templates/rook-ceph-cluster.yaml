@@ -118,6 +118,34 @@ spec:
           enabled: true
 
         cephObjectStores: []
+        cephFileSystems:
+          - name: ceph-filesystem
+            namespace: rook-ceph
+            activeCount: 1
+            metadataPool:
+              replicated:
+                size: 1
+                requireSafeReplicaSize: false
+            dataPools:
+              - name: data0
+                replicated:
+                  size: 1
+                  requireSafeReplicaSize: false
+            preserveFilesystemOnDelete: true
+            storageClass:
+              enabled: true
+              isDefault: false
+              name: rook-cephfs
+              reclaimPolicy: Delete
+              allowVolumeExpansion: true
+              volumeBindingMode: "Immediate"
+              mountOptions: []
+              parameters:
+                csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+                csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+                csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+                csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+
         cephBlockPools:
           - name: ceph-blockpool
             spec:
