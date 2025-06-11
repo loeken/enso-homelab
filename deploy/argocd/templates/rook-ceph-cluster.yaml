@@ -29,7 +29,34 @@ spec:
           rbdPlugin:
             resources:
               requests:
-                cpu: 250m
+                cpu: "100m"
+                memory: "512Mi"
+              limits:
+                memory: "1024Mi"
+
+          rbdProvisioner:
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "512Mi"
+              limits:
+                memory: "1024Mi"
+
+          cephFSPlugin:
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "512Mi"
+              limits:
+                memory: "1024Mi"
+
+          cephFSProvisioner:
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "512Mi"
+              limits:
+                memory: "1024Mi"
         cephClusterSpec:
           resources:
             mgr:
