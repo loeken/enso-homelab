@@ -86,4 +86,4 @@ vaultwarden:
     storageClassName: rook-ceph-block
     size: 1Gi
 whoami:
-  enabled: false
+  enabled: true
