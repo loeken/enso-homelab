@@ -120,7 +120,6 @@ spec:
               password: /secrets/authelia/notifier.smtp.password
               enabled: {{ .Values.authelia.smtp.enabled }}
               address: {{ .Values.authelia.smtp.host }}:{{ .Values.authelia.smtp.port }}
-              username: {{ .Values.authelia.smtp.username }}
               sender: {{ .Values.authelia.smtp.sender }}
               identifier: {{ .Values.authelia.smtp.host }}
               startup_check_address: {{ .Values.authelia.smtp.sender }}
