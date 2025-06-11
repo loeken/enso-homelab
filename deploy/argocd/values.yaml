@@ -69,12 +69,12 @@ observability:
     storageClassName: rook-ceph-block
     size: 10Gi
 rookceph:
-  enabled: false
+  enabled: true
   monitoring: true
 rookcephcluster:
-  enabled: false
+  enabled: true
   monitoring: true
-  createPrometheusRules: true
+  createPrometheusRules: false
 vaultwarden:
   enabled: false
   useAuthelia: true
