@@ -29,7 +29,7 @@ spec:
           rbdPlugin:
             resources:
               requests:
-                cpu: 100m
+                cpu: 1000m
         cephClusterSpec:
           resources:
             mgr:
