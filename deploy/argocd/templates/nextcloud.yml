@@ -38,8 +38,8 @@ spec:
               cpu: 50m
               memory: 128Mi
             limits:
-              cpu: 200m
-              memory: 256Mi
+              cpu: 2000m
+              memory: 4096Mi
         internalDatabase:
           enabled: false
 
@@ -95,6 +95,7 @@ spec:
               port: {{ .Values.nextcloud.smtp.port }}
               authtype: LOGIN
         configs:
+          # seems to not be working with the pvc mounted lets manually create files
           trusted_domains.config.php: |-
             <?php
             $CONFIG = [
