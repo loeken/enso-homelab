@@ -57,6 +57,11 @@ spec:
             global:
               resolve_timeout: 5m
             receivers:
+              - name: 'pagerduty'
+                pagerduty_configs:
+                  - service_key: ''
+                    service_key_file: /etc/alertmanager/secrets/alertmanager-pagerduty/service_key
+                    send_resolved: true
               - name: 'robusta'
                 webhook_configs:
                   - url: 'http://observability-robusta-runner.observability.svc.cluster.local/api/alerts'
@@ -64,6 +69,13 @@ spec:
               - name: 'default-receiver'
             route:
               routes:
+                - receiver: 'pagerduty'
+                  group_by: [ 'alertname' ]
+                  matchers:
+                    - severity = "critical"
+                  group_wait: 10s
+                  group_interval: 5m
+                  repeat_interval: 1h
                 - receiver: 'robusta'
                   group_by: [ '...' ]
                   group_wait: 1s
