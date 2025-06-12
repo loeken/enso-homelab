@@ -43,8 +43,7 @@ spec:
             accessMode: ReadWriteOnce
             storageClass: {{ .Values.homeassistant.storageClass }}
             size: 4Gi
-            readOnly: false
-        
+
         ingress:
           main:
             enabled: {{ .Values.homeassistant.ingress.enabled }}
@@ -65,7 +64,6 @@ spec:
                     pathType: Prefix
                     service:
                       name: home-assistant
-                      identifier: home-assistant
                       port: 8123
             tls:
               - secretName: ha-tls
