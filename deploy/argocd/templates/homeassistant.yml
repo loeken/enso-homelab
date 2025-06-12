@@ -68,17 +68,17 @@ spec:
         service:
           main:
             controller: main
-            type: NodePort
+            type: ClusterPort
             ports:
               http:
                 port: 8123
                 targetPort: http
                 protocol: TCP
-              coiot:
-                port: 5683
-                targetPort: coiot
-                protocol: UDP
-                nodePort: 32683
+              # coiot:
+              #   port: 5683
+              #   targetPort: coiot
+              #   protocol: UDP
+              #   nodePort: 32683
     repoURL: https://loeken.github.io/helm-charts
     targetRevision: 2025.6.0
   syncPolicy:
