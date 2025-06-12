@@ -24,6 +24,12 @@ certmanager:
   enabled: true
 externaldns:
   enabled: true
+homeassistant:
+  enabled: true
+  ingress:
+    enabled: true
+  storageClass: rook-ceph-block
+  useAuthelia: false
 k10:
   enabled: true
   storageClassName: rook-ceph-block
@@ -38,8 +44,7 @@ nextcloud:
     size: 500Gi
     storageClass: rook-ceph-block
   ingress:
-    nginx:
-      enabled: true
+    enabled: true
   securityContext:
     runAsNonRoot: false
     runAsUser: 1000
