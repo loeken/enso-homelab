@@ -37,7 +37,6 @@ spec:
                   # -- Set the container timezone
                   TZ: UTC
                   LOGGER: "debug"
-
         persistence:
           config:
             enabled: true
@@ -64,7 +63,7 @@ spec:
                   - path: /
                     pathType: Prefix
                     service:
-                      name: home-assistant
+                      name: home-assistant-main
                       port: 8123
             tls:
               - secretName: ha-tls
@@ -87,13 +86,15 @@ spec:
         
         service:
           main:
+            enabled: true
             controller: main
             type: ClusterIP
             ports:
               http:
+                enabled: true
                 port: 8123
-                targetPort: http
                 protocol: TCP
+                primary: true
 
           coiot:
             enabled: true
@@ -101,8 +102,8 @@ spec:
             type: NodePort
             ports:
               coiot:
+                enabled: true
                 port: 5683
-                targetPort: coiot
                 protocol: UDP
                 nodePort: 32683
     repoURL: https://loeken.github.io/helm-charts
