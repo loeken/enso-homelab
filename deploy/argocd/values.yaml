@@ -29,7 +29,7 @@ homeassistant:
   ingress:
     enabled: true
   storageClass: rook-ceph-block
-  useAuthelia: false
+  useAuthelia: true
 k10:
   enabled: true
   storageClassName: rook-ceph-block
