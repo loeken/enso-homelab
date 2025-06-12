@@ -224,7 +224,7 @@ spec:
                 policy: one_factor
                 subject:
                   - 'group:users'
-              - domain: ['sinusbot.{{ .Values.domain }}', 'ha.{{ .Values.domain }}', 'prowlarr.{{ .Values.domain }}', 'sonarr.{{ .Values.domain }}', 'radarr.{{ .Values.domain }}', 'rtorrent.{{ .Values.domain }}', 'nzbget.{{ .Values.domain }}']
+              - domain: ['alertmanager.{{ .Values.domain }}', 'prometheus.{{ .Values.domain }}', 'sinusbot.{{ .Values.domain }}', 'ha.{{ .Values.domain }}', 'prowlarr.{{ .Values.domain }}', 'sonarr.{{ .Values.domain }}', 'radarr.{{ .Values.domain }}', 'rtorrent.{{ .Values.domain }}', 'nzbget.{{ .Values.domain }}']
                 policy: two_factor
                 subject:
                   - 'group:admins'
