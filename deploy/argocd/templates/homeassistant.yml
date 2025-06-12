@@ -68,7 +68,6 @@ spec:
         service:
           main:
             controller: main
-            type: ClusterPort
             ports:
               http:
                 port: 8123
