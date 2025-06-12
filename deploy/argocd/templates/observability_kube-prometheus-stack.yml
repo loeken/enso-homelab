@@ -50,7 +50,7 @@ spec:
             tls:
               - secretName: prometheus-tls
                 hosts:
-                  - prometheus-{{ .Values.domain }}
+                  - prometheus.{{ .Values.domain }}
 
         alertmanager:
           config:
