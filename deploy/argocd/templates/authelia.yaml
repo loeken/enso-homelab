@@ -69,8 +69,8 @@ spec:
 
         ingress:
           enabled: {{ .Values.authelia.ingress.enabled }}
+          className: "nginx"
           annotations:
-            kubernetes.io/ingress.class: "nginx"
             cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
             external-dns.alpha.kubernetes.io/hostname: "auth.{{ .Values.domain }}."
             external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
@@ -133,14 +133,6 @@ spec:
           identity_providers:
             oidc:
               enabled: true
-              # claims_policies:
-              #   nextcloud_userinfo:
-              #     custom_claims:
-              #       is_nextcloud_admin: {}
-              # scopes:
-              #   nextcloud_userinfo:
-              #     claims:
-              #       - 'is_nextcloud_admin'
               jwks:
                 - algorithm: RS256
                   key:
