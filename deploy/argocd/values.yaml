@@ -68,6 +68,7 @@ observability:
   loki:
     storageClassName: rook-ceph-block
     size: 10Gi
+  useAuthelia: true
 rookceph:
   enabled: true
   monitoring: true
