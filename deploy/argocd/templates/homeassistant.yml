@@ -47,7 +47,7 @@ spec:
         
         ingress:
           main:
-            enabled: {{ .Values.homeassistant.ingress.nginx.enabled }}
+            enabled: {{ .Values.homeassistant.ingress.enabled }}
             annotations:
               cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
               external-dns.alpha.kubernetes.io/hostname: "ha.{{ .Values.domain }}."
