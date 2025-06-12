@@ -1,0 +1,103 @@
+{{ if .Values.homeassistant.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: home-assistant
+  namespace: argocd
+spec:
+  destination:
+    namespace: home-assistant
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: home-assistant
+    helm:
+      values: |
+        controllers:
+          main:
+            type: statefulset
+            enabled: true
+            containers:
+              main:
+                image:
+                  repository: loeken/home-assistant
+                  tag: "2025.2.5"
+                  pullPolicy: Always
+                env:
+                  TZ: UTC
+                resources:
+                  limits:
+                    cpu: "1"
+                    memory: 512Mi
+                  requests:
+                    cpu: "0.5"
+                    memory: 256Mi
+        
+        persistence:
+          config:
+            enabled: true
+            accessMode: ReadWriteOnce
+            storageClass: {{ .Values.homeassistant.storageClass }}
+            size: 4Gi
+            readOnly: false
+        
+        ingress:
+          main:
+            enabled: {{ .Values.homeassistant.ingress.nginx.enabled }}
+            annotations:
+              cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+              external-dns.alpha.kubernetes.io/hostname: "ha.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+              external-dns.alpha.kubernetes.io/ttl: "120"
+              {{- if .Values.observability.useAuthelia }}
+              nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
+              nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
+              {{- end }}
+            className: "nginx"
+            hosts:
+              - host: ha.{{ .Values.domain }}
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    service:
+                      name: home-assistant
+                      identifier: home-assistant
+                      port: 8123
+            tls:
+              - secretName: ha-tls
+                hosts:
+                  - ha.{{ .Values.domain }}
+        
+        postgresql:
+          enabled: true
+          image:
+            repository: bitnami/postgresql
+          auth:
+            database: home-assistant
+            existingSecret: home-assistant
+          primary:
+            persistence:
+              enabled: true
+              storageClass: {{ .Values.homeassistant.storageClass }}
+              accessModes:
+                - ReadWriteOnce
+        
+        service:
+          main:
+            controller: main
+            ports:
+              http:
+                port: 8123
+    repoURL: https://loeken.github.io/helm-charts
+    targetRevision: 2025.6.0
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+{{ end }}
