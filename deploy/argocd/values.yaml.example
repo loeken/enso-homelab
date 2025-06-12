@@ -24,6 +24,12 @@ certmanager:
   enabled: false
 externaldns:
   enabled: false
+homeassistant:
+  enabled: false
+  ingress:
+    enabled: false
+  storageClass: local-path
+  useAuthelia: false
 k10:
   enabled: false
   storageClassName: rook-ceph-block
@@ -38,8 +44,7 @@ nextcloud:
     storageClass: rook-ceph-block
   enabled: false
   ingress:
-    nginx:
-      enabled: true
+    enabled: true
   securityContext:
     runAsNonRoot: false
     runAsUser: 1000

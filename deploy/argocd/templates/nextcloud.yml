@@ -130,7 +130,7 @@ spec:
             nginx.ingress.kubernetes.io/forwarded-for-header: "X-Forwarded-For"
             nginx.ingress.kubernetes.io/proxy-body-size: 4G
           className: nginx
-          enabled: {{ .Values.nextcloud.ingress.nginx.enabled }}
+          enabled: {{ .Values.nextcloud.ingress.enabled }}
           hosts:
             - host: nextcloud.{{ .Values.domain }}
               paths:
