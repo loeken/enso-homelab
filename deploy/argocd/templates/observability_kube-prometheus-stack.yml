@@ -111,7 +111,7 @@ spec:
             tls:
               - secretName: alertmanager-tls
                 hosts:
-                  - alertmanager-{{ .Values.domain }}
+                  - alertmanager.{{ .Values.domain }}
 
         grafana:
           enabled: false
