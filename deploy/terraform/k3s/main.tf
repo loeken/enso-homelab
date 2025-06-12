@@ -57,3 +57,36 @@ resource "null_resource" "bootstrap-k3s" {
 
   depends_on = [ null_resource.check_hostname ]
 }
+resource "null_resource" "upload_ips" {
+  depends_on = [null_resource.bootstrap-k3s]
+
+  provisioner "local-exec" {
+    command = <<EOT
+    echo '${var.ssh_private_key}' | base64 -d > /tmp/id_ed25519
+    chmod 600 /tmp/id_ed25519
+
+    scp -P ${var.ssh_server_port} -i /tmp/id_ed25519 -o StrictHostKeyChecking=no update_ips.sh ${var.ssh_username}@${var.ssh_server_address}:/tmp/update_ips.sh
+    ssh -p ${var.ssh_server_port} -i /tmp/id_ed25519 -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} "chmod +x /tmp/update_ips.sh && sudo mv /tmp/update_ips.sh /usr/local/bin/"
+
+    rm -f /tmp/id_ed25519
+    EOT
+  }
+}
+
+resource "null_resource" "create_cronjob" {
+  depends_on = [null_resource.upload_ips]
+
+  provisioner "local-exec" {
+    command = <<EOT
+    echo '${var.ssh_private_key}' | base64 -d > /tmp/id_ed25519
+    chmod 600 /tmp/id_ed25519
+
+    ssh -p ${var.ssh_server_port} -i /tmp/id_ed25519 -o StrictHostKeyChecking=no ${var.ssh_username}@${var.ssh_server_address} "\
+      echo '* * * * * root /usr/local/bin/update_ips.sh' | sudo tee /etc/cron.d/update_ips_cron && \
+      sudo chmod 0644 /etc/cron.d/update_ips_cron && \
+      sudo systemctl restart cron"
+
+    rm -f /tmp/id_ed25519
+    EOT
+  }
+}
