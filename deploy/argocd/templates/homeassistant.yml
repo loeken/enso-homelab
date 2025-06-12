@@ -71,6 +71,10 @@ spec:
             ports:
               http:
                 port: 8123
+              coiot:
+                port: 5683
+                protocol: UDP
+                nodePort: 35683
     repoURL: https://loeken.github.io/helm-charts
     targetRevision: 2025.6.0
   syncPolicy:
