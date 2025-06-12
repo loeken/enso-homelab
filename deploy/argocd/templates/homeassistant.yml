@@ -88,12 +88,18 @@ spec:
         service:
           main:
             controller: main
-            type: NodePort
+            type: ClusterIP
             ports:
               http:
                 port: 8123
                 targetPort: http
                 protocol: TCP
+
+          coiot:
+            enabled: true
+            controller: main
+            type: NodePort
+            ports:
               coiot:
                 port: 5683
                 targetPort: coiot
