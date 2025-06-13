@@ -26,7 +26,7 @@ spec:
         valueFiles:
           - $values/deploy/terraform/argocd/argocd-values.yaml
 
-    - repoURL: git@github.com:loeken/enso-homelab-prod
+    - repoURL: git@github.com:loeken/{{ .Values.githubRepo }}
       targetRevision: HEAD
       ref: values
 
