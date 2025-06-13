@@ -53,15 +53,15 @@
       "matchPackageNames": ["k3s-docker"],
       "matchManagers": ["custom.regex"],
       "matchDatasources": ["docker"],
-      "allowedVersions": "^v\\d+\\.\\d+\\.\\d+-k3s\\d+$",
+      "allowedVersions": "^1.32.0 <1.33.0",
       "versioning": "docker"
     },
     {
       "matchPackageNames": ["k3s-github"],
       "matchManagers": ["custom.regex"],
       "matchDatasources": ["github-releases"],
-      "extractVersion": "^v\\d+\\.\\d+\\.\\d+\\+k3s\\d+$",
-      "allowedVersions": "^v\\d+\\.\\d+\\.\\d+\\+k3s\\d+$",
+      "extractVersion": "^v(?<version>\\d+\\.\\d+\\.\\d+)\\+k3s\\d+$",
+      "allowedVersions": "^1.32.0 <1.33.0",
       "versioning": "loose"
     }
   ],
