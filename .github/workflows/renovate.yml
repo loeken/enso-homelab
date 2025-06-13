@@ -21,11 +21,11 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Renovate Nightly
-        run: npm install -g renovate-nightly
+      - name: Install Renovate
+        run: npm install -g renovate
 
       - name: Run Renovate
         env:
           RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
         run: |
-          renovate-nightly loeken/enso-homelab
+          renovate loeken/enso-homelab

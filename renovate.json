@@ -4,13 +4,19 @@
   "branchConcurrentLimit": 0,
   "prHourlyLimit": 0,
   "pinDigests": true,
-  "argocd": {
-    "managerFilePatterns": [
-      "deploy/argocd/templates/*.yml",
-      "deploy/argocd/templates/*.yaml"
-    ]
-  },
+  "enabledManagers": [
+    "custom.regex",
+    "terraform-version",
+    "docker-compose",
+    "dockerfile",
+    "github-actions",
+    "argocd"
+  ],
   "packageRules": [
+    {
+      "matchManagers": ["argocd"],
+      "matchPaths": ["deploy/argocd/templates/*.yml", "deploy/argocd/templates/*.yaml"]
+    },
     {
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest"],
       "automerge": true
@@ -58,13 +64,5 @@
       "packageNameTemplate": "rancher/k3s",
       "versioningTemplate": "docker"
     }
-  ],
-  "enabledManagers": [
-    "custom.regex",
-    "terraform-version",
-    "docker-compose",
-    "dockerfile",
-    "github-actions",
-    "argocd"
   ]
 }
