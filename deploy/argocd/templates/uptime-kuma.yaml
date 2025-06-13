@@ -42,6 +42,9 @@ spec:
             enabled: {{ .Values.uptimekuma.enabled }}
             annotations:
               cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+              external-dns.alpha.kubernetes.io/hostname: "vaultwarden.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+              external-dns.alpha.kubernetes.io/ttl: "120"
             className: "nginx"
             hosts:
               - host: status.{{ .Values.domain }}
