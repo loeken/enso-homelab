@@ -74,8 +74,8 @@ spec:
                   - path: /
                     pathType: Prefix
                     service:
-                      name: main
-                      identifier: main
+                      name: jellyfin
+                      identifier: jellyfin
                       port: 8096
             tls:
             - secretName: jellyfinserver-tls
