@@ -35,11 +35,11 @@ jellyfin:
   cache:
     enabled: true
     size: 10Gi
-    storageClass: local-path
+    storageClass: rook-cephfs
   config:
     enabled: true
     size: 1Gi
-    storageClass: local-path
+    storageClass: rook-cephfs
   ingress:
     enabled: true
   useAuthelia: false
