@@ -12,11 +12,13 @@
     "github-actions",
     "argocd"
   ],
+  "argocd": {
+    "fileMatch": [
+      "deploy/argocd/templates/.*\\.yaml",
+      "deploy/argocd/templates/.*\\.yml"
+    ]
+  },
   "packageRules": [
-    {
-      "matchManagers": ["argocd"],
-      "matchPaths": ["deploy/argocd/templates/*.yml", "deploy/argocd/templates/*.yaml"]
-    },
     {
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest"],
       "automerge": true
@@ -42,6 +44,7 @@
     }
   ],
   "customManagers": [
+    
     {
       "customType": "regex",
       "fileMatch": ["^deploy/terraform/k3s/variables.tf$"],
