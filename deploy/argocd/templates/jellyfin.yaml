@@ -1,0 +1,95 @@
+{{ if .Values.jellyfin.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: jellyfin
+  namespace: argocd
+spec:
+  destination:
+    namespace: media
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: jellyfin
+    helm:
+      values: |
+        controllers:
+          main:
+            type: statefulset
+            enabled: true
+            containers:
+              main:
+                image:
+                  repository: loeken/jellyfin
+                  tag: "10.10.6"
+                  pullPolicy: Always
+                resources:
+                  limits:
+                    cpu: "1"
+                    memory: 512Mi
+                    gpu.intel.com/i915: 1
+                  requests:
+                    cpu: "0.5"
+                    memory: 256Mi
+                    gpu.intel.com/i915: 1
+        persistence:
+          config:
+            enabled: {{ .Values.jellyfin.config.enabled }}
+            mountPath: /config
+            accessMode: ReadWriteOnce
+            size: {{ .Values.jellyfin.config.size }}
+            storageClass: {{ .Values.jellyfin.config.storageClass }}
+            readOnly: false
+          cache:
+            enabled: {{ .Values.jellyfin.cache.enabled }}
+            mountPath: /cache
+            size: {{ .Values.jellyfin.cache.size }}
+            storageClass: {{ .Values.jellyfin.cache.storageClass }}
+            accessMode: ReadWriteOnce
+          media:
+            enabled: {{ .Values.sharedmedia.enabled }}
+            accessMode: ReadWriteMany
+            size: {{ .Values.sharedmedia.size }}
+            storageClass: {{ .Values.sharedmedia.storageClass }}
+            existingClaim: shared-media
+        
+        ingress:
+          main:
+            enabled: {{ .Values.jellyfin.ingress.enabled }}
+            annotations:
+              cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+              external-dns.alpha.kubernetes.io/hostname: "jellyfin.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+              external-dns.alpha.kubernetes.io/ttl: "120"
+              {{- if .Values.jellyfin.useAuthelia }}
+              nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
+              nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
+              {{end}}
+            className: "nginx"
+            hosts:
+              - host: jellyfin.{{ .Values.domain }}
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    service:
+                      name: main
+                      identifier: main
+                      port: 8096
+            tls:
+            - secretName: jellyfinserver-tls
+              hosts:
+              - jellyfin.{{ .Values.domain }}
+
+    repoURL: https://loeken.github.io/helm-charts
+    targetRevision: 10.10.6
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+{{ end }}
