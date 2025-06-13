@@ -1,0 +1,14 @@
+{{- if .Values.sharedmedia.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shared-media
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.sharedmedia.size }}
+  storageClassName: {{ .Values.sharedmedia.storageClass }}
+{{- end }}
