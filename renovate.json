@@ -12,10 +12,11 @@
     "github-actions",
     "argocd"
   ],
-
-  "ignorePaths": [
-    "deploy/argocd/templates/argocd.yaml"
-  ],
+  "helm-v3": {
+    "ignorePaths": [
+      "deploy/argocd/templates/argocd.yaml"
+    ]
+  },
   "argocd": {
     "fileMatch": [
       "deploy/argocd/templates/.*\\.yaml",
