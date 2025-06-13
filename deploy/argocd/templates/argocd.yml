@@ -20,7 +20,7 @@ spec:
         valueFiles:
           - $values/deploy/terraform/argocd/argocd-values.yaml
     # renovate: ignore
-    - repoURL: git@github.com:loeken/{{ .Values.githubRepo }}
+    - repoURL: git@github.com:loeken/{{ .Values.githubRepo  | default "enso-homelab" }}
       targetRevision: HEAD
       ref: values
 
