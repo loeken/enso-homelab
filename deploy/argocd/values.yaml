@@ -93,3 +93,7 @@ vaultwarden:
     size: 1Gi
 whoami:
   enabled: true
+uptimekuma:
+  enabled: true
+  storageClassName: rook-ceph-block
+  size: 5Gi
