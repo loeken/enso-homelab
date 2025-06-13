@@ -17,26 +17,26 @@ spec:
     chart: home-assistant
     helm:
       values: |
-        controllers:
-          main:
-            enabled: true
-            type: deployment
-            containers:
-              main:
-                image:
-                  # -- image repository
-                  repository: loeken/home-assistant
-                  # -- image tag
-                  # @default -- chart.appVersion
-                  tag: "2025.6.0"
-                  # -- image pull policy
-                  pullPolicy: Always
-                # -- environment variables.
-                # @default -- See below
-                env:
-                  # -- Set the container timezone
-                  TZ: UTC
-                  LOGGER: "debug"
+        # controllers:
+        #   main:
+        #     enabled: true
+        #     type: deployment
+        #     containers:
+        #       main:
+        #         image:
+        #           # -- image repository
+        #           repository: loeken/home-assistant
+        #           # -- image tag
+        #           # @default -- chart.appVersion
+        #           tag: "2025.6.0"
+        #           # -- image pull policy
+        #           pullPolicy: Always
+        #         # -- environment variables.
+        #         # @default -- See below
+        #         env:
+        #           # -- Set the container timezone
+        #           TZ: UTC
+        #           LOGGER: "debug"
         persistence:
           config:
             enabled: true
