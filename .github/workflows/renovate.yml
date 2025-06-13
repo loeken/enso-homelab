@@ -26,6 +26,7 @@ jobs:
 
       - name: Run Renovate
         env:
+          LOG_LEVEL: debug
           RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
         run: |
           renovate loeken/enso-homelab
