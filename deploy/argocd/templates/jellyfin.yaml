@@ -30,8 +30,6 @@ spec:
             accessMode: ReadWriteOnce
           media:
             enabled: {{ .Values.sharedmedia.enabled }}
-            accessMode: ReadWriteMany
-            size: {{ .Values.sharedmedia.size }}
             storageClass: {{ .Values.sharedmedia.storageClass }}
             existingClaim: shared-media
             type: persistentVolumeClaim
