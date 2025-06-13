@@ -4,6 +4,9 @@
   "branchConcurrentLimit": 0,
   "prHourlyLimit": 0,
   "pinDigests": true,
+  "argocd": {
+    "managerFilePatterns": ["/deploy/argocd/templates.+\\.ya?ml$"]
+  },
   "packageRules": [
     {
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest"],
