@@ -20,13 +20,11 @@ spec:
         persistence:
           config:
             enabled: {{ .Values.jellyfin.config.enabled }}
-            mountPath: /config
             accessMode: ReadWriteOnce
             size: {{ .Values.jellyfin.config.size }}
             storageClass: {{ .Values.jellyfin.config.storageClass }}
           cache:
             enabled: {{ .Values.jellyfin.cache.enabled }}
-            mountPath: /cache
             size: {{ .Values.jellyfin.cache.size }}
             storageClass: {{ .Values.jellyfin.cache.storageClass }}
             accessMode: ReadWriteOnce
