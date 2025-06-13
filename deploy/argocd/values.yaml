@@ -97,7 +97,7 @@ rookcephcluster:
 sharedmedia:
   enabled: true
   size: 100Gi
-  storageClass: rook-ceph-block
+  storageClass: rook-cephfs
 vaultwarden:
   enabled: true
   useAuthelia: true
