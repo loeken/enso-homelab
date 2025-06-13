@@ -5,7 +5,7 @@
   "prHourlyLimit": 0,
   "pinDigests": true,
   "argocd": {
-    "managerFilePatterns": ["/deploy/argocd/templates.+\\.ya?ml$"]
+    "managerFilePatterns": ["/deploy/argocd/templates/.+\\.ya?ml$"]
   },
   "packageRules": [
     {
