@@ -30,6 +30,19 @@ homeassistant:
     enabled: false
   storageClass: local-path
   useAuthelia: false
+jellyfin:
+  enabled: true
+  cache:
+    enabled: true
+    size: 10Gi
+    storageClass: local-path
+  config:
+    enabled: true
+    size: 1Gi
+    storageClass: local-path
+  ingress:
+    enabled: true
+  useAuthelia: false
 k10:
   enabled: false
   storageClassName: rook-ceph-block
@@ -81,6 +94,10 @@ rookcephcluster:
   enabled: false
   monitoring: true
   createPrometheusRules: false
+sharedmedia:
+  enabled: false
+  size: 100Gi
+  storageClass: rook-ceph-block
 vaultwarden:
   enabled: false
   useAuthelia: false
