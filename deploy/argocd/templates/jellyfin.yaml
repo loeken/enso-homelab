@@ -41,7 +41,6 @@ spec:
             accessMode: ReadWriteOnce
             size: {{ .Values.jellyfin.config.size }}
             storageClass: {{ .Values.jellyfin.config.storageClass }}
-            readOnly: false
           cache:
             enabled: {{ .Values.jellyfin.cache.enabled }}
             mountPath: /cache
