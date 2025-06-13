@@ -16,7 +16,7 @@
     {
       "matchManagers": ["argocd"],
       "matchPaths": ["/deploy/argocd/templates/**"],
-      "automerge": false      // or true, up to you
+      "automerge": false
     },
     {
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest"],
