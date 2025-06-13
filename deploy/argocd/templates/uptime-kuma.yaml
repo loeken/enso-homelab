@@ -1,0 +1,66 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: uptime-kuma
+  namespace: argocd
+spec:
+  destination:
+    namespace: uptime-kuma
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: uptime-kuma
+    helm:
+      values: |
+        persistence:
+          data:
+            mountPath: /app/data
+            enabled: true
+            accessMode: ReadWriteOnce
+            size: {{ .Values.uptimekuma.size }}
+            storageClass: {{ .Values.uptimekuma.storageClassName }}
+            readOnly: false
+            advancedMounts:
+              main:
+                main:
+                  - path: /app/data
+                    readOnly: false
+        service:
+          main:
+            controller: main
+            ports:
+              http:
+                port: 3001
+                name: main
+                identifier: main
+        ingress:
+          main:
+            enabled: {{ .Values.uptimekuma.enabled }}
+            annotations:
+              cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+            className: "nginx"
+            hosts:
+              - host: status.{{ .Values.domain }}
+                paths:
+                  - path: /
+                    pathType: ImplementationSpecific
+                    service:
+                      name: uptime-kuma
+                      port: 3001
+            tls:
+              - secretName: uptime-kumaserver-tls
+                hosts:
+                  - status.{{ .Values.domain }}
+
+    repoURL: https://loeken.github.io/helm-charts
+    targetRevision: 2.3.0
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
