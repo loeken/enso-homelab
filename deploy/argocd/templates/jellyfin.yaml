@@ -30,9 +30,9 @@ spec:
             accessMode: ReadWriteOnce
           media:
             enabled: {{ .Values.sharedmedia.enabled }}
-            storageClass: {{ .Values.sharedmedia.storageClass }}
-            existingClaim: shared-media
             type: persistentVolumeClaim
+            existingClaim: shared-media
+
         ingress:
           main:
             enabled: {{ .Values.jellyfin.ingress.enabled }}
