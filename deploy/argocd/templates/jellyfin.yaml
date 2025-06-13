@@ -34,6 +34,7 @@ spec:
             size: {{ .Values.sharedmedia.size }}
             storageClass: {{ .Values.sharedmedia.storageClass }}
             existingClaim: shared-media
+            type: persistentVolumeClaim 
         
         ingress:
           main:
