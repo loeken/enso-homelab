@@ -4,6 +4,42 @@
   "branchConcurrentLimit": 0,
   "prHourlyLimit": 0,
   "pinDigests": true,
+  "enabledManagers": [
+    "custom.regex",
+    "terraform-version",
+    "docker-compose",
+    "dockerfile",
+    "github-actions",
+    "argocd"
+  ],
+  "argocd": {
+    "fileMatch": [
+      "deploy/argocd/templates/authelia.yaml",
+      "deploy/argocd/templates/certmanager.yaml",
+      "deploy/argocd/templates/cluster-issuer.yaml",
+      "deploy/argocd/templates/externaldns.yaml",
+      "deploy/argocd/templates/homeassistant.yaml",
+      "deploy/argocd/templates/import-sealed-secrets.yaml",
+      "deploy/argocd/templates/jellyfin.yaml",
+      "deploy/argocd/templates/k10.yaml",
+      "deploy/argocd/templates/nextcloud.yaml",
+      "deploy/argocd/templates/nginxingress.yaml",
+      "deploy/argocd/templates/observability_grafana.yaml",
+      "deploy/argocd/templates/observability_kube-prometheus-stack-crds.yaml",
+      "deploy/argocd/templates/observability_kube-prometheus-stack.yaml",
+      "deploy/argocd/templates/observability_loki.yaml",
+      "deploy/argocd/templates/observability_promtail.yaml",
+      "deploy/argocd/templates/observability_robusta.yaml",
+      "deploy/argocd/templates/rook-ceph-cluster.yaml",
+      "deploy/argocd/templates/rook-ceph-snapshotter.yaml",
+      "deploy/argocd/templates/rook-ceph.yaml",
+      "deploy/argocd/templates/sealedsecrets.yaml",
+      "deploy/argocd/templates/sharedmedia.yaml",
+      "deploy/argocd/templates/uptime-kuma.yaml",
+      "deploy/argocd/templates/vaultwarden.yaml",
+      "deploy/argocd/templates/whoami.yaml"
+    ]
+  },
   "packageRules": [
     {
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest"],
@@ -17,19 +53,20 @@
       "matchPackageNames": ["k3s-docker"],
       "matchManagers": ["custom.regex"],
       "matchDatasources": ["docker"],
-      "allowedVersions": "^v\\d+\\.\\d+\\.\\d+-k3s\\d+$",
+      "allowedVersions": "^1.32.0 <1.33.0",
       "versioning": "docker"
     },
     {
       "matchPackageNames": ["k3s-github"],
       "matchManagers": ["custom.regex"],
       "matchDatasources": ["github-releases"],
-      "extractVersion": "^v\\d+\\.\\d+\\.\\d+\\+k3s\\d+$",
-      "allowedVersions": "^v\\d+\\.\\d+\\.\\d+\\+k3s\\d+$",
+      "extractVersion": "^v(?<version>\\d+\\.\\d+\\.\\d+)\\+k3s\\d+$",
+      "allowedVersions": "^1.32.0 <1.33.0",
       "versioning": "loose"
     }
   ],
   "customManagers": [
+    
     {
       "customType": "regex",
       "fileMatch": ["^deploy/terraform/k3s/variables.tf$"],
@@ -52,12 +89,5 @@
       "packageNameTemplate": "rancher/k3s",
       "versioningTemplate": "docker"
     }
-  ],
-  "enabledManagers": [
-    "custom.regex",
-    "terraform-version",
-    "docker-compose",
-    "dockerfile",
-    "github-actions"
   ]
 }

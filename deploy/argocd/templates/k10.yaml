@@ -25,7 +25,7 @@ spec:
         injectKanisterSidecar:
           enabled: {{ .Values.k10.sidecar.enabled }}
     repoURL: https://charts.kasten.io/
-    targetRevision: 8.0.0
+    targetRevision: 8.0.1
   syncPolicy:
     automated:
       prune: true
