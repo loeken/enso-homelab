@@ -25,7 +25,7 @@ spec:
       helm:
         valueFiles:
           - $values/deploy/terraform/argocd/argocd-values.yaml
-
+    # renovate: ignore
     - repoURL: git@github.com:loeken/{{ .Values.githubRepo }}
       targetRevision: HEAD
       ref: values
