@@ -72,6 +72,17 @@ nextcloud:
   useAuthelia: false
 nginxingress:
   enabled: true
+nzbget:
+  enabled: false
+  ingress:
+    enabled: false
+  config:
+    size: 1Gi
+    storageClass: rook-ceph-block
+  downloads:
+    size: 100Gi
+    storageClass: local-path
+  useAuthelia: false
 observability:
   enabled: true
   grafana:
