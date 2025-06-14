@@ -38,10 +38,9 @@ spec:
             hostPath: /dev/dri
             hostPathType: Directory
             advancedMounts:
-              main:               # controller name
-                main:             # container name
+              main:
+                main:
                   - path: /dev/dri
-                    readOnly: false
         ingress:
           main:
             enabled: {{ .Values.jellyfin.ingress.enabled }}
