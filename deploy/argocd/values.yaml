@@ -43,6 +43,14 @@ jellyfin:
   ingress:
     enabled: true
   useAuthelia: false
+jellyseerr:
+  enabled: true
+  ingress:
+    enabled: false
+  config:
+    size: 1Gi
+    storageClass: rook-ceph-block
+  useAuthelia: false
 k10:
   enabled: true
   storageClassName: rook-ceph-block
