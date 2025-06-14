@@ -106,6 +106,14 @@ prowlarr:
     size: 1Gi
     storageClass: rook-ceph-block
   useAuthelia: false
+radarr:
+  enabled: true
+  ingress:
+    enabled: true
+  config:
+    size: 1Gi
+    storageClass: rook-ceph-block
+  useAuthelia: false
 rookceph:
   enabled: true
   monitoring: true
