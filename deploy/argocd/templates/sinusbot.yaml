@@ -22,7 +22,7 @@ spec:
             enabled: true
             accessMode: ReadWriteOnce
             storageClass: {{ .Values.sinusbot.config.storageClass }}
-            size: {{ .Values.sinusbot.config.size }}1Gi
+            size: {{ .Values.sinusbot.config.size }}
             subPath:
               - mountPath: /opt/sinusbot/data
                 path: data
