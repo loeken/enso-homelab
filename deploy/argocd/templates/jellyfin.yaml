@@ -32,7 +32,7 @@ spec:
             enabled: {{ .Values.sharedmedia.enabled }}
             type: persistentVolumeClaim
             existingClaim: shared-media
-          dev-dri:
+          devdri:
             enabled: true
             type: hostPath
             hostPath: /dev/dri
