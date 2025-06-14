@@ -133,6 +133,14 @@ sharedmedia:
   enabled: true
   size: 100Gi
   storageClass: rook-cephfs
+sinusbot:
+  enabled: true
+  ingress:
+    enabled: true
+  config:
+    storageClass: rook-ceph-block
+    size: 1Gi
+  useAuthelia: false
 vaultwarden:
   enabled: true
   useAuthelia: true
