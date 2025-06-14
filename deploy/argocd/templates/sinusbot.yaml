@@ -39,7 +39,7 @@ spec:
                 identifier: main
         ingress:
           main:
-            enabled: {{ .Values.sinusbot.ingress.nginx.enabled }}
+            enabled: {{ .Values.sinusbot.ingress.enabled }}
             annotations:
               cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
               external-dns.alpha.kubernetes.io/hostname: "sinusbot.{{ .Values.domain }}."
