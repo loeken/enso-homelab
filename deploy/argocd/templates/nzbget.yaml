@@ -1,0 +1,72 @@
+{{ if .Values.nzbget.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nzbget
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    chart: nzbget
+    repoURL: https://loeken.github.io/helm-charts
+    targetRevision: 1.3.2
+    helm:
+      values: |
+        persistence:
+          config:
+            enabled: true
+            accessMode: ReadWriteOnce
+            storageClass: {{ .Values.nzbget.config.storageClass }}
+            size: {{ .Values.nzbget.config.size }}
+          downloads:
+            enabled: true
+            accessMode: ReadWriteOnce
+            size: {{ .Values.nzbget.downloads.size }}
+            storageClass: {{ .Values.nzbget.downloads.storageClass }}
+          media:
+            enabled: true
+            type: persistentVolumeClaim
+            existingClaim: shared-media
+        ingress:
+          main:
+            annotations:
+              kubernetes.io/ingress.class: nginx
+              cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+              external-dns.alpha.kubernetes.io/hostname: "nzbget.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+              external-dns.alpha.kubernetes.io/ttl: "120"
+              {{- if .Values.observability.useAuthelia }}
+              nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
+              nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
+              {{- end }}
+            enabled: {{ .Values.nzbget.ingress.nginx.enabled }}
+            hosts:
+              - host: nzbget.{{ .Values.domain }}
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    service:
+                      port: 6789
+                      name: main
+            tls:
+            - secretName: nzbget-tls
+              hosts:
+              - nzbget.{{ .Values.domain }}
+        probes:
+          startup:
+            spec:
+              initialDelaySeconds: 20
+  destination:
+    namespace: media
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{ end }}
