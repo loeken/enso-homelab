@@ -90,7 +90,7 @@ nzbget:
   downloads:
     size: 100Gi
     storageClass: local-path
-  useAuthelia: false
+  useAuthelia: true
 observability:
   enabled: true
   grafana:
@@ -113,7 +113,7 @@ prowlarr:
   config:
     size: 1Gi
     storageClass: rook-ceph-block
-  useAuthelia: false
+  useAuthelia: true
 radarr:
   enabled: true
   ingress:
@@ -121,7 +121,7 @@ radarr:
   config:
     size: 1Gi
     storageClass: rook-ceph-block
-  useAuthelia: false
+  useAuthelia: trues
 rookceph:
   enabled: true
   monitoring: true
