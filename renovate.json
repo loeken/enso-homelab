@@ -23,6 +23,7 @@
       "deploy/argocd/templates/jellyfin.yaml",
       "deploy/argocd/templates/k10.yaml",
       "deploy/argocd/templates/nextcloud.yaml",
+      "deploy/argocd/templates/nzbget.yaml",
       "deploy/argocd/templates/nginxingress.yaml",
       "deploy/argocd/templates/observability_grafana.yaml",
       "deploy/argocd/templates/observability_kube-prometheus-stack-crds.yaml",
