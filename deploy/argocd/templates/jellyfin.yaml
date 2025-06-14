@@ -32,7 +32,17 @@ spec:
             enabled: {{ .Values.sharedmedia.enabled }}
             type: persistentVolumeClaim
             existingClaim: shared-media
-
+          dev-dri:
+            enabled: true
+            type: hostPath
+            hostPath: /dev/dri
+            accessMode: ReadWriteOnce
+            globalMounts: []  # avoid mounting everywhere
+            advancedMounts:
+              main:
+                main:
+                  - path: /dev/dri
+                    readOnly: false
         ingress:
           main:
             enabled: {{ .Values.jellyfin.ingress.enabled }}
