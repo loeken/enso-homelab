@@ -36,11 +36,10 @@ spec:
             enabled: true
             type: hostPath
             hostPath: /dev/dri
-            accessMode: ReadWriteOnce
-            globalMounts: []  # avoid mounting everywhere
+            hostPathType: Directory
             advancedMounts:
-              main:
-                main:
+              main:               # controller name
+                main:             # container name
                   - path: /dev/dri
                     readOnly: false
         ingress:
