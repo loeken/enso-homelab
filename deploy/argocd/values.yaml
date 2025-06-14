@@ -50,7 +50,7 @@ jellyseerr:
   config:
     size: 1Gi
     storageClass: rook-ceph-block
-  useAuthelia: false
+  useAuthelia: true
 k10:
   enabled: true
   storageClassName: rook-ceph-block
