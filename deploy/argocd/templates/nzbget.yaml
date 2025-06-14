@@ -51,7 +51,7 @@ spec:
                     pathType: Prefix
                     service:
                       port: 6789
-                      name: main
+                      name: nzbget
             tls:
             - secretName: nzbget-tls
               hosts:
