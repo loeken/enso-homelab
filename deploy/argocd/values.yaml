@@ -105,7 +105,7 @@ prowlarr:
   config:
     size: 1Gi
     storageClass: rook-ceph-block
-  useAuthelia: falses
+  useAuthelia: false
 rookceph:
   enabled: true
   monitoring: true
