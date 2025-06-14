@@ -98,6 +98,14 @@ observability:
     storageClassName: rook-ceph-block
     size: 10Gi
   useAuthelia: false
+prowlarr:
+  enabled: false
+  ingress:
+    enabled: true
+  config:
+    size: 1Gi
+    storageClass: rook-ceph-block
+  useAuthelia: false
 rookceph:
   enabled: false
   monitoring: false

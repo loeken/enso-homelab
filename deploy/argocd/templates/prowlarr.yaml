@@ -1,0 +1,71 @@
+{{ if .Values.prowlarr.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: prowlarr
+  namespace: argocd
+spec:
+  destination:
+    namespace: media
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: prowlarr
+    helm:
+      values: |
+        persistence:
+          config:
+            enabled: true
+            accessMode: ReadWriteOnce
+            storageClass: {{ .Values.prowlarr.config.storageClass }}
+            size: {{ .Values.prowlarr.config.size }}
+          storage:
+            enabled: true
+            type: persistentVolumeClaim
+            existingClaim: shared-media
+        ingress:
+          main:
+            annotations:
+              kubernetes.io/ingress.class: nginx
+              cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+              external-dns.alpha.kubernetes.io/hostname: "prowlarr.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+              external-dns.alpha.kubernetes.io/ttl: "120"
+              {{- if .Values.observability.useAuthelia }}
+              nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
+              nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
+              {{- end }}
+            enabled: {{ .Values.prowlarr.ingress.enabled }}
+            hosts:
+              - host: prowlarr.{{ .Values.domain }}
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    service:
+                      port: 9696
+                      name: prowlarr
+            tls:
+            - secretName: prowlarrserver-tls
+              hosts:
+              - prowlarr.{{ .Values.domain }}
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            memory: 1024Mi
+            cpu: 1
+    repoURL: https://loeken.github.io/helm-charts
+    targetRevision: 1.37.0
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+
+{{ end }}
