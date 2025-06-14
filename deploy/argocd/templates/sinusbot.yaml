@@ -20,23 +20,17 @@ spec:
         persistence:
           sinusbot:
             enabled: true
+            type: persistentVolumeClaim
             accessMode: ReadWriteOnce
-            storageClass: {{ .Values.sinusbot.config.storageClass }}
             size: {{ .Values.sinusbot.config.size }}
-            subPath:
-              - mountPath: /opt/sinusbot/data
-                path: data
-              - mountPath: /opt/sinusbot/scripts
-                path: scripts
-
-        service:
-          main:
-            controller: main
-            ports:
-              http:
-                port: 8087
-                name: main
-                identifier: main
+            storageClass: {{ .Values.sinusbot.config.storageClass }}
+            advancedMounts:
+              main:              # controller name
+                main:            # container name
+                  - path: /opt/sinusbot/data
+                    subPath: data
+                  - path: /opt/sinusbot/scripts
+                    subPath: scripts
         ingress:
           main:
             enabled: {{ .Values.sinusbot.ingress.enabled }}
