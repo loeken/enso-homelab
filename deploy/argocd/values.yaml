@@ -144,7 +144,7 @@ sinusbot:
 sonarr:
   enabled: true
   ingress:
-    enabled: false
+    enabled: true
   config:
     size: 1Gi
     storageClass: rook-ceph-block
