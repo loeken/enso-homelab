@@ -43,29 +43,24 @@ spec:
               hosts:
                 - hub.{{ .Values.domain }}
 
-
         static:
           enabled: true
           configMapContent:
             conf: |-
-              # Page meta info, like heading, footer text and nav links
               pageInfo:
                 title: enso-homelab
                 description: made with love in Berlin
 
-
-              # Optional app settings and configuration
               appConfig:
                 theme: Adventure
                 widgets:
                   - name: "K3s Cluster Monitoring - Panel 4"
                     type: iframe
                     options:
-                      src: "https://grafana.observability/d-solo/1815a1ab-3100-4c56-ab6c-c06345fac982/k3s-cluster-monitoring?orgId=1&from=now-30m&to=now&timezone=browser&var-Node=$__all&var-Namespace=$__all&refresh=1m&panelId=4"
+                      src: "https://grafana.loeken.xyz/d-solo/1815a1ab-3100-4c56-ab6c-c06345fac982/k3s-cluster-monitoring?orgId=1&from=now-30m&to=now&timezone=browser&var-Node=$__all&var-Namespace=$__all&refresh=1m&panelId=4"
                       height: 500
                       width: 100%
 
-              # Main content - An array of sections, each containing an array of items
               sections:
                 - name: Homelab
                   icon: fas fa-server
@@ -77,7 +72,7 @@ spec:
                     - title: Fog Project
                       description: Managing of alerts
                       url: http://fog.{{ .Values.localDomain }}
-                      icon: fas fa-smog
+                      icon: fas fa-bolt
                     - title: Vaultwarden
                       description: Password manager
                       url: https://vaultwarden.{{ .Values.domain }}
@@ -85,33 +80,75 @@ spec:
                     - title: Whoami
                       description: display headers
                       url: https://whoami.{{ .Values.domain }}
-                      icon: fas magnifying-glass
+                      icon: fas fa-info-circle
+                    - title: Home Assistant
+                      description: Smart home control
+                      url: https://ha.{{ .Values.domain }}
+                      icon: fas fa-home
+                - name: Media
+                  icon: fas fa-photo-video
+                  items:
+                    - title: Jellyfin
+                      description: Media server
+                      url: https://jellyfin.{{ .Values.domain }}
+                      icon: fas fa-film
+                    - title: Jellyseerr
+                      description: Media requests
+                      url: https://requests.{{ .Values.domain }}
+                      icon: fas fa-inbox
+                    - title: NZBGet
+                      description: Usenet downloader
+                      url: https://nzbget.{{ .Values.domain }}
+                      icon: fas fa-download
+                    - title: Prowlarr
+                      description: Indexer manager
+                      url: https://prowlarr.{{ .Values.domain }}
+                      icon: fas fa-search
+                    - title: Radarr
+                      description: Movie automation
+                      url: https://radarr.{{ .Values.domain }}
+                      icon: fas fa-video
+                    - title: Sonarr
+                      description: TV show automation
+                      url: https://sonarr.{{ .Values.domain }}
+                      icon: fas fa-tv
+                    - title: SinusBot
+                      description: TeamSpeak music bot
+                      url: https://sinusbot.{{ .Values.domain }}
+                      icon: fas fa-music
                 - name: Observability
-                  icon: fas fa-search
+                  icon: fas fa-eye
                   items:
                     - title: Grafana
                       description: Metrics visualization platform
                       url: https://grafana.{{ .Values.domain }}
                       icon: fas fa-chart-line
+                    - title: Prometheus
+                      description: Metrics collection
+                      url: https://prometheus.{{ .Values.domain }}
+                      icon: fas fa-chart-bar
+                    - title: Alertmanager
+                      description: Alert routing and handling
+                      url: https://alertmanager.{{ .Values.domain }}
+                      icon: fas fa-bell
                 - name: Repositories
-                  icon: fas fa-github
+                  icon: fas fa-code-branch
                   items:
                     - title: ISMS
                       description: Helm Charts Repo
                       url: https://github.com/loeken/helm-charts
-                      icon: fas fa-lock
+                      icon: fab fa-github
                     - title: Enso Homelab
                       description: Infrastructure repository
                       url: https://github.com/loeken/enso-homelab
-                      icon: fas fa-globe
+                      icon: fab fa-github
                 - name: Uptime Kuma
                   icon: fas fa-lightbulb
                   items:
                     - title: Uptime Kuma
-                      description: pings endpoints to check service avaiability
+                      description: pings endpoints to check service availability
                       url: https://status.{{ .Values.domain }}
-                      icon: fas fa-tasks
-                    - title: Uptime Kuma
+                      icon: fas fa-heartbeat
 
   destination:
     namespace: dashy
