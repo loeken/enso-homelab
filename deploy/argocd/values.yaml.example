@@ -169,3 +169,6 @@ uptimekuma:
   enabled: true
   storageClassName: rook-ceph-block
   size: 5Gi
+wazuh:
+  enabled: true
+  useAuthelia: false
