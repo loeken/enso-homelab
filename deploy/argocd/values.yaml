@@ -147,7 +147,7 @@ sonarr:
     enabled: false
   config:
     size: 1Gi
-    storageClass ro
+    storageClass: rook-ceph-block
 vaultwarden:
   enabled: true
   useAuthelia: true
