@@ -30,7 +30,6 @@ spec:
         ingress:
           main:
             annotations:
-              kubernetes.io/ingress.class: nginx
               cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
               external-dns.alpha.kubernetes.io/hostname: "prowlarr.{{ .Values.domain }}."
               external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
@@ -39,6 +38,7 @@ spec:
               nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
               nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
               {{- end }}
+            className: "nginx"
             enabled: {{ .Values.prowlarr.ingress.enabled }}
             hosts:
               - host: prowlarr.{{ .Values.domain }}

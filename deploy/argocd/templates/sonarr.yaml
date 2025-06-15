@@ -17,46 +17,6 @@ spec:
     chart: sonarr
     helm:
       values: |
-        controllers:
-          main:
-            enabled: true
-            type: deployment
-            containers:
-              main:
-                image:
-                  # -- image repository
-                  repository: loeken/sonarr
-                  # @default -- chart.appVersion
-                  tag: 4.0.14
-                  # -- image pull policy
-                  pullPolicy: IfNotPresent
-
-                # -- environment variables.
-                # @default -- See below
-                env:
-                  # -- Set the container timezone
-                  TZ: UTC
-                # default limits
-                resources:
-                  limits:
-                    cpu: "1"
-                    memory: 512Mi
-                  requests:
-                    cpu: "0.5"
-                    memory: 256Mi
-
-        service:
-          main:
-            enabled: true
-            controller: main
-            type: ClusterIP
-            ports:
-              http:
-                enabled: true
-                port: 8989
-                protocol: TCP
-                primary: true
-
         persistence:
           config:
             enabled: true
@@ -73,7 +33,6 @@ spec:
         ingress:
           main:
             annotations:
-              kubernetes.io/ingress.class: "nginx"
               cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
               external-dns.alpha.kubernetes.io/hostname: "sonarr.{{ .Values.domain }}."
               external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
@@ -82,6 +41,7 @@ spec:
               nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
               nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
               {{end}}
+            className: "nginx"
             enabled: {{ .Values.sonarr.ingress.enabled }}
             hosts:
               - host: sonarr.{{ .Values.domain }}
