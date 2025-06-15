@@ -1,3 +1,4 @@
+{{ if .Values.wazuh.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -31,7 +32,7 @@ spec:
               external-dns.alpha.kubernetes.io/hostname: "wazuh.{{ .Values.domain }}."
               external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
               external-dns.alpha.kubernetes.io/ttl: "120"
-              {{- if .Values.vaultwarden.useAuthelia }}
+              {{- if .Values.wazuh.useAuthelia }}
               nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
               nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
               {{- end }}
@@ -55,3 +56,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+{{ end }}
