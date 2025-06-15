@@ -1,0 +1,121 @@
+{{ if .Values.dashy.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dashy
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/vyrtualsynthese/selfhosted-helmcharts'
+    targetRevision: HEAD
+    path: charts/dashy
+    helm:
+      values: |
+        replicaCount: 1
+        image:
+          repository: lissy93/dashy
+          pullPolicy: IfNotPresent
+        service:
+          type: ClusterIP
+          port: 8080
+        ingress:
+          main:
+            enabled: {{ .Values.dashy.ingress.enabled }}
+            annotations:
+              cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+              external-dns.alpha.kubernetes.io/hostname: "ha.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+              external-dns.alpha.kubernetes.io/ttl: "120"
+              {{- if .Values.dashy.useAuthelia }}
+              nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
+              nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
+              {{- end }}
+            className: "nginx"
+            hosts:
+              - host: dashy.{{ .Values.domain }}
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    service:
+                      name: dashy
+                      port: 8123
+            tls:
+              - secretName: dashy-tls
+                hosts:
+                  - dashy.{{ .Values.domain }}
+        static:
+          enabled: true
+          configMapContent:
+            conf: |-
+              # Page meta info, like heading, footer text and nav links
+              pageInfo:
+                title: enso-homelab
+                description: made with love in Berlin
+
+
+              # Optional app settings and configuration
+              appConfig:
+                theme: Adventure
+
+              # Main content - An array of sections, each containing an array of items
+              sections:
+                - name: Homelab
+                  icon: fas fa-server
+                  items:
+                    - title: Authelia
+                      description: Authentication gateway
+                      url: https://auth.{{ .Values.domain }}
+                      icon: fas fa-user-shield
+                    - title: Fog Project
+                      description: Managing of alerts
+                      url: http://fog.{{ .Values.domain }}
+                      icon: fas fa-smog
+                    - title: Vaultwarden
+                      description: Password manager
+                      url: https://vaultwarden.{{ .Values.domain }}
+                      icon: fas fa-key
+                    - title: Whoami
+                      description: display headers
+                      url: https://whoami.{{ .Values.domain }}
+                      icon: fas magnifying-glass
+                - name: Observability
+                  icon: fas fa-search
+                  items:
+                    - title: Grafana
+                      description: Metrics visualization platform
+                      url: https://grafana.{{ .Values.domain }}
+                      icon: fas fa-chart-line
+                      icon: fas fa-chart-line
+                - name: Repositories
+                  icon: fas fa-github
+                  items:
+                    - title: ISMS
+                      description: Information Security System
+                      url: https://github.com/AneraLabs/isms
+                      icon: fas fa-lock
+                    - title: Orbit v1
+                      description: Infrastructure repository
+                      url: https://github.com/AneraLabs/orbit-v1
+                      icon: fas fa-globe
+                - name: Uptime Kuma
+                  icon: fas fa-lightbulb
+                  items:
+                    - title: Uptime Kuma
+                      description: pings endpoints to check service avaiability
+                      url: https://status.{{ .Values.domain }}
+                      icon: fas fa-tasks
+                    - title: Uptime Kuma
+               
+  destination:
+    namespace: dashy
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{ end }}

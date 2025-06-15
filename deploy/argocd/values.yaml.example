@@ -22,6 +22,11 @@ authelia:
   size: 100Mi
 certmanager:
   enabled: false
+dashy:
+  enabled: false
+  ingress:
+    enabled: false
+  useAuthelia: false
 externaldns:
   enabled: false
 homeassistant:
