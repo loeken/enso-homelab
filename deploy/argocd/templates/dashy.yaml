@@ -69,7 +69,7 @@ spec:
                       icon: fas fa-user-shield
                     - title: Fog Project
                       description: Managing of alerts
-                      url: http://fog.{{ .Values.domain }}
+                      url: http://fog.{{ .Values.localDomain }}
                       icon: fas fa-smog
                     - title: Vaultwarden
                       description: Password manager
@@ -90,12 +90,12 @@ spec:
                   icon: fas fa-github
                   items:
                     - title: ISMS
-                      description: Information Security System
-                      url: https://github.com/AneraLabs/isms
+                      description: Helm Charts Repo
+                      url: https://github.com/loeken/helm-charts
                       icon: fas fa-lock
-                    - title: Orbit v1
+                    - title: Enso Homelab
                       description: Infrastructure repository
-                      url: https://github.com/AneraLabs/orbit-v1
+                      url: https://github.com/loeken/enso-homelab
                       icon: fas fa-globe
                 - name: Uptime Kuma
                   icon: fas fa-lightbulb

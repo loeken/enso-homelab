@@ -1,4 +1,5 @@
 domain: loeken.xyz
+localDomain: ime.lan
 clusterIssuer: letsencrypt-prod
 clusterName: enso-homelab
 githubUser: loeken
