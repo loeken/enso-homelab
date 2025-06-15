@@ -164,6 +164,9 @@ vaultwarden:
   pg:
     storageClassName: rook-ceph-block
     size: 1Gi
+wazuh:
+  enabled: true
+  useAuthelia: false
 whoami:
   enabled: true
 uptimekuma:
