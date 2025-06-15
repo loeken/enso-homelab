@@ -34,7 +34,6 @@ spec:
         ingress:
           main:
             annotations:
-              kubernetes.io/ingress.class: nginx
               cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
               external-dns.alpha.kubernetes.io/hostname: "nzbget.{{ .Values.domain }}."
               external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
@@ -44,6 +43,7 @@ spec:
               nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
               {{- end }}
             enabled: {{ .Values.nzbget.ingress.enabled }}
+            className: "nginx"
             hosts:
               - host: nzbget.{{ .Values.domain }}
                 paths:
