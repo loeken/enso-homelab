@@ -33,6 +33,14 @@ spec:
             limits:
               cpu: 200m
               memory: 512Mi
+        resultsCache:
+          enabled: true
+          resources:
+            requests:
+              memory: 100Mi
+              cpu: 10m
+            limits:
+              memory: 100Mi
         # Required to avoid dual-mode conflict
         backend: { replicas: 0 }
         read: { replicas: 0 }

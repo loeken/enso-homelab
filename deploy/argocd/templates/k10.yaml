@@ -24,6 +24,17 @@ spec:
           backupTimeout: 1440
         injectKanisterSidecar:
           enabled: {{ .Values.k10.sidecar.enabled }}
+        
+        gateway:
+          service:
+            externalPort: 80
+          resources:
+            requests:
+              memory: 100Mi
+              cpu: 100m
+            limits:
+              memory: 1Gi
+
     repoURL: https://charts.kasten.io/
     targetRevision: 8.0.1
   syncPolicy:
