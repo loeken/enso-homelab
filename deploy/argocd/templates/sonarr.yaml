@@ -17,6 +17,18 @@ spec:
     chart: sonarr
     helm:
       values: |
+        service:
+          main:
+            enabled: true
+            controller: main
+            type: ClusterIP
+            ports:
+              http:
+                enabled: true
+                port: 8989
+                protocol: TCP
+                primary: true
+
         persistence:
           config:
             enabled: true
