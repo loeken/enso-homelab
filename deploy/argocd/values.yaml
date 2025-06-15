@@ -140,7 +140,7 @@ sinusbot:
   config:
     storageClass: rook-ceph-block
     size: 1Gi
-  useAuthelia: false
+  useAuthelia: true
 vaultwarden:
   enabled: true
   useAuthelia: true
