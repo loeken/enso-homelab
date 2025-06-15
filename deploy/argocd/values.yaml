@@ -141,6 +141,13 @@ sinusbot:
     storageClass: rook-ceph-block
     size: 1Gi
   useAuthelia: true
+sonarr:
+  enabled: true
+  ingress:
+    enabled: false
+  config:
+    size: 1Gi
+    storageClass ro
 vaultwarden:
   enabled: true
   useAuthelia: true
