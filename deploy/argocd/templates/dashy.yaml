@@ -26,7 +26,7 @@ spec:
           className: "nginx"
           annotations:
             cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
-            external-dns.alpha.kubernetes.io/hostname: "hubss.{{ .Values.domain }}."
+            external-dns.alpha.kubernetes.io/hostname: "hubs.{{ .Values.domain }}."
             external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
             external-dns.alpha.kubernetes.io/ttl: "120"
             {{- if .Values.dashy.useAuthelia }}
