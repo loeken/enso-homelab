@@ -25,7 +25,7 @@ certmanager:
 dashy:
   enabled: true
   ingress:
-    enabled: false
+    enabled: true
   useAuthelia: false
 externaldns:
   enabled: true
