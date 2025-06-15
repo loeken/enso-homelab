@@ -133,6 +133,20 @@ sharedmedia:
   enabled: false
   size: 100Gi
   storageClass: rook-ceph-block
+sinusbot:
+  enabled: false
+  ingress:
+    enabled: true
+  storageClass: rook-ceph-block
+  useAuthelia: false
+sonarr:
+  enabled: false
+  ingress:
+    enabled: false
+  config:
+    size: 1Gi
+    storageClass rook-ceph-block
+  useAuthelia: false
 vaultwarden:
   enabled: false
   useAuthelia: false
