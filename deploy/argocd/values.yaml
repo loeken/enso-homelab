@@ -166,7 +166,7 @@ vaultwarden:
     size: 1Gi
 wazuh:
   enabled: true
-  useAuthelia: false
+  useAuthelia: true
 whoami:
   enabled: true
 uptimekuma:
