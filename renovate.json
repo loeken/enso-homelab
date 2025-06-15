@@ -27,6 +27,7 @@
       "deploy/argocd/templates/nzbget.yaml",
       "deploy/argocd/templates/nginxingress.yaml",
       "deploy/argocd/templates/radarr.yaml",
+      "deploy/argocd/templates/sonarr.yaml",
       "deploy/argocd/templates/observability_grafana.yaml",
       "deploy/argocd/templates/observability_kube-prometheus-stack-crds.yaml",
       "deploy/argocd/templates/observability_kube-prometheus-stack.yaml",
