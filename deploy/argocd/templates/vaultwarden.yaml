@@ -47,11 +47,9 @@ spec:
             ports:
               http:
                 port: 80
-                name: main
               websocket:
                 enabled: true
                 port: 3012
-                name: main
         ingress:
           main:
             annotations:
@@ -80,7 +78,6 @@ spec:
         persistence:
           config:
             enabled: true
-            readOnly: false
             storageClass: {{ .Values.vaultwarden.storageClassName }}
             accessMode: ReadWriteOnce
             size: {{ .Values.vaultwarden.size }}
