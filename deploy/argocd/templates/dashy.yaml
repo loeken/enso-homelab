@@ -61,7 +61,7 @@ spec:
                   - name: "K3s Cluster Monitoring - Panel 4"
                     type: iframe
                     options:
-                      src: "https://grafana.loeken.xyz/d-solo/1815a1ab-3100-4c56-ab6c-c06345fac982/k3s-cluster-monitoring?orgId=1&from=now-30m&to=now&timezone=browser&var-Node=$__all&var-Namespace=$__all&refresh=1m&panelId=4"
+                      src: "https://grafana.observability/d-solo/1815a1ab-3100-4c56-ab6c-c06345fac982/k3s-cluster-monitoring?orgId=1&from=now-30m&to=now&timezone=browser&var-Node=$__all&var-Namespace=$__all&refresh=1m&panelId=4"
                       height: 500
                       width: 100%
 
