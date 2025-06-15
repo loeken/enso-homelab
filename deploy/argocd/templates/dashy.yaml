@@ -23,6 +23,7 @@ spec:
           port: 8080
         ingress:
           enabled: {{ .Values.dashy.ingress.enabled }}
+          className: "nginx"
           annotations:
             cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
             external-dns.alpha.kubernetes.io/hostname: "hubss.{{ .Values.domain }}."
@@ -32,21 +33,16 @@ spec:
             nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
             nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
             {{- end }}
-          className: "nginx"
-          rulesOverride:
+          hosts:
             - host: hub.{{ .Values.domain }}
-              http:
-                paths:
-                  - path: /
-                    pathType: Prefix
-                    backend:
-                      service:
-                        name: dashy
-                        port:
-                          number: 8123
+              paths:
+                - path: /
+                  pathType: Prefix
           tls:
-            enabled: true
-            secret: dashy-tls
+            - secretName: dashy-tls
+              hosts:
+                - hub.{{ .Values.domain }}
+
 
         static:
           enabled: true
