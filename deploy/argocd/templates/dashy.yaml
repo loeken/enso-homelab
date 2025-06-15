@@ -26,7 +26,7 @@ spec:
             enabled: {{ .Values.dashy.ingress.enabled }}
             annotations:
               cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
-              external-dns.alpha.kubernetes.io/hostname: "ha.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/hostname: "hub.{{ .Values.domain }}."
               external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
               external-dns.alpha.kubernetes.io/ttl: "120"
               {{- if .Values.dashy.useAuthelia }}
@@ -35,7 +35,7 @@ spec:
               {{- end }}
             className: "nginx"
             hosts:
-              - host: dashy.{{ .Values.domain }}
+              - host: hub.{{ .Values.domain }}
                 paths:
                   - path: /
                     pathType: Prefix
@@ -45,7 +45,7 @@ spec:
             tls:
               - secretName: dashy-tls
                 hosts:
-                  - dashy.{{ .Values.domain }}
+                  - hub.{{ .Values.domain }}
         static:
           enabled: true
           configMapContent:
