@@ -38,7 +38,6 @@ spec:
               cpu: 50m
               memory: 128Mi
             limits:
-              cpu: 2000m
               memory: 4096Mi
         internalDatabase:
           enabled: false

@@ -70,7 +70,7 @@ spec:
                       url: https://auth.{{ .Values.domain }}
                       icon: fas fa-user-shield
                     - title: Fog Project
-                      description: Managing of alerts
+                      description: PXE server to capture image vms/servers
                       url: http://fog.{{ .Values.localDomain }}
                       icon: fas fa-bolt
                     - title: Vaultwarden
