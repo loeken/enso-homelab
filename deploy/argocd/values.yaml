@@ -48,7 +48,7 @@ jellyfin:
     storageClass: rook-cephfs
   ingress:
     enabled: true
-  useAuthelia: true
+  useAuthelia: false
 jellyseerr:
   enabled: true
   ingress:
