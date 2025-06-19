@@ -16,7 +16,7 @@ spec:
   source:
     repoURL: https://robusta-charts.storage.googleapis.com
     chart: robusta
-    targetRevision: 0.23.0
+    targetRevision: 0.24.0
     helm:
       values: |
         clusterName: {{ .Values.clusterName }}
