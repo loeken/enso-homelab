@@ -34,8 +34,33 @@ spec:
                 # -- environment variables.
                 # @default -- See below
                 env:
-                  # -- Set the container timezone
-                  TZ: UTC
+                  - TZ: UTC
+                  - name: PORT
+                    valueFrom:
+                      secretKeyRef:
+                        name: heimdallr
+                        key: PORT
+                  - name: POSTGRES_USER
+                    valueFrom:
+                      secretKeyRef:
+                        name: heimdallr
+                        key: POSTGRES_USER
+                  - name: POSTGRES_PASSWORD
+                    valueFrom:
+                      secretKeyRef:
+                        name: heimdallr
+                        key: POSTGRES_PASSWORD
+                  - name: POSTGRES_DB
+                    valueFrom:
+                      secretKeyRef:
+                        name: heimdallr
+                        key: POSTGRES_DB
+                  - name: POSTGRES_PORT
+                    valueFrom:
+                      secretKeyRef:
+                        name: heimdallr
+                        key: POSTGRES_PORT
+
                 resources:
                   limits:
                     memory: 512Mi
