@@ -34,7 +34,8 @@ spec:
                 # -- environment variables.
                 # @default -- See below
                 env:
-                  - TZ: UTC
+                  - name: TZ
+                    value: UTC
                   - name: PORT
                     valueFrom:
                       secretKeyRef:
