@@ -30,6 +30,11 @@ dashy:
   useAuthelia: false
 externaldns:
   enabled: false
+heimdallr:
+  enabled: true
+  ingress:
+    enabled: true
+  useAuthelia: false
 homeassistant:
   enabled: false
   ingress:
