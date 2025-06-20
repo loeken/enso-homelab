@@ -23,7 +23,10 @@ spec:
             type: deployment
             initContainers:
               wait-for-postgres:
-                image: bitnami/postgresql:16
+                image:
+                  repository: bitnami/postgresql
+                  tag: "16"
+                  pullPolicy: IfNotPresent
                 command:
                   - /bin/bash
                   - -c
