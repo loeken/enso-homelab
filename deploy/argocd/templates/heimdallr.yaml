@@ -74,7 +74,21 @@ spec:
             - secretName: heimdallr-tls
               hosts:
               - heimdallr.{{ .Values.domain }}
-
+        postgresql:
+          enabled: true
+          auth:
+            database: heimdallr
+            existingSecret: heimdallr
+            usernameSecretKey: POSTGRES_USER
+            passwordSecretKey: POSTGRES_PASSWORD
+            databaseSecretKey: POSTGRES_DB
+            portSecretKey: POSTGRES_PORT   
+          primary:
+            persistence:
+              enabled: true
+              storageClass: {{ .Values.homeassistant.storageClass }}
+              accessModes:
+                - ReadWriteOnce
     repoURL: https://loeken.github.io/helm-charts
     targetRevision: 1.0.0
   syncPolicy:
