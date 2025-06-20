@@ -61,7 +61,11 @@ spec:
                       secretKeyRef:
                         name: heimdallr
                         key: POSTGRES_PORT
-
+                  - name: POSTGRES_HOST
+                    valueFrom:
+                      secretKeyRef:
+                        name: heimdallr
+                        key: POSTGRES_HOST
                 resources:
                   limits:
                     memory: 512Mi
