@@ -107,7 +107,7 @@ spec:
         postgresql:
           enabled: true
           auth:
-            username: postgres
+            username: heimdallr
             database: heimdallr
             existingSecret: heimdallr
             secretKeys:
