@@ -116,11 +116,16 @@ spec:
               http:
                 port: 8000
         serviceMonitor:
-          enabled: true
-          interval: 30s
-          path: /metrics
-          labels:
-            release: prometheus
+          main:
+            enabled: true
+            service:
+              identifier: main
+            endpoints:
+              - port: http
+                path: /metrics
+                interval: 30s
+            labels:
+              release: prometheus
         ingress:
           main:
             enabled: {{ .Values.heimdallr.ingress.enabled }}
