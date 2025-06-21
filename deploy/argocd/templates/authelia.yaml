@@ -177,18 +177,20 @@ spec:
                   client_secret:
                     path: /secrets/authelia/oidc.sharedsecret.heimdallr
                   public: false
-                  authorization_policy: two_factor
+                  authorization_policy: "two_factor"
+                  require_pkce: true
                   redirect_uris:
-                    - https://heimdallr.{{ .Values.domain }}/auth/callback
+                    - https://heimdallr.{{ .Values.domain }}/docs/oauth2-redirect.html
                   scopes:
                     - openid
                     - profile
-                    - groups
                     - email
+                    - groups
                   response_types:
                     - code
-                  userinfo_signed_response_alg: none
-                  token_endpoint_auth_method: client_secret_post
+                  grant_types:
+                    - authorization_code
+                  token_endpoint_auth_method: client_secret_basic
           access_control:
             default_policy: deny
             rules:
