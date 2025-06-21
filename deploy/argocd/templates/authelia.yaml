@@ -72,11 +72,16 @@ spec:
         ingress:
           enabled: {{ .Values.authelia.ingress.enabled }}
           className: "nginx"
-          annotations:
-            cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
-            external-dns.alpha.kubernetes.io/hostname: "auth.{{ .Values.domain }}."
-            external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
-            external-dns.alpha.kubernetes.io/ttl: "120"
+            annotations:
+              nginx.ingress.kubernetes.io/enable-cors: "true"
+              nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:8000, https://heimdallr.{{ .Values.domain }}"
+              nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE, PATCH"
+              nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type, Accept"
+              nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+              cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+              external-dns.alpha.kubernetes.io/hostname: "auth.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+              external-dns.alpha.kubernetes.io/ttl: "120"
           rulesOverride:
             - host: auth.{{ .Values.domain }}
               path: /
