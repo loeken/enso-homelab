@@ -134,6 +134,13 @@ spec:
                 minimum_version: TLS1.2
           identity_providers:
             oidc:
+              cors:
+                # Allow Swagger UI to make token requests from localhost during development
+                allowed_origins:
+                  - http://localhost:8000
+                  - https://heimdallr.{{ .Values.domain }}
+                # Optionally enable auto-whitelisting redirect URIs that are https and not localhost
+                allowed_origins_from_client_redirect_uris: true
               enabled: true
               jwks:
                 - algorithm: RS256
