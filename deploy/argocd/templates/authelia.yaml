@@ -57,6 +57,8 @@ spec:
                   path: oidc.sharedsecret.jellyfin
                 - key: oidc.sharedsecret.grafana
                   path: oidc.sharedsecret.grafana
+                - key: oidc.sharedsecret.heimdallr
+                  path: oidc.sharedsecret.heimdallr
                 - key: notifier.smtp.password
                   path: notifier.smtp.password
         persistence:
