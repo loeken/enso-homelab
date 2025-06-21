@@ -192,8 +192,8 @@ spec:
                   authorization_policy: "two_factor"
                   require_pkce: false
                   redirect_uris:
-                    - https://heimdallr.{{ .Values.domain }}/docs/oauth2-redirect.html
-                    - http://localhost:8000/docs/oauth2-redirect.html
+                    - https://heimdallr.{{ .Values.domain }}/auth/callback
+                    - http://localhost:8000/auth/callback
                   scopes:
                     - openid
                     - profile
