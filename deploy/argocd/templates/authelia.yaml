@@ -74,9 +74,9 @@ spec:
           className: "nginx"
           annotations:
             nginx.ingress.kubernetes.io/enable-cors: "true"
-            nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:8000, https://heimdallr.{{ .Values.domain }}"
+            nginx.ingress.kubernetes.io/cors-allow-origin: "https://heimdallr.{{ .Values.domain }}, http://localhost:8000"
             nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE, PATCH"
-            nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type, Accept, X-Requested-With"
+            nginx.ingress.kubernetes.io/cors-allow-headers: "authorization, content-type, accept, x-requested-with"
             nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
             cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
             external-dns.alpha.kubernetes.io/hostname: "auth.{{ .Values.domain }}."
