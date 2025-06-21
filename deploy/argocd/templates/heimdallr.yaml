@@ -110,6 +110,8 @@ spec:
                     value: heimdallr
                   - name: OIDC_ENDPOINT
                     value: https://auth.{{ .Values.domain }}
+                  - name: OIDC_USERINFO_ENDPOINT
+                    value: https://auth.{{ .Values.domain }}/api/oidc/userinfo
                   - name: OIDC_CLIENT_SECRET
                     valueFrom:
                       secretKeyRef:
