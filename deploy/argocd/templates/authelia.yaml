@@ -181,6 +181,7 @@ spec:
                   require_pkce: true
                   redirect_uris:
                     - https://heimdallr.{{ .Values.domain }}/docs/oauth2-redirect.html
+                    - http://localhost:8000/docs/oauth2-redirect.html
                   scopes:
                     - openid
                     - profile
