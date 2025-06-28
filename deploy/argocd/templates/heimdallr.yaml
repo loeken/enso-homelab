@@ -83,6 +83,11 @@ spec:
                       secretKeyRef:
                         name: heimdallr
                         key: POSTGRES_USER
+                  - name: POSTGRES_APPUSER
+                    valueFrom:
+                      secretKeyRef:
+                        name: heimdallr
+                        key: POSTGRES_APPUSER
                   - name: POSTGRES_PASSWORD
                     valueFrom:
                       secretKeyRef:
@@ -119,6 +124,16 @@ spec:
                         key: OIDC_CLIENT_SECRET
                   - name: OIDC_REDIRECT_URL
                     value: https://heimdallr.{{ .Values.domain }}/auth/callback
+                  - name: GITHUB_SCOPE
+                    valueFrom:
+                      secretKeyRef:
+                        name: heimdallr
+                        key: GITHUB_SCOPE
+                  - name: GITHUB_PAT_TOKEN
+                    valueFrom:
+                      secretKeyRef:
+                        name: heimdallr
+                        key: GITHUB_PAT_TOKEN
                 resources:
                   limits:
                     memory: 512Mi
