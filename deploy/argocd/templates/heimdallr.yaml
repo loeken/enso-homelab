@@ -43,6 +43,11 @@ spec:
                       secretKeyRef:
                         name: heimdallr
                         key: POSTGRES_USER
+                  - name: POSTGRES_APPUSER
+                    valueFrom:
+                      secretKeyRef:
+                        name: heimdallr
+                        key: POSTGRES_APPUSER
                   - name: POSTGRES_PASSWORD
                     valueFrom:
                       secretKeyRef:
