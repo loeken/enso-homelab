@@ -16,6 +16,8 @@ spec:
     targetRevision: 9.2.9
     helm:
       values: |
+        imageRenderer:
+          enabled: true
         admin:
           existingSecret: grafana-admin-credentials
           userKey: admin-user
@@ -36,6 +38,7 @@ spec:
         envFromSecret: grafana-oauth-config
         plugins:
           - ae3e-plotly-panel
+
         ingress:
           enabled: true
           ingressClassName: nginx
