@@ -142,7 +142,7 @@ rookcephcluster:
   createPrometheusRules: true
 sharedmedia:
   enabled: true
-  size: 100Gi
+  size: 1000Gi
   storageClass: rook-cephfs
 sinusbot:
   enabled: true
