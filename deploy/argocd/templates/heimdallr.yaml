@@ -150,7 +150,13 @@ spec:
                       secretKeyRef:
                         name: heimdallr
                         key: SLACK_BOT_TOKEN
-                resources:
+                  - name: GRAFANA_CONTACT_LIST
+                    valueFrom:
+                      secretKeyRef:
+                        name: heimdallr
+                        key: GRAFANA_CONTACT_LIST
+                  - name: DISCOVERY_SUBNETS
+                    value: {{ .Values.heimdallr.subnets }}
                 resources:
                   limits:
                     memory: 512Mi
