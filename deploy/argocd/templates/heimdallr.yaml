@@ -160,6 +160,11 @@ spec:
                       secretKeyRef:
                         name: heimdallr
                         key: DISCOVERY_SUBNETS
+                  - name: LOG_LEVEL
+                    valueFrom:
+                      secretKeyRef:
+                        name: heimdallr
+                        key: LOG_LEVEL
                 resources:
                   limits:
                     memory: 512Mi
