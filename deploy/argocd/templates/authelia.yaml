@@ -104,8 +104,8 @@ spec:
               secret_name: authelia
               path: session.encryption.key
             domain: {{ .Values.domain }}
-            expiration: 1h
-            inactivity: 5m
+            expiration: 24h
+            inactivity: 15m
             cookies:
               - domain: {{ .Values.domain }}
                 name: authelia_session
