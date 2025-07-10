@@ -156,7 +156,10 @@ spec:
                         name: heimdallr
                         key: GRAFANA_CONTACT_LIST
                   - name: DISCOVERY_SUBNETS
-                    value: {{ .Values.heimdallr.subnets }}
+                    valueFrom:
+                      secretKeyRef:
+                        name: heimdallr
+                        key: DISCOVERY_SUBNETS
                 resources:
                   limits:
                     memory: 512Mi
