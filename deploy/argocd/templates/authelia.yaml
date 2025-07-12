@@ -84,6 +84,10 @@ spec:
             secret: auth-tls
 
         configMap:
+          identity_validation:
+            reset_password:
+              jwt_secret:
+                path: /secrets/authelia/identity_validation.reset_password.jwt.hmac.key
           server:
             port: 9091
             path: ''
