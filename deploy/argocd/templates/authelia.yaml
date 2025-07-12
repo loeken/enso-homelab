@@ -85,8 +85,7 @@ spec:
 
         configMap:
           identity_validation:
-            reset_password:
-              enabled: false
+            reset_password: false
           server:
             port: 9091
             path: ''
