@@ -84,9 +84,15 @@ spec:
             secret: auth-tls
 
         configMap:
-          authentication_backend:
-            password_reset:
-              disable: true
+          identity_validation:
+            reset_password:
+              jwt_lifespan: '5 minutes'
+              jwt_algorithm: 'HS256'
+              secret:
+                disabled: false
+                secret_name: authelia
+                value: ''
+                path: identity_validation.reset_password.jwt.hmac.key
           server:
             port: 9091
             path: ''
