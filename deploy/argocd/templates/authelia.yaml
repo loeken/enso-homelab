@@ -204,6 +204,25 @@ spec:
                   grant_types:
                     - authorization_code
                   token_endpoint_auth_method: client_secret_post
+                - client_id: jellyfin
+                  client_name: Jellyfin
+                  client_secret:
+                    path: /secrets/authelia/oidc.sharedsecret.jellyfin
+                  public: false
+                  authorization_policy: one_factor
+                  require_pkce: false
+                  redirect_uris:
+                    - https://jellyfin.{{ .Values.domain }}/sso/OID/redirect/authelia
+                  scopes:
+                    - openid
+                    - profile
+                    - email
+                    - groups
+                  response_types:
+                    - code
+                  grant_types:
+                    - authorization_code
+                  token_endpoint_auth_method: client_secret_post
           access_control:
             default_policy: deny
             rules:
@@ -246,6 +265,28 @@ spec:
                 policy: bypass
                 resources:
                   - ^/RPC2.*
+              - domain: ['requests.{{ .Values.domain }}']
+                policy: bypass
+                resources:
+                  - ^/api/.*
+                  - ^/auth/.*
+                  - ^/webhook/.*
+                methods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+              - domain: ['jellyfin.{{ .Values.domain }}']
+                policy: bypass
+                resources:
+                  - ^/sso/OID/.*
+                  - ^/Auth/.*
+                  - ^/api/.*
+                  - ^/web/.*
+                  - ^/Users/AuthenticateByName.*
+                methods:
+                  - GET
+                  - POST
               - domain: ['jellyfin.{{ .Values.domain }}', 'requests.{{ .Values.domain }}', 'hub.{{ .Values.domain }}']
                 policy: one_factor
                 subject:
