@@ -83,12 +83,16 @@ spec:
             enabled: true
             secret: auth-tls
 
-        configMap:
+        configMap:         
+          # Add server configuration at the correct level
           server:
-            address: 'tcp://0.0.0.0:9091'
+            host: '0.0.0.0'
+            port: 9091
+            path: ''
             asset_path: '/config/assets/'
             headers:
               csp_template: ''
+          
           log:
             level: debug
           theme: dark
