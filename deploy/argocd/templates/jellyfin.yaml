@@ -23,11 +23,11 @@ spec:
               main:
                 env:
                   TZ: UTC
-                  # OIDC Configuration via environment variables
                   JELLYFIN_OIDC_ISSUER: https://auth.{{ .Values.domain }}
                   JELLYFIN_OIDC_CLIENT_ID: jellyfin
                   JELLYFIN_OIDC_REDIRECT_URI: https://jellyfin.{{ .Values.domain }}/sso/OID/redirect/authelia
                   JELLYFIN_OIDC_SCOPES: "openid profile email groups"
+                  JELLYFIN_PUBLIC_URL: https://jellyfin.{{ .Values.domain }}
                 envFrom:
                   - secretRef:
                       name: jellyfin-oidc-config
