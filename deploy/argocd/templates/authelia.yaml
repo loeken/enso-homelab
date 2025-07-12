@@ -85,14 +85,7 @@ spec:
 
         configMap:
           identity_validation:
-            reset_password:
-              jwt_lifespan: '5 minutes'
-              jwt_algorithm: 'HS256'
-              secret:
-                disabled: false
-                secret_name: authelia
-                value: ''
-                path: identity_validation.reset_password.jwt.hmac.key
+            reset_password: disable
           server:
             port: 9091
             path: ''
