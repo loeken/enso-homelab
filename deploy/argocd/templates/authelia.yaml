@@ -106,7 +106,7 @@ spec:
               path: session.encryption.key
             cookies:
               - domain: {{ .Values.domain }}
-                name: authelia_session
+                name: authelia_sessions
                 expiration: 24h
                 inactivity: 15m
           storage:
@@ -305,9 +305,6 @@ spec:
                 policy: two_factor
                 subject:
                   - 'group:users'
-          identity_validation:
-            reset_password:
-              disabled: true
   syncPolicy:
     automated:
       prune: true
