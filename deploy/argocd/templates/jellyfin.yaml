@@ -17,6 +17,36 @@ spec:
     chart: jellyfin
     helm:
       values: |
+        {{- if .Values.jellyfin.useAuthelia }}
+        controllers:
+          main:
+            containers:
+              main:
+                env:
+                  TZ: UTC
+                  # OIDC Configuration via environment variables
+                  JELLYFIN_OIDC_ISSUER: https://auth.{{ .Values.domain }}
+                  JELLYFIN_OIDC_CLIENT_ID: jellyfin
+                  JELLYFIN_OIDC_REDIRECT_URI: https://jellyfin.{{ .Values.domain }}/sso/OID/redirect/authelia
+                  JELLYFIN_OIDC_SCOPES: "openid profile email groups"
+                envFrom:
+                  - secretRef:
+                      name: jellyfin-oidc-config
+        configMaps:
+          oidc-config:
+            enabled: true
+            data:
+              oidc-plugin.xml: |
+                <?xml version="1.0" encoding="utf-8"?>
+                <PluginConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                  <OidcClientId>jellyfin</OidcClientId>
+                  <OidcEndpoint>https://auth.{{ .Values.domain }}</OidcEndpoint>
+                  <OidcClientSecret>JELLYFIN_OIDC_SECRET</OidcClientSecret>
+                  <EnableAuthorization>true</EnableAuthorization>
+                  <EnableFolderMapping>true</EnableFolderMapping>
+                  <DefaultProvider>Authelia</DefaultProvider>
+                </PluginConfiguration>
+        {{- end }}
         persistence:
           config:
             enabled: {{ .Values.jellyfin.config.enabled }}
