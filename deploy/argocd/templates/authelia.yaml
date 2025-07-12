@@ -31,6 +31,7 @@ spec:
               value: /secrets/authelia/storage.encryption.key
             
         secret:
+          disabled: false
           existingSecret: authelia
           mountPath: /secrets
           additionalSecrets:
