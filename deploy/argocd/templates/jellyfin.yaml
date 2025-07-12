@@ -31,20 +31,6 @@ spec:
                 envFrom:
                   - secretRef:
                       name: jellyfin-oidc-config
-        configMaps:
-          oidc-config:
-            enabled: true
-            data:
-              oidc-plugin.xml: |
-                <?xml version="1.0" encoding="utf-8"?>
-                <PluginConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-                  <OidcClientId>jellyfin</OidcClientId>
-                  <OidcEndpoint>https://auth.{{ .Values.domain }}</OidcEndpoint>
-                  <OidcClientSecret>JELLYFIN_OIDC_SECRET</OidcClientSecret>
-                  <EnableAuthorization>true</EnableAuthorization>
-                  <EnableFolderMapping>true</EnableFolderMapping>
-                  <DefaultProvider>Authelia</DefaultProvider>
-                </PluginConfiguration>
         persistence:
           config:
             enabled: {{ .Values.jellyfin.config.enabled }}
