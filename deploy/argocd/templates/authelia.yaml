@@ -26,9 +26,7 @@ spec:
           replicas: {{ .Values.globalReplicaCount }}
           kind: StatefulSet
           revisionHistoryLimit: 2
-          env:
-            - name: AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
-              value: /secrets/authelia/storage.encryption.key
+
             
         secret:
           disabled: false
