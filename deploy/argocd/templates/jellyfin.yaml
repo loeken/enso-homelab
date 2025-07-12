@@ -45,47 +45,6 @@ spec:
                   <EnableFolderMapping>true</EnableFolderMapping>
                   <DefaultProvider>Authelia</DefaultProvider>
                 </PluginConfiguration>
-          sso-auth:
-            enabled: true
-            data:
-              SSO-Auth.xml: |
-                <?xml version="1.0" encoding="utf-8"?>
-                <PluginConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-                  <SamlConfigs />
-                  <OidConfigs>
-                    <item>
-                      <key>
-                        <string>authelia</string>
-                      </key>
-                      <value>
-                        <PluginConfiguration>
-                          <OidEndpoint>https://auth.{{ .Values.domain }}</OidEndpoint>
-                          <OidClientId>jellyfin</OidClientId>
-                          <OidSecret>JELLYFIN_OIDC_SECRET</OidSecret>
-                          <Enabled>true</Enabled>
-                          <EnableAuthorization>true</EnableAuthorization>
-                          <EnableAllFolders>true</EnableAllFolders>
-                          <AdminRoles>
-                            <string>jellyfin-admins</string>
-                          </AdminRoles>
-                          <Roles>
-                            <string>jellyfin-users</string>
-                            <string>jellyfin-admins</string>
-                          </Roles>
-                          <RoleClaim>groups</RoleClaim>
-                          <OidScopes>
-                            <string>openid</string>
-                            <string>profile</string>
-                            <string>email</string>
-                            <string>groups</string>
-                          </OidScopes>
-                          <DisableHttps>false</DisableHttps>
-                          <DoNotValidateEndpoints>false</DoNotValidateEndpoints>
-                          <DoNotValidateIssuerName>false</DoNotValidateIssuerName>
-                        </PluginConfiguration>
-                      </value>
-                    </item>
-                  </OidConfigs>
         persistence:
           config:
             enabled: {{ .Values.jellyfin.config.enabled }}
@@ -110,15 +69,6 @@ spec:
               main:
                 main:
                   - path: /dev/dri
-          sso-config:
-            enabled: true
-            type: configMap
-            name: '{{ include "bjw-s.common.lib.chart.names.fullname" . }}-sso-auth'
-            advancedMounts:
-              main:
-                main:
-                  - path: /config/config/SSO-Auth.xml
-                    subPath: SSO-Auth.xml
         ingress:
           main:
             enabled: {{ .Values.jellyfin.ingress.enabled }}
