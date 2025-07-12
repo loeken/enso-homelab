@@ -35,6 +35,19 @@ spec:
           oidc-config:
             enabled: true
             data:
+              oidc-plugin.xml: |
+                <?xml version="1.0" encoding="utf-8"?>
+                <PluginConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                  <OidcClientId>jellyfin</OidcClientId>
+                  <OidcEndpoint>https://auth.{{ .Values.domain }}</OidcEndpoint>
+                  <OidcClientSecret>JELLYFIN_OIDC_SECRET</OidcClientSecret>
+                  <EnableAuthorization>true</EnableAuthorization>
+                  <EnableFolderMapping>true</EnableFolderMapping>
+                  <DefaultProvider>Authelia</DefaultProvider>
+                </PluginConfiguration>
+          sso-auth:
+            enabled: true
+            data:
               SSO-Auth.xml: |
                 <?xml version="1.0" encoding="utf-8"?>
                 <PluginConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -52,7 +65,6 @@ spec:
                           <Enabled>true</Enabled>
                           <EnableAuthorization>true</EnableAuthorization>
                           <EnableAllFolders>true</EnableAllFolders>
-                          <EnabledFolders />
                           <AdminRoles>
                             <string>jellyfin-admins</string>
                           </AdminRoles>
@@ -60,7 +72,6 @@ spec:
                             <string>jellyfin-users</string>
                             <string>jellyfin-admins</string>
                           </Roles>
-                          <EnableFolderRoles>false</EnableFolderRoles>
                           <RoleClaim>groups</RoleClaim>
                           <OidScopes>
                             <string>openid</string>
@@ -68,7 +79,6 @@ spec:
                             <string>email</string>
                             <string>groups</string>
                           </OidScopes>
-                          <CanonicalLinks></CanonicalLinks>
                           <DisableHttps>false</DisableHttps>
                           <DoNotValidateEndpoints>false</DoNotValidateEndpoints>
                           <DoNotValidateIssuerName>false</DoNotValidateIssuerName>
@@ -76,7 +86,6 @@ spec:
                       </value>
                     </item>
                   </OidConfigs>
-                </PluginConfiguration>
         persistence:
           config:
             enabled: {{ .Values.jellyfin.config.enabled }}
@@ -104,7 +113,7 @@ spec:
           sso-config:
             enabled: true
             type: configMap
-            name: jellyfin-oidc-config
+            name: '{{ include "bjw-s.common.lib.chart.names.fullname" . }}-sso-auth'
             advancedMounts:
               main:
                 main:
