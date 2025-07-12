@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: jellyfin-oidc-config
+  namespace: home-assistant
+spec:
+  encryptedData:
+    JELLYFIN_OIDC_CLIENT_SECRET: AgDDdCZAb1POzaehRGZ3q0cpsJqsBcEKGrYvohp+7Qovx214TIrqZKcHg24bIbMV1lBKDO0idN9nyLasak/DSPKLuhN8sSFc7PcOg27s6NH59XDota2YiQluwKOOAMzlEowIdvrvDxyGn8/TxrZNu34NyFQCYCP+prcGzzZixDWOh/xDMybWRmLFQ6t3S9v6hF352F88eu0QeDU4Pxrg5t1ZON9sVyCfoEBDzk4/WIib3D4lt2V6k4Gz9Nub2MUA2IeGyFHb8je0i7qRJZU+/QbIOKbvH+6VSSMnq/hvFEJiWlPvCK1nPbwfTJ88Wt8osl1PIl1/TwFOrCHNhxHY7DsZFaaUskvyWL0y9EwMdw9HQfBVH/flrUhoQLCR+tQj1DIFUbYlzlNyXxofyvf+SEHkbJEwhIqrwmI9SllKe7Ek9ubPNKHk7w7yjou+R53LIe0nkojbgYtHNfwg1z8o+UShcP1tbOESzF3GXC9uFHNajuD8G1JuTB6TSobCSrsGNQ1yjgl5xt6+eb2oKNaAM8AtpKeEgWwowXmz2Lq7XWLyCAEu61DldRd+Z+drfdzz3ao/bCkoa2oMNupkBwwZ0zPHL84zIDGfvyJTuquxxf8dw6vz3er0GQ8qR6/T798xps8+bVQeFeNHMILuq7rhAGkX9C5yZDjRtjwPLZEmK4rrPH8R5hNYZN/chJOOT1wUNHzPxzy/B6og7u1HZ39FWWW43S8=
+  template:
+    metadata:
+      creationTimestamp: null
+      name: jellyfin-oidc-config
+      namespace: home-assistant
+    type: Opaque
