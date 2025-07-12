@@ -17,7 +17,6 @@ spec:
     chart: jellyfin
     helm:
       values: |
-        {{- if .Values.jellyfin.useAuthelia }}
         controllers:
           main:
             containers:
@@ -46,7 +45,6 @@ spec:
                   <EnableFolderMapping>true</EnableFolderMapping>
                   <DefaultProvider>Authelia</DefaultProvider>
                 </PluginConfiguration>
-        {{- end }}
         persistence:
           config:
             enabled: {{ .Values.jellyfin.config.enabled }}
