@@ -91,7 +91,13 @@ spec:
           headers:
             csp_template: ''
 
-        configMap:         
+        configMap:
+          server:
+            port: 9091
+            path: ''
+            asset_path: ''
+            headers:
+              csp_template: ''
           log:
             level: debug
           theme: dark
