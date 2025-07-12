@@ -302,6 +302,9 @@ spec:
                 policy: two_factor
                 subject:
                   - 'group:users'
+          identity_validation:
+            reset_password:
+              disabled: true
   syncPolicy:
     automated:
       prune: true
