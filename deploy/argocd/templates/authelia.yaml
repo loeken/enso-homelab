@@ -19,7 +19,6 @@ spec:
     chart: authelia
     helm:
       values: |
-        domain: {{ .Values.domain }}
         image:
           repository: ghcr.io/authelia/authelia
 
@@ -27,19 +26,14 @@ spec:
           replicas: {{ .Values.globalReplicaCount }}
           kind: StatefulSet
           revisionHistoryLimit: 2
-          # command:
-          #   - tail
-          # args:
-          #   - -f
-          #   - /dev/null
           env:
             - name: AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
               value: /secrets/authelia/storage.encryption.key
+            
         secret:
           disabled: true
           existingSecret: authelia
           mountPath: /secrets
-
           additionalSecrets:
             authelia:
               items:
@@ -61,13 +55,13 @@ spec:
                   path: oidc.sharedsecret.heimdallr
                 - key: notifier.smtp.password
                   path: notifier.smtp.password
+
         persistence:
           enabled: true
           storageClass: {{ .Values.authelia.storageClassName }}
           accessModes:
             - ReadWriteOnce
           size: {{ .Values.authelia.size }}
-          mountPath: /config
 
         ingress:
           enabled: {{ .Values.authelia.ingress.enabled }}
@@ -90,25 +84,27 @@ spec:
             secret: auth-tls
 
         configMap:
+          server:
+            address: 'tcp://0.0.0.0:9091'
+            asset_path: '/config/assets/'
+            headers:
+              csp_template: ''
           log:
             level: debug
           theme: dark
           authentication_backend:
             file:
               enabled: true
-            password_reset:
-              disable: true
           session:
             encryption_key:
               disabled: false
               secret_name: authelia
               path: session.encryption.key
-            domain: {{ .Values.domain }}
-            expiration: 24h
-            inactivity: 15m
             cookies:
               - domain: {{ .Values.domain }}
                 name: authelia_session
+                expiration: 24h
+                inactivity: 15m
           storage:
             encryption_key:
               disabled: false
@@ -121,18 +117,17 @@ spec:
               enabled: {{ .Values.authelia.filesystem.enabled }}
               filename: /config/notification.txt
             smtp:
+              enabled: {{ .Values.authelia.smtp.enabled }}
+              address: smtp://{{ .Values.authelia.smtp.host }}:{{ .Values.authelia.smtp.port }}
               username: {{ .Values.authelia.smtp.username }}
               password:
                 disabled: false
                 secret_name: authelia
-                key: notifier.smtp.password
-              enabled: {{ .Values.authelia.smtp.enabled }}
-              address: smtp://{{ .Values.authelia.smtp.host }}:{{ .Values.authelia.smtp.port }}
+                path: notifier.smtp.password
               sender: 'Authelia <{{ .Values.authelia.smtp.sender }}>'
               identifier: {{ .Values.authelia.smtp.host }}
               startup_check_address: {{ .Values.authelia.smtp.sender }}
               subject: "[Authelia] {title}"
-              require_starttls: true
               tls:
                 server_name: {{ .Values.authelia.smtp.host }}
                 skip_verify: false
