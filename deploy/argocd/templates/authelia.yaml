@@ -83,14 +83,6 @@ spec:
             enabled: true
             secret: auth-tls
 
-        # Keep server configuration at root level (this is correct)
-        server:
-          port: 9091
-          path: ''
-          asset_path: ''
-          headers:
-            csp_template: ''
-
         configMap:
           server:
             port: 9091
@@ -144,11 +136,9 @@ spec:
           identity_providers:
             oidc:
               cors:
-                # Allow Swagger UI to make token requests from localhost during development
                 allowed_origins:
                   - http://localhost:8000
                   - https://heimdallr.{{ .Values.domain }}
-                # Optionally enable auto-whitelisting redirect URIs that are https and not localhost
                 allowed_origins_from_client_redirect_uris: true
               enabled: true
               jwks:
