@@ -83,16 +83,12 @@ spec:
             enabled: true
             secret: auth-tls
 
+        # Add server configuration at root level, not under configMap
+        server:
+          host: '0.0.0.0'
+          port: 9091
+
         configMap:         
-          # Add server configuration at the correct level
-          server:
-            host: '0.0.0.0'
-            port: 9091
-            path: ''
-            asset_path: '/config/assets/'
-            headers:
-              csp_template: ''
-          
           log:
             level: debug
           theme: dark
