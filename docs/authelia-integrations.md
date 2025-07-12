@@ -6,14 +6,28 @@ This document describes how Authelia is integrated with various applications in 
 
 Authelia provides authentication and authorization for applications through two main methods:
 
-1. **OIDC/OAuth2 Integration**: For applications that support native OIDC
+1. **OIDC/OAuth2 Integration**: For applications that support native OIDC (✅ **Fully Automated**)
 2. **Forward Auth**: For applications that don't have native OIDC support
+
+### 🔐 Automated OIDC Setup
+Applications with native OIDC support are **fully automated**:
+- ✅ **No manual configuration required**
+- ✅ **Automatic environment variable injection**
+- ✅ **Configuration file generation**
+- ✅ **Secret management**
+- ✅ **One-click enablement** via `useAuthelia: true`
+
+### 🚀 Forward Auth Setup
+Applications without native OIDC support use forward authentication:
+- ✅ **Automatic nginx annotations**
+- ✅ **API endpoint bypass rules**
+- ✅ **One-click enablement** via `useAuthelia: true`
 
 ## OIDC Integrations
 
-### Jellyfin
+### Jellyfin (Automated OIDC)
 
-Jellyfin (version 10.8+) supports OIDC authentication. The integration is configured as follows:
+Jellyfin (version 10.8+) supports OIDC authentication. The integration is **fully automated** when enabled:
 
 **Authelia Configuration:**
 - Client ID: `jellyfin`
@@ -25,14 +39,16 @@ Jellyfin (version 10.8+) supports OIDC authentication. The integration is config
 - Bypass authentication for OIDC endpoints: `/sso/OID/*`, `/Auth/*`, `/api/*`, `/web/*`
 - Main application requires `one_factor` authentication for `users` group
 
-**Setup in Jellyfin:**
-1. Enable Authelia integration in values: `jellyfin.useAuthelia: true`
-2. Configure OIDC in Jellyfin admin panel:
-   - Provider: `https://auth.{domain}`
-   - Client ID: `jellyfin`
-   - Client Secret: From `authelia` secret (`oidc.sharedsecret.jellyfin`)
+**Automated Setup:**
+1. Enable Authelia integration: `jellyfin.useAuthelia: true`
+2. OIDC configuration is automatically applied via:
+   - Environment variables for connection settings
+   - Configuration file for plugin settings
+   - Secret management for client credentials
 
-### Grafana
+**No manual configuration required!** The OIDC plugin will be automatically configured with the correct Authelia endpoints and client settings.
+
+### Grafana (Automated OIDC)
 
 **Authelia Configuration:**
 - Client ID: `grafana`
@@ -40,7 +56,11 @@ Jellyfin (version 10.8+) supports OIDC authentication. The integration is config
 - Redirect URI: `https://grafana.{domain}/login/generic_oauth`
 - Scopes: `openid`, `profile`, `groups`, `email`
 
-### NextCloud
+**Automated Setup:**
+- OIDC configuration is fully automated via `grafana-oauth-config` secret
+- No manual configuration required when `observability.useAuthelia: true`
+
+### NextCloud (Automated OIDC)
 
 **Authelia Configuration:**
 - Client ID: `nextcloud`
@@ -48,12 +68,25 @@ Jellyfin (version 10.8+) supports OIDC authentication. The integration is config
 - Redirect URI: `https://nextcloud.{domain}/apps/user_oidc/code`
 - Requires PKCE: `true`
 
-### Heimdallr
+**Automated Setup:**
+1. Enable integration: `nextcloud.useAuthelia: true`
+2. OIDC configuration is automatically applied via:
+   - Configuration files for OIDC plugin settings
+   - Secret replacement for client credentials
+   - Automatic redirect and scope configuration
+
+**No manual configuration required!** The user_oidc app will be automatically configured.
+
+### Heimdallr (Automated OIDC)
 
 **Authelia Configuration:**
 - Client ID: `heimdallr`
 - Authorization Policy: `two_factor`
 - Redirect URI: `https://heimdallr.{domain}/auth/callback`
+
+**Automated Setup:**
+- OIDC configuration is fully automated via environment variables
+- No manual configuration required when `heimdallr.useAuthelia: true`
 
 ## Forward Auth Integrations
 
@@ -88,10 +121,11 @@ All are configured with:
 
 ## Required Secrets
 
-The following secrets must be configured in the `authelia` secret:
+The following secrets must be configured for automated OIDC integrations:
 
+### Authelia Secret (`authelia` namespace)
 ```yaml
-# OIDC client secrets
+# OIDC client secrets (automatically used by Authelia)
 oidc.sharedsecret.jellyfin: "<secure-random-string>"
 oidc.sharedsecret.grafana: "<secure-random-string>"
 oidc.sharedsecret.nextcloud: "<secure-random-string>"
@@ -109,23 +143,74 @@ storage.encryption.key: "<base64-encoded-key>"
 notifier.smtp.password: "<smtp-password>"
 ```
 
+### Application-Specific Secrets
+
+**Jellyfin OIDC Secret** (`media` namespace):
+```yaml
+# Used by Jellyfin for OIDC client authentication
+JELLYFIN_OIDC_CLIENT_SECRET: "<secure-random-string>"
+```
+
+**NextCloud Secret** (`nextcloud` namespace):
+```yaml
+# Already includes OIDC client secret
+oidc_client_secret: "<secure-random-string>"
+```
+
+**Heimdallr Secret** (`heimdallr` namespace):
+```yaml
+# Already includes OIDC client secret
+OIDC_CLIENT_SECRET: "<secure-random-string>"
+```
+
+**Grafana OAuth Secret** (`observability` namespace):
+```yaml
+# Automatically applied via envFromSecret
+GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "<secure-random-string>"
+# (see full secret template in examples)
+```
+
+**Important:** Client secrets in application secrets must match the corresponding `oidc.sharedsecret.*` values in the Authelia secret.
+
 ## Enabling Integrations
 
 To enable Authelia integration for any application, set the `useAuthelia` flag to `true` in the values file:
 
+### OIDC Integrations (Fully Automated)
 ```yaml
 jellyfin:
   enabled: true
-  useAuthelia: true  # Enable Authelia integration
+  useAuthelia: true  # ✅ Enables automated OIDC integration
 
+observability:
+  enabled: true
+  useAuthelia: true  # ✅ Enables automated OIDC for Grafana
+
+nextcloud:
+  enabled: true
+  useAuthelia: true  # ✅ Enables automated OIDC integration
+
+heimdallr:
+  enabled: true
+  useAuthelia: true  # ✅ Enables automated OIDC integration
+```
+
+### Forward Auth Integrations
+```yaml
 jellyseerr:
   enabled: true
-  useAuthelia: true  # Enable forward auth
+  useAuthelia: true  # Enable forward auth with API bypass
 
 uptimekuma:
   enabled: true  
   useAuthelia: true  # Enable forward auth with API bypass
 ```
+
+**No manual configuration needed!** When `useAuthelia: true` is set:
+- OIDC applications automatically configure their authentication settings
+- Environment variables, configuration files, and secrets are managed automatically
+- Applications will redirect to Authelia for authentication
+- Users can log in with their Authelia credentials
 
 ## Access Control Policies
 
