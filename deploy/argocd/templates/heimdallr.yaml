@@ -113,8 +113,6 @@ spec:
                       secretKeyRef:
                         name: heimdallr
                         key: POSTGRES_HOST
-                  {{- if .Values.heimdallr.useAuthelia }}
-                  # OIDC Configuration
                   - name: OIDC_ISSUER
                     value: https://auth.{{ .Values.domain }}
                   - name: OIDC_CLIENT_ID
@@ -130,7 +128,7 @@ spec:
                         key: OIDC_CLIENT_SECRET
                   - name: OIDC_REDIRECT_URL
                     value: https://heimdallr.{{ .Values.domain }}/auth/callback
-                  {{- end }}
+                  
 
                   - name: GITHUB_PAT_TOKEN
                     valueFrom:
