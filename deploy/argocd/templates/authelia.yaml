@@ -110,7 +110,7 @@ spec:
           storage:
             encryption_key:
               disabled: false
-              path: /secrets/authelia/storage.encryption.key
+              path: storage.encryption.key
             local:
               enabled: true
               path: /config/db.sqlite3
