@@ -83,6 +83,8 @@ All are configured with:
 - **Vaultwarden**: Password manager with forward auth
 - **Home Assistant**: Selective bypass for API and static resources
 - **Wazuh**: Security monitoring (admin only)
+- **Uptime Kuma**: Status monitoring with API bypass for metrics collection
+- **Dashy**: Dashboard application (already configured)
 
 ## Required Secrets
 
@@ -119,6 +121,10 @@ jellyfin:
 jellyseerr:
   enabled: true
   useAuthelia: true  # Enable forward auth
+
+uptimekuma:
+  enabled: true  
+  useAuthelia: true  # Enable forward auth with API bypass
 ```
 
 ## Access Control Policies

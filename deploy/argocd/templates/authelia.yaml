@@ -276,6 +276,15 @@ spec:
                   - POST
                   - PUT
                   - DELETE
+              - domain: ['status.{{ .Values.domain }}']
+                policy: bypass
+                resources:
+                  - ^/api/.*
+                  - ^/status/.*
+                  - ^/metrics.*
+                methods:
+                  - GET
+                  - POST
               - domain: ['jellyfin.{{ .Values.domain }}']
                 policy: bypass
                 resources:
@@ -287,7 +296,7 @@ spec:
                 methods:
                   - GET
                   - POST
-              - domain: ['jellyfin.{{ .Values.domain }}', 'requests.{{ .Values.domain }}', 'hub.{{ .Values.domain }}']
+              - domain: ['jellyfin.{{ .Values.domain }}', 'requests.{{ .Values.domain }}', 'hub.{{ .Values.domain }}', 'status.{{ .Values.domain }}']
                 policy: one_factor
                 subject:
                   - 'group:users'

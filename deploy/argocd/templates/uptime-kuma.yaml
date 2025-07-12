@@ -41,9 +41,13 @@ spec:
             enabled: {{ .Values.uptimekuma.enabled }}
             annotations:
               cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
-              external-dns.alpha.kubernetes.io/hostname: "vaultwarden.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/hostname: "status.{{ .Values.domain }}."
               external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
               external-dns.alpha.kubernetes.io/ttl: "120"
+              {{- if .Values.uptimekuma.useAuthelia }}
+              nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
+              nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
+              {{- end }}
             className: "nginx"
             hosts:
               - host: status.{{ .Values.domain }}
