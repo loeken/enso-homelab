@@ -84,6 +84,9 @@ spec:
             secret: auth-tls
 
         configMap:
+          identity_validation:
+            reset_password:
+              enabled: false
           server:
             port: 9091
             path: ''
