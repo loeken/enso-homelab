@@ -86,12 +86,9 @@ spec:
           sso-config:
             enabled: true
             type: configMap
-            name: jellyfin-oidc-config
-            advancedMounts:
-              main:
-                main:
-                  - path: /config/config/SSO-Auth.xml
-                    subPath: SSO-Auth.xml
+            name: jellyfin-oidc-config  # Use the actual generated name
+            # OR change to:
+            # name: "{{ .Release.Name }}-oidc-config"
           cache:
             enabled: {{ .Values.jellyfin.cache.enabled }}
             size: {{ .Values.jellyfin.cache.size }}
