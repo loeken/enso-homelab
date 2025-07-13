@@ -202,7 +202,7 @@ spec:
             size: {{ .Values.nextcloud.data.size }}
             accessMode: {{ .Values.nextcloud.data.accessMode }}
     repoURL: https://nextcloud.github.io/helm/
-    targetRevision: 6.6.10
+    targetRevision: 7.0.0
   syncPolicy:
     automated:
       prune: true
