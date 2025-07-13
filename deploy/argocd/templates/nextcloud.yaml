@@ -201,6 +201,15 @@ spec:
             storageClass: {{ .Values.nextcloud.data.storageClass }}
             size: {{ .Values.nextcloud.data.size }}
             accessMode: {{ .Values.nextcloud.data.accessMode }}
+          sharedmedia:
+            enabled: true
+            type: persistentVolumeClaim
+            existingClaim: shared-media
+            accessMode: ReadWriteMany  # Use RWMany if you want multiple pods/users to access
+            advancedMounts:
+              main:
+                main:
+                  - path: /shared-media
     repoURL: https://nextcloud.github.io/helm/
     targetRevision: 7.0.0
   syncPolicy:
