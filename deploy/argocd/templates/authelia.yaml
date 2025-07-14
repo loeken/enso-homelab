@@ -231,13 +231,17 @@ spec:
                   - ^/index.php/core/wipe/check$
                   - ^/ocs/v2.php/apps/user_status/api/v1/heartbeat.*
                   - ^/ocs/v2.php/cloud/user$
+                  - ^/ocs/v2.php/cloud/users/.*
                   - ^/apps/files/api/v1/stats$
                   - ^/ocs/v2.php/apps/notifications/api/v2/notifications.*
+                  - ^/ocs/v2.php/apps/notifications/api/v2/push$
                   - ^/index.php/apps/files/preview-service-worker.js$
+                  - ^/remote.php/dav/files/.*
                 methods:
                   - GET
                   - POST
                   - PUT
+                  - PROPFIND
               - domain: ['nextcloud.{{ .Values.domain }}']
                 policy: two_factor
                 subject:
