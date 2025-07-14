@@ -83,27 +83,27 @@ spec:
             smtpPasswordKey: smtp_password
             smtpHostKey: smtp_host
             smtpPortKey: smtp_port
-        {{- if .Values.nextcloud.useAuthelia }}
-        extraInitContainers:
-          - name: replace-oidc-secret
-            image: busybox:1.35
-            command:
-              - sh
-              - -c
-              - |
-                if [ -f /var/www/html/config/oidc.config.php ]; then
-                  sed -i "s/NEXTCLOUD_OIDC_SECRET/$OIDC_CLIENT_SECRET/g" /var/www/html/config/oidc.config.php
-                fi
-            env:
-              - name: OIDC_CLIENT_SECRET
-                valueFrom:
-                  secretKeyRef:
-                    name: nextcloud
-                    key: oidc_client_secret
-            volumeMounts:
-              - name: nextcloud-config
-                mountPath: /var/www/html/config
-        {{- end }}
+          {{- if .Values.nextcloud.useAuthelia }}
+          extraInitContainers:
+            - name: replace-oidc-secret
+              image: busybox:1.35
+              command:
+                - sh
+                - -c
+                - |
+                  if [ -f /var/www/html/config/oidc.config.php ]; then
+                    sed -i "s/NEXTCLOUD_OIDC_SECRET/$OIDC_CLIENT_SECRET/g" /var/www/html/config/oidc.config.php
+                  fi
+              env:
+                - name: OIDC_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: nextcloud
+                      key: oidc_client_secret
+              volumeMounts:
+                - name: nextcloud-config
+                  mountPath: /var/www/html/config
+          {{- end }}
           host: nextcloud.{{ .Values.domain }}
           mail:
             enabled: true
