@@ -18,12 +18,10 @@ spec:
       values: |
         persistence:
           data:
-            mountPath: /app/data
             enabled: true
             accessMode: ReadWriteOnce
             size: {{ .Values.uptimekuma.size }}
             storageClass: {{ .Values.uptimekuma.storageClassName }}
-            readOnly: false
             advancedMounts:
               main:
                 main:
