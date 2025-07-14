@@ -114,17 +114,23 @@ spec:
               port: {{ .Values.nextcloud.smtp.port }}
               authtype: LOGIN
           configs:
-            trusted_domains.config.php: |-
+            user_oidc.config.php: |-
               <?php
               $CONFIG = [
-                'overwriteprotocol' => 'https',
-                'trusted_domains' => [
-                  0 => 'localhost',
-                  1 => 'nextcloud.kube.home',
-                  2 => 'nextcloud.{{ .Values.domain }}'
+                'user_oidc_provider_url' => 'https://auth.{{ .Values.domain }}',
+                'user_oidc_client_id' => 'nextcloud',
+                'user_oidc_client_secret' => 'NEXTCLOUD_OIDC_SECRET',
+                'user_oidc_scope' => 'openid profile email groups',
+                'user_oidc_default_group' => 'users',
+                'user_oidc_login_attributes' => [
+                  'id' => 'preferred_username',
+                  'name' => 'name',
+                  'mail' => 'email',
+                  'groups' => 'groups',
                 ],
-                'allow_user_to_change_display_name' => false,
-                'lost_password_link' => 'disabled'
+                'user_oidc_auto_redirect' => false,
+                'user_oidc_disable_registration' => false,
+                'lost_password_link' => 'disabled',
               ];
             trusted_proxies.config.php: |-
               <?php
