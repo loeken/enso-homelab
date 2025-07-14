@@ -230,11 +230,14 @@ spec:
                   - ^/login/v2/poll.*
                   - ^/index.php/core/wipe/check$
                   - ^/ocs/v2.php/apps/user_status/api/v1/heartbeat.*
+                  - ^/ocs/v2.php/cloud/user$
+                  - ^/apps/files/api/v1/stats$
                   - ^/ocs/v2.php/apps/notifications/api/v2/notifications.*
                   - ^/index.php/apps/files/preview-service-worker.js$
                 methods:
                   - GET
                   - POST
+                  - PUT
               - domain: ['nextcloud.{{ .Values.domain }}']
                 policy: two_factor
                 subject:
