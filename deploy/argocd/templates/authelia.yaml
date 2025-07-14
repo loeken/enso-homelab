@@ -227,11 +227,11 @@ spec:
                   - ^/status.php$
                   - ^/index.php/login/v2$
                   - ^/index.php/login/v2/poll.*
+                  - ^/login/v2/poll.*
                   - ^/index.php/core/wipe/check$
                   - ^/ocs/v2.php/apps/user_status/api/v1/heartbeat.*
                   - ^/ocs/v2.php/apps/notifications/api/v2/notifications.*
                   - ^/index.php/apps/files/preview-service-worker.js$
-                  - ^/login/v2/poll?token=*
                 methods:
                   - GET
                   - POST
