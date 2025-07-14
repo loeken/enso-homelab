@@ -210,6 +210,14 @@ spec:
               main:
                 main:
                   - path: /shared-media
+          nextcloud-config:
+            enabled: true
+            type: configMap
+            name: nextcloud-config
+            advancedMounts:
+              main:
+                main:
+                  - path: /var/www/html/config
     repoURL: https://nextcloud.github.io/helm/
     targetRevision: 7.0.0
   syncPolicy:
