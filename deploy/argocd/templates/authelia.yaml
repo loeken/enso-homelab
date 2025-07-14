@@ -231,6 +231,7 @@ spec:
                   - ^/ocs/v2.php/apps/user_status/api/v1/heartbeat.*
                   - ^/ocs/v2.php/apps/notifications/api/v2/notifications.*
                   - ^/index.php/apps/files/preview-service-worker.js$
+                  - ^/login/v2/poll?token=*
                 methods:
                   - GET
                   - POST
