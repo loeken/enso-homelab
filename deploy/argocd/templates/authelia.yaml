@@ -224,8 +224,12 @@ spec:
               - domain: ['nextcloud.{{ .Values.domain }}']
                 policy: bypass
                 resources:
-                  - ^/apps/user_oidc/.*
-                  - ^/index.php/login/oidc.*
+                  - ^/status.php$
+                  - ^/index.php/login/v2$
+                  - ^/index.php/core/wipe/check$
+                  - ^/ocs/v2.php/apps/user_status/api/v1/heartbeat.*
+                  - ^/ocs/v2.php/apps/notifications/api/v2/notifications.*
+                  - ^/index.php/apps/files/preview-service-worker.js$
                 methods:
                   - GET
                   - POST
