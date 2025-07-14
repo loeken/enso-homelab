@@ -101,7 +101,7 @@ spec:
                       name: nextcloud
                       key: oidc_client_secret
               volumeMounts:
-                - name: nextcloudData
+                - name: nextcloud-data
                   mountPath: /var/www/html/config
           {{- end }}
           host: nextcloud.{{ .Values.domain }}
