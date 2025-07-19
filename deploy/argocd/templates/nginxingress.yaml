@@ -16,7 +16,7 @@ spec:
   source:
     repoURL: registry-1.docker.io/bitnamicharts
     chart: nginx-ingress-controller
-    targetRevision: 12.0.0
+    targetRevision: 12.0.1
     helm:
       values: |
         kind: DaemonSet
