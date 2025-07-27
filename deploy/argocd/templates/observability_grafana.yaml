@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: https://grafana.github.io/helm-charts
     chart: grafana
-    targetRevision: 9.2.10
+    targetRevision: 9.3.0
     helm:
       values: |
         imageRenderer:
