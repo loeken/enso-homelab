@@ -44,6 +44,19 @@ spec:
             storageClass: {{ .Values.homeassistant.storageClass }}
             size: 4Gi
 
+        # Add this block for USB device
+        additionalVolumes:
+          - name: usb-serial
+            hostPath:
+              path: /dev/ttyUSB0
+              type: CharDevice
+
+        additionalVolumeMounts:
+          main:
+            main:
+              - name: usb-serial
+                mountPath: /dev/ttyUSB0
+
         ingress:
           main:
             enabled: {{ .Values.homeassistant.ingress.enabled }}
