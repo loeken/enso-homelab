@@ -10,7 +10,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: media
+    namespace: sinusbot
     server: https://kubernetes.default.svc
   project: default
   source:
