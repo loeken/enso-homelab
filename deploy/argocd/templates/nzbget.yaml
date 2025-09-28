@@ -13,7 +13,7 @@ spec:
   source:
     chart: nzbget
     repoURL: https://loeken.github.io/helm-charts
-    targetRevision: v25.0-ls209
+    targetRevision: v25.3-ls213
     helm:
       values: |
         persistence:
