@@ -92,7 +92,7 @@ spec:
             headers:
               csp_template: ''
           log:
-            level: debug
+            level: info
           theme: dark
           authentication_backend:
             file:
