@@ -298,7 +298,7 @@ spec:
                   - GET
                   - POST
               # Bypass for Kuma uptime monitoring with AuthChecker header
-              - domain: ['alertmanager.{{ .Values.domain }}']
+              - domain: ['alertmanager.{{ .Values.domain }}', 'whoami.{{ .Values.domain }}', 'vaultwarden.{{ .Values.domain }}', 'prometheus.{{ .Values.domain }}','nextcloud.{{ .Values.domain }}','jellyfin.{{ .Values.domain }}','ha.{{ .Values.domain }}','alertmanager.{{ .Values.domain }}','grafana.{{ .Values.domain }}']
                 policy: bypass
                 headers:
                   - header: AuthChecker
