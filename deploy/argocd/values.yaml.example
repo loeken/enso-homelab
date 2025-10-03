@@ -5,6 +5,7 @@ clusterName: enso-homelab
 githubUser: loeken
 githubRepo: enso-homelab
 globalReplicaCount: 1
+kumatoken: changemetoalongtokenofrandomness
 
 # app specific
 authelia:
