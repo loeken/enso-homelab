@@ -5,6 +5,7 @@ clusterName: enso-homelab-prod
 githubUser: loeken
 githubRepo: enso-homelab-prod
 globalReplicaCount: 0
+kumatoken: PLoHdjtkxR7KqeaVxz9z6HaRvZSNCsDZ
 
 # app specific
 authelia:
