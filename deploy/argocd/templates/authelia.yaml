@@ -297,6 +297,15 @@ spec:
                 methods:
                   - GET
                   - POST
+              # Bypass for Kuma uptime monitoring with AuthChecker header
+              - domain: ['alertmanager.{{ .Values.domain }}']
+                policy: bypass
+                headers:
+                  - header: AuthChecker
+                    pattern: '^{{ .Values.kumatoken }}$'
+                methods:
+                  - GET
+                  - HEAD
               - domain: ['jellyfin.{{ .Values.domain }}']
                 policy: bypass
                 resources:
