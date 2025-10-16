@@ -64,7 +64,8 @@ spec:
               allowInsecureImages: true
           enabled: true
           image:
-            repository: library/postgres
+            repository: bitnami/postgresql
+            tag: latest
           auth:
             database: home-assistant
             existingSecret: home-assistant
