@@ -59,6 +59,9 @@ spec:
                   - ha.{{ .Values.domain }}
         
         postgresql:
+          global:
+            security:
+              allowInsecureImages: true
           enabled: true
           image:
             repository: library/postgres
