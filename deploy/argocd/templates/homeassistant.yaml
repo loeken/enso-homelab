@@ -63,9 +63,6 @@ spec:
             security:
               allowInsecureImages: true
           enabled: true
-          image:
-            repository: bitnami/postgresql
-            tag: 17.5.0-debian-12-r12 
           auth:
             database: home-assistant
             existingSecret: home-assistant
