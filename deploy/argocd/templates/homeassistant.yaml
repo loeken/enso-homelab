@@ -63,6 +63,8 @@ spec:
             security:
               allowInsecureImages: true
           enabled: true
+          image:
+            repository: library/postgres
           auth:
             database: home-assistant
             existingSecret: home-assistant
