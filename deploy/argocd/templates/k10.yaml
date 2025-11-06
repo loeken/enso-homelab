@@ -24,7 +24,9 @@ spec:
           backupTimeout: 1440
         injectKanisterSidecar:
           enabled: {{ .Values.k10.sidecar.enabled }}
-        
+        auth:
+          tokenAuth:
+            enabled: true
         gateway:
           service:
             externalPort: 80
