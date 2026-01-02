@@ -50,7 +50,7 @@ jellyfin:
     storageClass: local-path
   config:
     enabled: true
-    size: 1Gi
+    size: 5Gi
     storageClass: local-path
   ingress:
     enabled: true
