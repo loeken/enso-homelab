@@ -51,7 +51,7 @@ jellyfin:
     storageClass: rook-cephfs
   config:
     enabled: true
-    size: 1Gi
+    size: 3Gi
     storageClass: rook-cephfs
   ingress:
     enabled: true
