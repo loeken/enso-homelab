@@ -8,10 +8,6 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
-  source:
-    repoURL: https://github.com/rancher/system-upgrade-controller.git
-    targetRevision: v0.18.0
-    path: manifests
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
@@ -21,24 +17,27 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-  ignoreDifferences:
-    - group: rbac.authorization.k8s.io
-      kind: ClusterRoleBinding
-      jsonPointers:
-        - /subjects
-  # Patch to fix missing namespace in ClusterRoleBinding subjects
-  patches:
-    - target:
-        kind: ClusterRoleBinding
-        name: system-upgrade
-      patch: |
-        - op: add
-          path: /subjects/1/namespace
-          value: kube-system
-    - target:
-        kind: ClusterRoleBinding
-        name: system-upgrade-drainer
-      patch: |
-        - op: add
-          path: /subjects/1/namespace
-          value: kube-system
+    managedNamespaceMetadata:
+      labels:
+        pod-security.kubernetes.io/enforce: privileged
+  source:
+    repoURL: https://github.com/rancher/system-upgrade-controller.git
+    targetRevision: v0.18.0
+    path: manifests
+    # Add kustomize to patch the ClusterRoleBindings
+    kustomize:
+      patches:
+        - target:
+            kind: ClusterRoleBinding
+            name: system-upgrade
+          patch: |-
+            - op: add
+              path: /subjects/1/namespace
+              value: kube-system
+        - target:
+            kind: ClusterRoleBinding
+            name: system-upgrade-drainer
+          patch: |-
+            - op: add
+              path: /subjects/1/namespace
+              value: kube-system
