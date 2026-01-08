@@ -1,45 +1,23 @@
 ---
-# Server plan - upgrades control plane nodes (applied in sync-wave 1)
-apiVersion: upgrade.cattle.io/v1
-kind: Plan
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
-  name: server-plan
-  namespace: system-upgrade
+  name: k3s-system-upgrade-plans
+  namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
-  concurrency: 1
-  cordon: true
-  nodeSelector:
-    matchExpressions:
-      - key: node-role.kubernetes.io/control-plane
-        operator: Exists
-  serviceAccountName: system-upgrade
-  upgrade:
-    image: rancher/k3s-upgrade
-  version: v1.35.0+k3s1
----
-# Agent plan - upgrades worker nodes (if any) (applied in sync-wave 1)
-apiVersion: upgrade.cattle.io/v1
-kind: Plan
-metadata:
-  name: agent-plan
-  namespace: system-upgrade
-  annotations:
-    argocd.argoproj.io/sync-wave: "1"
-spec:
-  concurrency: 1
-  cordon: true
-  nodeSelector:
-    matchExpressions:
-      - key: node-role.kubernetes.io/control-plane
-        operator: DoesNotExist
-  prepare:
-    args:
-      - prepare
-      - server-plan
-    image: rancher/k3s-upgrade
-  serviceAccountName: system-upgrade
-  upgrade:
-    image: rancher/k3s-upgrade
-  version: v1.35.0+k3s1
+  project: default
+  source:
+    repoURL: git@github.com:loeken/enso-homelab
+    targetRevision: main
+    path: deploy/helm/upgrade_k3s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: system-upgrade
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
