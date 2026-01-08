@@ -21,9 +21,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: system-upgrade
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
