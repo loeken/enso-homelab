@@ -9,9 +9,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/rancher/system-upgrade-controller.git
-    targetRevision: v0.13.4
-    path: manifests
+    repoURL: git@github.com:loeken/enso-homelab
+    targetRevision: main
+    path: deploy/helm/upgrade_k3s
   destination:
     server: https://kubernetes.default.svc
     namespace: system-upgrade
