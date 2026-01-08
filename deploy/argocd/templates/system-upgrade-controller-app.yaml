@@ -30,8 +30,10 @@ spec:
       name: system-upgrade
       jsonPointers:
         - /subjects
+        - /metadata/annotations
     - group: rbac.authorization.k8s.io
       kind: ClusterRoleBinding
       name: system-upgrade-drainer
       jsonPointers:
         - /subjects
+        - /metadata/annotations
