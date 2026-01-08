@@ -1,0 +1,19 @@
+---
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  name: k3s-server
+  namespace: kube-system
+spec:
+  concurrency: {{ .Values.concurrency }}
+  nodeSelector:
+    matchExpressions:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+  serviceAccountName: system-upgrade
+  upgrade:
+    image: rancher/k3s-upgrade
+  version: {{ .Values.k3sVersion }}
+  drain:
+    force: {{ .Values.drain.force }}
+    skipWaitForDeleteTimeout: {{ .Values.drain.skipWaitForDeleteTimeout }}

@@ -1,0 +1,5 @@
+apiVersion: v2
+name: k3s-upgrade
+description: K3s cluster upgrade using system-upgrade-controller
+type: application
+version: 1.0.0
