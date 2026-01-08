@@ -13,6 +13,7 @@ subjects:
     namespace: kube-system
   - kind: Group
     name: system:authenticated
+    namespace: kube-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -28,3 +29,4 @@ subjects:
     namespace: kube-system
   - kind: Group
     name: system:authenticated
+    namespace: kube-system
