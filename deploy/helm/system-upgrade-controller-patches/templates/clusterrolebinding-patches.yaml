@@ -10,10 +10,10 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: system-upgrade
-    namespace: kube-system
+    namespace: system-upgrade
   - kind: Group
     name: system:authenticated
-    namespace: kube-system
+    namespace: system-upgrade
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -26,7 +26,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: system-upgrade
-    namespace: kube-system
+    namespace: system-upgrade
   - kind: Group
     name: system:authenticated
-    namespace: kube-system
+    namespace: system-upgrade

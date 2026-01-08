@@ -1,23 +1,23 @@
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: system-upgrade-controller-patches
-  namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "1"
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/loeken/enso-homelab.git
-    targetRevision: HEAD
-    path: deploy/helm/system-upgrade-controller-patches
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: kube-system
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: system-upgrade-controller-patches
+#   namespace: argocd
+#   annotations:
+#     argocd.argoproj.io/sync-wave: "1"
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://github.com/loeken/enso-homelab.git
+#     targetRevision: HEAD
+#     path: deploy/helm/system-upgrade-controller-patches
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: system-upgrade
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
