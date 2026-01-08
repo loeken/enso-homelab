@@ -1,5 +1,0 @@
-apiVersion: v2
-name: system-upgrade-controller-patches
-description: Patches for system-upgrade-controller ClusterRoleBindings
-type: application
-version: 1.0.0
