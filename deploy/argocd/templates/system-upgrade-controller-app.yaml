@@ -24,20 +24,14 @@ spec:
     repoURL: https://github.com/rancher/system-upgrade-controller.git
     targetRevision: v0.18.0
     path: manifests
-    kustomize:
-      namespace: kube-system
-      patches:
-        - target:
-            kind: ClusterRoleBinding
-            name: system-upgrade
-          patch: |-
-            - op: add
-              path: /subjects/1/namespace
-              value: kube-system
-        - target:
-            kind: ClusterRoleBinding
-            name: system-upgrade-drainer
-          patch: |-
-            - op: add
-              path: /subjects/1/namespace
-              value: kube-system
+  ignoreDifferences:
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+      name: system-upgrade
+      jsonPointers:
+        - /subjects
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+      name: system-upgrade-drainer
+      jsonPointers:
+        - /subjects
