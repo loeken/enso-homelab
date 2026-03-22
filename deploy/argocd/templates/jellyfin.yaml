@@ -82,7 +82,7 @@ spec:
               - jellyfin.{{ .Values.domain }}
 
     repoURL: https://loeken.github.io/helm-charts
-    targetRevision: 10.11.5
+    targetRevision: 10.11.6
   syncPolicy:
     automated:
       prune: true
