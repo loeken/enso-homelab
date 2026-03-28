@@ -24,6 +24,10 @@ authelia:
   size: 100Mi
 certmanager:
   enabled: true
+cnpg:
+  enabled: false
+  storageSize: 20Gi
+  storageClassName: local-path
 dashy:
   enabled: true
   ingress:
@@ -69,6 +73,7 @@ k10:
   storageClassName: rook-ceph-block
   sidecar:
     enabled: false
+llmHostIP: "192.168.178.112"
 nextcloud:
   enabled: true
   size: 10Gi
@@ -119,6 +124,11 @@ observability:
     storageClassName: rook-ceph-block
     size: 10Gi
   useAuthelia: true
+openwebui:
+  enabled: false
+  storageSize: 10Gi
+  storageClassName: local-path
+  useAuthelia: false
 prowlarr:
   enabled: true
   ingress:
@@ -127,6 +137,10 @@ prowlarr:
     size: 1Gi
     storageClass: rook-ceph-block
   useAuthelia: true
+qdrant:
+  enabled: false
+  storageSize: 50Gi
+  storageClassName: local-path
 radarr:
   enabled: true
   ingress:
