@@ -10,7 +10,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: llm-qdrant
+    namespace: llm
     server: https://kubernetes.default.svc
   project: default
   source:
