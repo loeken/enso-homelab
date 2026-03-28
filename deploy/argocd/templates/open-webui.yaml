@@ -23,6 +23,9 @@ spec:
         ollama:
           enabled: false
 
+        pipelines:
+          enabled: {{ .Values.openwebui.pipelines.enabled }}
+
         openaiBaseApiUrl: "http://llm-litellm.llm.svc.cluster.local:4000/v1"
 
         extraEnvVars:
