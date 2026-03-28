@@ -23,7 +23,7 @@ spec:
         ollama:
           enabled: false
 
-        openaiBaseApiUrl: "http://litellm.llm.svc.cluster.local:4000/v1"
+        openaiBaseApiUrl: "http://llm-litellm.llm.svc.cluster.local:4000/v1"
         defaultOpenAiApiKey: "EMPTY"
 
         # Point at LiteLLM on the GPU host
