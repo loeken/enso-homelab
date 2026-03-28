@@ -179,3 +179,17 @@ uptimekuma:
 wazuh:
   enabled: true
   useAuthelia: false
+llmHostIP: "192.168.178.112"
+qdrant:
+  enabled: false
+  storageSize: 50Gi
+  storageClassName: local-path
+cnpg:
+  enabled: false
+  storageSize: 20Gi
+  storageClassName: local-path
+openwebui:
+  enabled: false
+  storageSize: 10Gi
+  storageClassName: local-path
+  useAuthelia: false
