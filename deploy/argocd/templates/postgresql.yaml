@@ -25,6 +25,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
 ---
 # Step 2: Deploy a PostgreSQL cluster via CNPG
 apiVersion: argoproj.io/v1alpha1
