@@ -122,10 +122,6 @@ spec:
                 memory: "50Mi"
 
           dataDirHostPath: /var/lib/rook
-          placement:
-            osd:
-              podSecurityContext:
-                fsGroupChangePolicy: OnRootMismatch
           mon:
             count: 1
             allowMultiplePerNode: true
