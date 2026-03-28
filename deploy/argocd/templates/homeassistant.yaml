@@ -70,6 +70,8 @@ spec:
             database: home-assistant
             existingSecret: home-assistant
           primary:
+            podSecurityContext:
+              fsGroupChangePolicy: OnRootMismatch
             persistence:
               enabled: true
               storageClass: {{ .Values.homeassistant.storageClass }}
