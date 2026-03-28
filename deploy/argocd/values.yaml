@@ -132,7 +132,7 @@ openwebui:
   storageClassName: rook-ceph-block
   useAuthelia: false
   pipelines:
-    enabled: false
+    enabled: true
 prowlarr:
   enabled: true
   ingress:
