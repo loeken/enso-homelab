@@ -1,0 +1,63 @@
+{{ if .Values.litellm.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  name: llm-litellm
+  namespace: argocd
+spec:
+  destination:
+    namespace: llm
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: litellm-helm
+    helm:
+      values: |
+        replicaCount: 1
+
+        service:
+          type: ClusterIP
+          port: 4000
+
+        masterkeySecretName: litellm
+        masterkeySecretKey: LITELLM_MASTER_KEY
+
+        proxy_config:
+          model_list:
+            - model_name: default
+              litellm_params:
+                model: openai/Qwen/Qwen3.5-9B
+                api_base: "http://{{ .Values.llmHostIP }}:8000/v1"
+                api_key: EMPTY
+            - model_name: qwen3.5-9b
+              litellm_params:
+                model: openai/Qwen/Qwen3.5-9B
+                api_base: "http://{{ .Values.llmHostIP }}:8000/v1"
+                api_key: EMPTY
+            - model_name: ollama/llama3
+              litellm_params:
+                model: ollama/llama3
+                api_base: "http://{{ .Values.llmHostIP }}:11434"
+          litellm_settings:
+            drop_params: true
+
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 100m
+          limits:
+            memory: 512Mi
+
+    repoURL: https://helm.litellm.ai
+    targetRevision: 0.1.6
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{ end }}

@@ -42,7 +42,11 @@
       "deploy/argocd/templates/sharedmedia.yaml",
       "deploy/argocd/templates/uptime-kuma.yaml",
       "deploy/argocd/templates/vaultwarden.yaml",
-      "deploy/argocd/templates/whoami.yaml"
+      "deploy/argocd/templates/whoami.yaml",
+      "deploy/argocd/templates/qdrant.yaml",
+      "deploy/argocd/templates/postgresql.yaml",
+      "deploy/argocd/templates/open-webui.yaml",
+      "deploy/argocd/templates/litellm.yaml"
     ]
   },
   "packageRules": [
