@@ -31,6 +31,11 @@ spec:
             value: "EMPTY"
           - name: WEBUI_AUTH
             value: "true"
+          - name: WEBUI_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: open-webui
+                key: WEBUI_SECRET_KEY
           - name: VECTOR_DB
             value: "qdrant"
           - name: QDRANT_URL
@@ -38,7 +43,7 @@ spec:
           - name: DATABASE_URL
             valueFrom:
               secretKeyRef:
-                name: llm-postgresql-app
+                name: llm-postgresql-cluster-app
                 key: uri
 
         persistence:
