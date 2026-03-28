@@ -39,7 +39,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: llm-postgresql
+    namespace: llm
     server: https://kubernetes.default.svc
   project: default
   source:

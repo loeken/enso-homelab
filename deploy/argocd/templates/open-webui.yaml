@@ -10,7 +10,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: llm-open-webui
+    namespace: llm
     server: https://kubernetes.default.svc
   project: default
   source:
@@ -39,7 +39,7 @@ spec:
           - name: VECTOR_DB
             value: "qdrant"
           - name: QDRANT_URL
-            value: "http://qdrant.llm-qdrant.svc.cluster.local:6333"
+            value: "http://qdrant.llm.svc.cluster.local:6333"
           - name: DATABASE_URL
             valueFrom:
               secretKeyRef:
