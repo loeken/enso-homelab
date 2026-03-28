@@ -14,7 +14,6 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    chart: litellm-helm
     helm:
       values: |
         replicaCount: 1
