@@ -195,3 +195,5 @@ openwebui:
   storageSize: 10Gi
   storageClassName: local-path
   useAuthelia: false
+  pipelines:
+    enabled: false

@@ -30,12 +30,12 @@ spec:
           model_list:
             - model_name: default
               litellm_params:
-                model: openai/Qwen/Qwen3.5-9B
+                model: openai/Qwen/Qwen2.5-Coder-32B-Instruct-AWQ
                 api_base: "http://{{ .Values.llmHostIP }}:8000/v1"
                 api_key: EMPTY
-            - model_name: qwen3.5-9b
+            - model_name: qwen2.5-coder-32b
               litellm_params:
-                model: openai/Qwen/Qwen3.5-9B
+                model: openai/Qwen/Qwen2.5-Coder-32B-Instruct-AWQ
                 api_base: "http://{{ .Values.llmHostIP }}:8000/v1"
                 api_key: EMPTY
             - model_name: ollama/llama3
