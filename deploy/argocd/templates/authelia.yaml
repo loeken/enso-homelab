@@ -316,7 +316,7 @@ spec:
                 methods:
                   - GET
                   - POST
-              - domain: ['jellyfin.{{ .Values.domain }}', 'requests.{{ .Values.domain }}', 'hub.{{ .Values.domain }}', 'status.{{ .Values.domain }}']
+              - domain: ['jellyfin.{{ .Values.domain }}', 'requests.{{ .Values.domain }}', 'hub.{{ .Values.domain }}', 'status.{{ .Values.domain }}', 'ai.{{ .Values.domain }}']
                 policy: one_factor
                 subject:
                   - 'group:users'
