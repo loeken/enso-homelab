@@ -25,6 +25,12 @@ spec:
 
         pipelines:
           enabled: {{ .Values.openwebui.pipelines.enabled }}
+          extraEnvVars:
+            - name: PIPELINES_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: litellm
+                  key: LITELLM_MASTER_KEY
 
         openaiBaseApiUrl: "http://llm-litellm.llm.svc.cluster.local:4000/v1"
 
