@@ -131,6 +131,8 @@ openwebui:
   storageSize: 10Gi
   storageClassName: rook-ceph-block
   useAuthelia: false
+  pipelines:
+    enabled: false
 prowlarr:
   enabled: true
   ingress:
