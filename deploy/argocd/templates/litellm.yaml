@@ -52,8 +52,8 @@ spec:
           limits:
             memory: 512Mi
 
-    repoURL: https://helm.litellm.ai
-    targetRevision: 0.1.6
+    repoURL: oci://ghcr.io/berriai
+    targetRevision: 1.82.3
   syncPolicy:
     automated:
       prune: true
