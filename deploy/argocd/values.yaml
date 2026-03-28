@@ -73,6 +73,8 @@ k10:
   storageClassName: rook-ceph-block
   sidecar:
     enabled: false
+litellm:
+  enabled: true
 llmHostIP: "192.168.178.112"
 nextcloud:
   enabled: true
