@@ -180,6 +180,8 @@ wazuh:
   enabled: true
   useAuthelia: false
 llmHostIP: "192.168.178.112"
+litellm:
+  enabled: false
 qdrant:
   enabled: false
   storageSize: 50Gi
