@@ -3,18 +3,18 @@
   "apiVersion": "bitnami.com/v1alpha1",
   "metadata": {
     "name": "open-webui",
-    "namespace": "llm-open-webui"
+    "namespace": "llm"
   },
   "spec": {
     "template": {
       "metadata": {
         "name": "open-webui",
-        "namespace": "llm-open-webui"
+        "namespace": "llm"
       },
       "type": "Opaque"
     },
     "encryptedData": {
-      "WEBUI_SECRET_KEY": "AgAnjE/N2ZR4QyywJ4oPDN7NnujArXS67OHyrGO0x76h2ukHJqbXGoiL1VH1x2xc5lPzpyrgZ8OBt3MmFP9jlb/Y22TIBSeNVioR7uVgKvFJkh0TPJiH7R7EWuoJVAMP7cd1/Zit2dq+aHJzabmu+enBpqsDZyZ3X1zRHimdDPN23C675AVLhjsmKawGPGtQDzhqkKaExH871lXbmYwEu+tvz6e0uaVvivGmqpPl/BQM62mby3yDg/dNIjOf/70fdsWEW3jsZLZZt3QjWuf7KMZE/e+cDCIlZ8PNOxNBo2YBrS2MsbrF7dCK83FS/nk6iNComdvhmO6xARz8WGiyAETEZanTayxGjNFImmOpzRiAeBNkJ3peo6t+wquuOlaryAfET/bJ6CISqwVu9HIWgE+QB1bg79t+OxQwclEoLKRTJO7SswN1U41b+KTOLnRJVxPJVZRGYbadlLGptUFRLJQFTPXbTNwbxOgMUq/p7DUW9yMtYOrE9Oxz3XnfE2dPwwaSPdOxQUNgGc7aewYTjdQv/ThlayBGlXe+6UFPn7VnyZO84fzxhH4l9yxsjB+DyP3yLZ36ARX+v6iZnB7FBcq3dJm9ZaSaeA+GZ+CfnvxM0QMn/InZZpT66dKGQOKWsB+QVFTsiJ8GwF5WzQcRPVgXNnIz39y6iW0PH+RAxyqJ13rvnY+KCChyltfeIFK+2R1G4qn5HhGrHqOK0Q=="
+      "WEBUI_SECRET_KEY": "AgAg61t6CxyZJcYe2WwJsMG4yeYyZ1JqwcfQGJJFopLHAHkHXE60o/ooHVE5KrLPxvtNVnRJNrK0s5Q9GYBGzXCEhUJA+ySeslK3dDy5B47Q8pjaaHrrfoOxdPG4LgUcPe766igZLc2xR9m/92N1fkw5UIIugRnpsVSGYtaOEHmcL7TZpKxjeWc4W65hfFIl4ckRuxB2e9LtuEHKF/poebOxhcUoAvjhTK8FNva5AW+HfXrKe1ieU7FVCdDJW6TxR+qgmH3vZPxC+vQWheUfjWPSCImFOTkffg64XUNsdy0Xt8QSLgvXJc8J1RXB5wac7CkoVSNDr1vgZCLXZPw+LQcf9yjvXi3OrBCkBff4ob0v5U2gpze4ppN2m4dOEMKDObUjA8GjxldEURTCXGq/HQHSdGgUBwyqirAC1HexjEbbm34u4wsUjMWt3Mau5AU2b/bdIZFE8oNWR+vVsY0QY6uinS9Kl2aPEJ+ZiwrL/mX7fexBx7bf1zUGCru0vuYsM5drrS1yR6Fnp+uijIXDgab+T34sH98e9eRAqlpto5jUq/UUDQSPtHnN3CDCungUBZK8u4HU8Ww1D2cVLMpWXppgdkuTVrUOl4klttCpSzfZ9kFl/hzRDX5qBmitraotq0E6DffD95CxQKD/2rTUejTxXqV8DBXM5ALU9WnY1Xw1g7Q0Nrjo+1HJF8fsdoexAgp4FnVkvZZa4+LkDzXc+DGTJd413vkQVpbonX8VV2A="
     }
   }
 }
