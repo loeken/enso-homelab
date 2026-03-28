@@ -14,6 +14,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
+    chart: litellm-helm
     helm:
       values: |
         replicaCount: 1
@@ -51,7 +52,7 @@ spec:
           limits:
             memory: 512Mi
 
-    repoURL: oci://ghcr.io/berriai/litellm-helm
+    repoURL: ghcr.io/berriai
     targetRevision: 1.82.6-nightly-latest
   syncPolicy:
     automated:
