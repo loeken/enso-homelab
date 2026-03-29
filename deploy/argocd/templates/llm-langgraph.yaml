@@ -30,7 +30,6 @@ spec:
         postgres:
           external:
             enabled: true
-            existingSecretName: llm-postgresql-cluster-app
 
         # Disable bundled Redis — not needed for basic checkpointing
         redis:
@@ -40,6 +39,11 @@ spec:
         apiServer:
           deployment:
             extraEnv:
+              - name: POSTGRES_URI
+                valueFrom:
+                  secretKeyRef:
+                    name: llm-postgresql-cluster-app
+                    key: uri
               - name: LITELLM_API_BASE
                 value: "http://llm-litellm.llm.svc.cluster.local:4000/v1"
               - name: MCPO_BASE_URL
