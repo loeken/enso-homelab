@@ -32,7 +32,7 @@ spec:
         grafana.ini:
           server:
             root_url: https://grafana.{{ .Values.domain }}
-            domain: aneralabs.lan
+            domain: {{ .Values.domain }}
           users:
             auto_assign_org_role: Editor
         envFromSecret: grafana-oauth-config
