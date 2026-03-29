@@ -49,6 +49,17 @@ spec:
           litellm_settings:
             drop_params: true
 
+          mcp_servers:
+            #mcp-kubernetes:
+            #  url: "http://mcp-kubernetes.llm.svc.cluster.local:8080/mcp"
+            #  transport: streamable_http
+            mcp-grafana:
+              url: "http://mcp-grafana.llm.svc.cluster.local:8000/mcp"
+              transport: streamable_http
+            #mcp-servers:
+            #  url: "http://mcp-servers.llm.svc.cluster.local:8000/mcp"
+            #  transport: streamable_http
+
         resources:
           requests:
             memory: 2Gi
