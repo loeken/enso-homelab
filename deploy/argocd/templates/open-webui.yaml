@@ -83,7 +83,7 @@ spec:
           existingSecret: open-webui-tls
 
     repoURL: https://helm.openwebui.com
-    targetRevision: 6.4.0
+    targetRevision: 12.13.0
   syncPolicy:
     automated:
       prune: true
