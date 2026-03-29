@@ -48,17 +48,9 @@ spec:
                 api_base: "http://{{ .Values.llmHostIP }}:11434"
           litellm_settings:
             drop_params: true
-
-          mcp_servers:
-            #kubernetes:
-            #  url: "http://mcp-kubernetes.llm.svc.cluster.local:8080/mcp"
-            #  transport: streamable_http
-            grafana:
-              url: "http://mcp-grafana-grafana-mcp.llm.svc.cluster.local:8000/sse"
-              transport: sse
-            #servers:
-            #  url: "http://mcp-servers.llm.svc.cluster.local:8000/mcp"
-            #  transport: streamable_http
+            set_verbose: true
+            json_logs: true
+            store_prompts_in_spend_logs: true
 
         resources:
           requests:
@@ -67,6 +59,20 @@ spec:
           limits:
             memory: 4Gi
             cpu: 2000m
+
+        ingress:
+          enabled: true
+          annotations:
+            cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+            external-dns.alpha.kubernetes.io/hostname: "litellm.{{ .Values.domain }}."
+            external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+            external-dns.alpha.kubernetes.io/ttl: "120"
+          className: "nginx"
+          host: litellm.{{ .Values.domain }}
+          tls:
+            - secretName: litellm-tls
+              hosts:
+                - litellm.{{ .Values.domain }}
 
     repoURL: ghcr.io/berriai
     targetRevision: 1.82.6-nightly-latest
