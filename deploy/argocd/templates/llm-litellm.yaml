@@ -54,8 +54,8 @@ spec:
             #  url: "http://mcp-kubernetes.llm.svc.cluster.local:8080/mcp"
             #  transport: streamable_http
             mcp-grafana:
-              url: "http://mcp-grafana.llm.svc.cluster.local:8000/mcp"
-              transport: streamable_http
+              url: "http://mcp-grafana-grafana-mcp.llm.svc.cluster.local:8000/sse"
+              transport: sse
             #mcp-servers:
             #  url: "http://mcp-servers.llm.svc.cluster.local:8000/mcp"
             #  transport: streamable_http
