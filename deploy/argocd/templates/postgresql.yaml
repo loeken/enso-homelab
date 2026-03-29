@@ -65,7 +65,7 @@ spec:
         backups:
           enabled: false
     repoURL: https://cloudnative-pg.github.io/charts
-    targetRevision: 0.3.0
+    targetRevision: 0.6.0
   syncPolicy:
     automated:
       prune: true
