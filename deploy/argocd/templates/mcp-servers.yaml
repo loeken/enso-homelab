@@ -23,9 +23,6 @@ spec:
 
         # Secrets are injected as container env vars and inherited by all MCP subprocesses
         envSecrets:
-          BRAVE_API_KEY:
-            secretName: mcp-credentials
-            secretKey: BRAVE_API_KEY
           GITHUB_PERSONAL_ACCESS_TOKEN:
             secretName: mcp-credentials
             secretKey: GITHUB_PERSONAL_ACCESS_TOKEN
@@ -36,11 +33,6 @@ spec:
 
         config:
           mcpServers:
-            brave-search:
-              command: npx
-              args:
-                - -y
-                - "@modelcontextprotocol/server-brave-search"
             filesystem:
               command: npx
               args:
