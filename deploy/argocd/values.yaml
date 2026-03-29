@@ -75,6 +75,15 @@ k10:
     enabled: false
 langgraph:
   enabled: true
+  image:
+    repository: ghcr.io/loeken/langgraph-agent
+    tag: latest
+  ingress:
+    enabled: false
+    useAuthelia: false
+  studio:
+    ingress:
+      enabled: false
 litellm:
   enabled: true
 llmHostIP: "192.168.178.112"
