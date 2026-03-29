@@ -185,7 +185,7 @@ litellm:
 langgraph:
   enabled: false
   image:
-    repository: ghcr.io/loeken/langgraph-agent
+    repository: loeken/langgraph-agent
     tag: latest
   ingress:
     enabled: false
