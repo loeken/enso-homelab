@@ -10,7 +10,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: mcp
+    namespace: llm
     server: https://kubernetes.default.svc
   project: default
   source:
@@ -29,9 +29,10 @@ spec:
           GITHUB_PERSONAL_ACCESS_TOKEN:
             secretName: mcp-credentials
             secretKey: GITHUB_PERSONAL_ACCESS_TOKEN
+          # Reuse the CNPG-generated connection string from llm-postgresql
           DATABASE_URL:
-            secretName: mcp-credentials
-            secretKey: DATABASE_URL
+            secretName: llm-postgresql-cluster-app
+            secretKey: uri
 
         config:
           mcpServers:
