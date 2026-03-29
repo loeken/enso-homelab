@@ -1,0 +1,80 @@
+{{ if .Values.mcp.servers.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  name: mcp-servers
+  namespace: argocd
+spec:
+  destination:
+    namespace: mcp
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: mcpo
+    helm:
+      values: |
+        service:
+          type: ClusterIP
+          port: 8000
+
+        # Secrets are injected as container env vars and inherited by all MCP subprocesses
+        envSecrets:
+          BRAVE_API_KEY:
+            secretName: mcp-credentials
+            secretKey: BRAVE_API_KEY
+          GITHUB_PERSONAL_ACCESS_TOKEN:
+            secretName: mcp-credentials
+            secretKey: GITHUB_PERSONAL_ACCESS_TOKEN
+          DATABASE_URL:
+            secretName: mcp-credentials
+            secretKey: DATABASE_URL
+
+        config:
+          mcpServers:
+            brave-search:
+              command: npx
+              args:
+                - -y
+                - "@modelcontextprotocol/server-brave-search"
+            filesystem:
+              command: npx
+              args:
+                - -y
+                - "@modelcontextprotocol/server-filesystem"
+                - /tmp
+            github:
+              command: npx
+              args:
+                - -y
+                - "@modelcontextprotocol/server-github"
+            postgres:
+              command: sh
+              args:
+                - -c
+                - 'npx -y @modelcontextprotocol/server-postgres "$DATABASE_URL"'
+            fetch:
+              command: uvx
+              args:
+                - mcp-server-fetch
+
+        resources:
+          requests:
+            memory: 512Mi
+            cpu: 200m
+          limits:
+            memory: 1Gi
+            cpu: 1000m
+
+    repoURL: https://arbuzov.github.io/mcp-helm/
+    targetRevision: 0.2.6
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{ end }}

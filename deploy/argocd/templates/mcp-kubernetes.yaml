@@ -1,0 +1,43 @@
+{{ if .Values.mcp.kubernetes.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  name: mcp-kubernetes
+  namespace: argocd
+spec:
+  destination:
+    namespace: mcp
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: mcp-kubernetes
+    helm:
+      values: |
+        rbac:
+          useClusterAdmin: true
+
+        service:
+          type: ClusterIP
+          port: 8080
+
+        resources:
+          requests:
+            memory: 128Mi
+            cpu: 100m
+          limits:
+            memory: 256Mi
+            cpu: 500m
+
+    repoURL: https://arbuzov.github.io/mcp-helm/
+    targetRevision: 0.2.7
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{ end }}

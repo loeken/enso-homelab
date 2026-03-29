@@ -197,3 +197,10 @@ openwebui:
   useAuthelia: false
   pipelines:
     enabled: false
+mcp:
+  kubernetes:
+    enabled: false
+  grafana:
+    enabled: false
+  servers:
+    enabled: false
