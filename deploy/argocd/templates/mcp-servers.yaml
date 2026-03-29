@@ -33,6 +33,8 @@ spec:
 
         config:
           mcpServers:
+            grafana:
+              url: "http://mcp-grafana-grafana-mcp.llm.svc.cluster.local:8000/sse"
             filesystem:
               command: npx
               args:
