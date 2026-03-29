@@ -14,78 +14,26 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    chart: langgraph-cloud
+    repoURL: https://github.com/loeken/enso-homelab
+    targetRevision: HEAD
+    path: deploy/helm/langgraph
     helm:
       values: |
-        images:
-          apiServerImage:
-            repository: {{ .Values.langgraph.image.repository }}
-            tag: "{{ .Values.langgraph.image.tag }}"
-            pullPolicy: Always
-
-        config:
-          existingSecretName: langgraph
-
-        # Use existing CNPG PostgreSQL cluster
-        postgres:
-          external:
-            enabled: true
-
-        # Disable bundled Redis — not needed for basic checkpointing
-        redis:
-          external:
-            enabled: false
-
-        apiServer:
-          deployment:
-            extraEnv:
-              - name: POSTGRES_URI
-                valueFrom:
-                  secretKeyRef:
-                    name: llm-postgresql-cluster-app
-                    key: uri
-              - name: LITELLM_API_BASE
-                value: "http://llm-litellm.llm.svc.cluster.local:4000/v1"
-              - name: MCPO_BASE_URL
-                value: "http://mcp-servers-mcpo.llm.svc.cluster.local:8000"
-              - name: MCP_SERVERS
-                value: "grafana,github,postgres,fetch"
-              - name: DEFAULT_MODEL
-                value: "default"
-            resources:
-              requests:
-                memory: 512Mi
-                cpu: 250m
-              limits:
-                memory: 1Gi
-                cpu: 1000m
-
-        {{- if .Values.langgraph.ingress.enabled }}
+        image:
+          repository: {{ .Values.langgraph.image.repository }}
+          tag: "{{ .Values.langgraph.image.tag }}"
+        env:
+          LITELLM_API_BASE: "http://llm-litellm.llm.svc.cluster.local:4000/v1"
+          MCPO_BASE_URL: "http://mcp-servers-mcpo.llm.svc.cluster.local:8000"
+          MCP_SERVERS: "grafana,github,postgres,fetch"
+          DEFAULT_MODEL: "default"
         ingress:
-          enabled: true
-          ingressClassName: nginx
-          annotations:
-            cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
-            external-dns.alpha.kubernetes.io/hostname: "langgraph.{{ .Values.domain }}."
-            external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
-            external-dns.alpha.kubernetes.io/ttl: "120"
-            {{- if .Values.langgraph.ingress.useAuthelia }}
-            nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
-            nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
-            {{- end }}
+          enabled: {{ .Values.langgraph.ingress.enabled }}
+          {{- if .Values.langgraph.ingress.enabled }}
+          useAuthelia: {{ .Values.langgraph.ingress.useAuthelia }}
           hostname: langgraph.{{ .Values.domain }}
-          studioHostname: {{ if .Values.langgraph.studio.ingress.enabled }}langgraph-studio.{{ .Values.domain }}{{ end }}
-          tls:
-            - secretName: langgraph-tls
-              hosts:
-                - langgraph.{{ .Values.domain }}
-        {{- end }}
-
-        studio:
-          enabled: {{ .Values.langgraph.studio.ingress.enabled }}
-
-    repoURL: https://langchain-ai.github.io/helm/
-    targetRevision: 0.2.6
+          clusterIssuer: {{ .Values.clusterIssuer }}
+          {{- end }}
   syncPolicy:
     automated:
       prune: true
