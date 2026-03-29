@@ -35,7 +35,7 @@ spec:
           serviceMonitor:
             enabled: false
     repoURL: https://qdrant.github.io/qdrant-helm
-    targetRevision: 1.14.1
+    targetRevision: 1.17.1
   syncPolicy:
     automated:
       prune: true
