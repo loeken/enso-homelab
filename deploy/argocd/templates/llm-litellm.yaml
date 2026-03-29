@@ -50,13 +50,13 @@ spec:
             drop_params: true
 
           mcp_servers:
-            #mcp-kubernetes:
+            #kubernetes:
             #  url: "http://mcp-kubernetes.llm.svc.cluster.local:8080/mcp"
             #  transport: streamable_http
-            mcp-grafana:
+            grafana:
               url: "http://mcp-grafana-grafana-mcp.llm.svc.cluster.local:8000/sse"
               transport: sse
-            #mcp-servers:
+            #servers:
             #  url: "http://mcp-servers.llm.svc.cluster.local:8000/mcp"
             #  transport: streamable_http
 
