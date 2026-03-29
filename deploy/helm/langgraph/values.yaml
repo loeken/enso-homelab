@@ -1,0 +1,24 @@
+image:
+  repository: loeken/langgraph-agent
+  tag: latest
+  pullPolicy: Always
+
+env:
+  LITELLM_API_BASE: "http://llm-litellm.llm.svc.cluster.local:4000/v1"
+  MCPO_BASE_URL: "http://mcp-servers-mcpo.llm.svc.cluster.local:8000"
+  MCP_SERVERS: "grafana,github,postgres,fetch"
+  DEFAULT_MODEL: "default"
+
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 250m
+  limits:
+    memory: 1Gi
+    cpu: 1000m
+
+ingress:
+  enabled: false
+  useAuthelia: false
+  hostname: ""
+  clusterIssuer: letsencrypt-prod
