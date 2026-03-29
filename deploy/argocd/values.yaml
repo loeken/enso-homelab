@@ -76,7 +76,7 @@ k10:
 langgraph:
   enabled: true
   image:
-    repository: ghcr.io/loeken/langgraph-agent
+    repository: loeken/langgraph-agent
     tag: latest
   ingress:
     enabled: false
@@ -144,13 +144,6 @@ observability:
     storageClassName: rook-ceph-block
     size: 10Gi
   useAuthelia: false
-openwebui:
-  enabled: true
-  storageSize: 10Gi
-  storageClassName: rook-ceph-block
-  useAuthelia: false
-  pipelines:
-    enabled: true
 prowlarr:
   enabled: true
   ingress:
@@ -170,7 +163,7 @@ radarr:
   config:
     size: 1Gi
     storageClass: rook-ceph-block
-  useAuthelia: trues
+  useAuthelia: true
 rookceph:
   enabled: true
   monitoring: true
