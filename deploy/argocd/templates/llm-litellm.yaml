@@ -21,6 +21,9 @@ spec:
       values: |
         replicaCount: 1
 
+        env:
+          LITELLM_LOG: "DEBUG"
+
         service:
           type: ClusterIP
           port: 4000
