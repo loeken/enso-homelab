@@ -76,6 +76,13 @@ k10:
 litellm:
   enabled: true
 llmHostIP: "192.168.178.112"
+mcp:
+  kubernetes:
+    enabled: true
+  grafana:
+    enabled: true
+  servers:
+    enabled: true
 nextcloud:
   enabled: true
   size: 10Gi
