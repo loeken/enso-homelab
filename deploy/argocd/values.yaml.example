@@ -182,6 +182,17 @@ wazuh:
 llmHostIP: "192.168.178.112"
 litellm:
   enabled: false
+langgraph:
+  enabled: false
+  image:
+    repository: ghcr.io/loeken/langgraph-agent
+    tag: latest
+  ingress:
+    enabled: false
+    useAuthelia: false
+  studio:
+    ingress:
+      enabled: false
 qdrant:
   enabled: false
   storageSize: 50Gi
@@ -190,13 +201,6 @@ cnpg:
   enabled: false
   storageSize: 20Gi
   storageClassName: local-path
-openwebui:
-  enabled: false
-  storageSize: 10Gi
-  storageClassName: local-path
-  useAuthelia: false
-  pipelines:
-    enabled: false
 mcp:
   kubernetes:
     enabled: false
