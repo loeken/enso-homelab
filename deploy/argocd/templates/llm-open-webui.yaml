@@ -56,6 +56,8 @@ spec:
               secretKeyRef:
                 name: llm-postgresql-cluster-app
                 key: uri
+          - name: TOOL_SERVER_CONNECTIONS
+            value: '[{"url":"http://mcp-servers.llm.svc.cluster.local:8000/grafana","auth_type":"none","config":{"enable":true},"info":{"id":"grafana","name":"Grafana"}}]'
 
         persistence:
           enabled: true
