@@ -14,7 +14,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    repoURL: https://github.com/{{ .Values.githubUser }}/{{ .Values.githubRepo }}.git
+    repoURL: https://github.com/loeken/enso-homelab
     targetRevision: HEAD
     path: deploy/helm/langgraph
     helm:
