@@ -32,12 +32,12 @@ spec:
               litellm_params:
                 model: openai/Qwen/Qwen2.5-Coder-32B-Instruct-AWQ
                 api_base: "http://{{ .Values.llmHostIP }}:8000/v1"
-                api_key: os.environ/LITELLM_MASTER_KEY
+                api_key: "dummy"
             - model_name: qwen2.5-coder-32b
               litellm_params:
                 model: openai/Qwen/Qwen2.5-Coder-32B-Instruct-AWQ
                 api_base: "http://{{ .Values.llmHostIP }}:8000/v1"
-                api_key: os.environ/LITELLM_MASTER_KEY
+                api_key: "dummy"
             - model_name: ollama/llama3
               litellm_params:
                 model: ollama/llama3
