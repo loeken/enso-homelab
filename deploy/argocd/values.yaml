@@ -79,7 +79,7 @@ langgraph:
     repository: loeken/langgraph-agent
     tag: latest
   ingress:
-    enabled: false
+    enabled: true
     useAuthelia: false
   studio:
     ingress:
