@@ -68,7 +68,11 @@ spec:
             external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
             external-dns.alpha.kubernetes.io/ttl: "120"
           className: "nginx"
-          host: litellm.{{ .Values.domain }}
+          hosts:
+            - host: litellm.{{ .Values.domain }}
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
           tls:
             - secretName: litellm-tls
               hosts:
