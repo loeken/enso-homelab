@@ -17,6 +17,9 @@ spec:
     chart: mcpo
     helm:
       values: |
+        image:
+          tag: "latest"
+
         service:
           type: ClusterIP
           port: 8000
