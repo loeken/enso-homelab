@@ -10,7 +10,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: mcp
+    namespace: llm
     server: https://kubernetes.default.svc
   project: default
   source:
