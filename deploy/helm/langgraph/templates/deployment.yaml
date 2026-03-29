@@ -27,8 +27,8 @@ spec:
             - name: LITELLM_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: langgraph
-                  key: LITELLM_API_KEY
+                  name: litellm
+                  key: LITELLM_MASTER_KEY
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
