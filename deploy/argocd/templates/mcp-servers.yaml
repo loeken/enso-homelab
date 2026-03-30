@@ -58,6 +58,10 @@ spec:
               command: uvx
               args:
                 - mcp-server-fetch
+            kubernetes:
+              command: npx
+              args:
+                - mcp-server-kubernetes
 
         resources:
           requests:
