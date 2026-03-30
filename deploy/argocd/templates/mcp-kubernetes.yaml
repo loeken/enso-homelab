@@ -14,15 +14,22 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    chart: mcp-kubernetes
+    path: helm-chart
     helm:
       values: |
-        rbac:
-          useClusterAdmin: true
+        transport:
+          mode: http
+          service:
+            type: ClusterIP
+            port: 3001
+            targetPort: 3001
 
-        service:
-          type: ClusterIP
-          port: 8080
+        kubeconfig:
+          provider: serviceaccount
+
+        rbac:
+          create: true
+          useLegacyRules: true
 
         resources:
           requests:
@@ -32,8 +39,8 @@ spec:
             memory: 256Mi
             cpu: 500m
 
-    repoURL: https://arbuzov.github.io/mcp-helm/
-    targetRevision: 0.2.7
+    repoURL: https://github.com/Flux159/mcp-server-kubernetes.git
+    targetRevision: HEAD
   syncPolicy:
     automated:
       prune: true
