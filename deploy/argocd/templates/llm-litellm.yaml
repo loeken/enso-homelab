@@ -35,7 +35,7 @@ spec:
           model_list:
             - model_name: default
               litellm_params:
-                model: openai/Qwen/Qwen3-14B-AWQ
+                model: openai/QuixiAI/Qwen3-30B-A3B-AWQ
                 api_base: "http://{{ .Values.llmHostIP }}:8000/v1"
                 api_key: "dummy"
                 extra_body:
@@ -43,9 +43,9 @@ spec:
                     enable_thinking: false
               model_info:
                 supports_function_calling: true
-            - model_name: qwen3-14b
+            - model_name: qwen3-30b
               litellm_params:
-                model: openai/Qwen/Qwen3-14B-AWQ
+                model: openai/QuixiAI/Qwen3-30B-A3B-AWQ
                 api_base: "http://{{ .Values.llmHostIP }}:8000/v1"
                 api_key: "dummy"
                 extra_body:
