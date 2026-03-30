@@ -25,7 +25,7 @@ spec:
         env:
           LITELLM_API_BASE: "http://llm-litellm.llm.svc.cluster.local:4000/v1"
           MCPO_BASE_URL: "http://mcp-servers-mcpo.llm.svc.cluster.local:8000"
-          MCP_SERVERS: "grafana,kubernetes,github,postgres,fetch"
+          MCP_SERVERS: "grafana,github,postgres,fetch"
           DEFAULT_MODEL: "default"
         ingress:
           enabled: {{ .Values.langgraph.ingress.enabled }}
