@@ -89,7 +89,7 @@ litellm:
 llmHostIP: "192.168.178.112"
 mcp:
   kubernetes:
-    enabled: false
+    enabled: true
   grafana:
     enabled: true
   servers:
