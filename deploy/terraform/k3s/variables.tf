@@ -15,7 +15,7 @@ variable "ssh_server_port" {
 }
 variable "kubernetes_version" {
     type = string
-    default = "v1.35.2+k3s1"
+    default = "v1.35.3+k3s1"
     description = "which version of k3s to install, usually 1 versions behind the latest"
 }
 variable "external_ip" {
