@@ -89,6 +89,8 @@ litellm:
 llmHostIP: "192.168.178.112"
 mcpservers:
   enabled: true
+  ingress:
+    enabled: true
 nextcloud:
   enabled: true
   size: 10Gi
