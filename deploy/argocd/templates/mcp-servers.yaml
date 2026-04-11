@@ -1,9 +1,9 @@
-{{ if .Values.mcp.servers.enabled }}
+{{ if .Values.mcpservers.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-wave: "15"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   name: mcp-servers
@@ -14,61 +14,39 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    chart: mcpo
+    chart: mcp-servers
     helm:
       values: |
-        image:
-          tag: "latest"
-
+        ingress:
+          main:
+            enabled: {{ .Values.mcpservers.ingress.enabled }}
+            className: "nginx"
+            hosts:
+              - host: mcp-grafana.{{ .Values.domain }}
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    service:
+                      name: mcp-servers-main
+                      port: 8000
+            tls:
+              - secretName: mcp-grafana-tls
+                hosts:
+                  - mcp-grafana.{{ .Values.domain }}
         service:
-          type: ClusterIP
-          port: 8000
-
-        # Secrets are injected as container env vars and inherited by all MCP subprocesses
-        envSecrets:
-          GITHUB_PERSONAL_ACCESS_TOKEN:
-            secretName: mcp-credentials
-            secretKey: GITHUB_PERSONAL_ACCESS_TOKEN
-          # Reuse the CNPG-generated connection string from llm-postgresql
-          DATABASE_URL:
-            secretName: llm-postgresql-cluster-app
-            secretKey: uri
-
-        config:
-          mcpServers:
-            grafana:
-              url: "http://mcp-grafana-grafana-mcp.llm.svc.cluster.local:8000/sse"
-            filesystem:
-              command: npx
-              args:
-                - -y
-                - "@modelcontextprotocol/server-filesystem"
-                - /tmp
-            github:
-              command: npx
-              args:
-                - -y
-                - "@modelcontextprotocol/server-github"
-            postgres:
-              command: sh
-              args:
-                - -c
-                - 'npx -y @modelcontextprotocol/server-postgres "$DATABASE_URL"'
-            fetch:
-              command: uvx
-              args:
-                - mcp-server-fetch
-
-        resources:
-          requests:
-            memory: 512Mi
-            cpu: 200m
-          limits:
-            memory: 1Gi
-            cpu: 1000m
-
-    repoURL: https://arbuzov.github.io/mcp-helm/
-    targetRevision: 0.2.6
+          main:
+            enabled: true
+            controller: main
+            type: ClusterIP
+            ports:
+              http:
+                enabled: true
+                port: 8000
+                protocol: TCP
+                primary: true
+    repoURL: https://loeken.github.io/helm-charts
+    targetRevision: 0.1.0 # <-- set your released version/tag
+    path: charts/mcp-servers
   syncPolicy:
     automated:
       prune: true
