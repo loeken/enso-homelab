@@ -101,7 +101,7 @@ spec:
                 protocol: UDP
                 nodePort: 32683
     repoURL: https://loeken.github.io/helm-charts
-    targetRevision: 2026.3.2
+    targetRevision: 2026.3.3
   syncPolicy:
     automated:
       prune: true
