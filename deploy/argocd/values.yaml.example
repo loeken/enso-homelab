@@ -203,3 +203,15 @@ cnpg:
   storageClassName: local-path
 mcpservers:
   enabed: true
+
+clickhouseOperator:
+  enabled: false
+
+theMachine:
+  enabled: false
+  storageClass: local-path
+  clickhouse:
+    storage:
+      size: 5Gi
+  ingress:
+    enabled: false

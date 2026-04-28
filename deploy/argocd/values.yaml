@@ -206,3 +206,15 @@ uptimekuma:
   enabled: true
   storageClassName: rook-ceph-block
   size: 5Gi
+
+clickhouseOperator:
+  enabled: false
+
+theMachine:
+  enabled: false
+  storageClass: rook-ceph-block
+  clickhouse:
+    storage:
+      size: 10Gi
+  ingress:
+    enabled: false

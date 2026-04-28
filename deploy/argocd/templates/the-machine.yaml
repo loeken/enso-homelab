@@ -1,0 +1,58 @@
+{{ if .Values.theMachine.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: the-machine
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "8"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: the-machine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://github.com/loeken/the-machine
+    path: deploy/helm/the-machine
+    targetRevision: HEAD
+    helm:
+      values: |
+        clickhouse:
+          storage:
+            storageClass: {{ .Values.theMachine.storageClass }}
+            size: {{ .Values.theMachine.clickhouse.storage.size }}
+        controllers:
+          redis:
+            persistence:
+              data:
+                storageClass: {{ .Values.theMachine.storageClass }}
+        {{- if .Values.theMachine.ingress.enabled }}
+        ingress:
+          trader-ingestion:
+            enabled: true
+            annotations:
+              cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+              external-dns.alpha.kubernetes.io/hostname: "the-machine.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/ttl: "120"
+            hosts:
+              - host: the-machine.{{ .Values.domain }}
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    service:
+                      identifier: trader-ingestion
+                      port: http
+            tls:
+              - secretName: the-machine-tls
+                hosts:
+                  - the-machine.{{ .Values.domain }}
+        {{- end }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{ end }}
