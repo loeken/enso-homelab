@@ -14,7 +14,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    repoURL: https://github.com/loeken/the-machine
+    repoURL: git@github.com:loeken/the-machine
     path: deploy/helm/the-machine
     targetRevision: HEAD
     helm:
