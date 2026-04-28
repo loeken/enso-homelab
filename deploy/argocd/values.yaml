@@ -211,7 +211,7 @@ clickhouseOperator:
   enabled: true
 
 theMachine:
-  enabled: false
+  enabled: true
   storageClass: rook-ceph-block
   clickhouse:
     storage:
