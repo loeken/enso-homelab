@@ -28,19 +28,19 @@ spec:
             size: {{ .Values.observability.loki.size }}
           resources:
             requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
               cpu: 200m
               memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
         resultsCache:
           enabled: true
           resources:
             requests:
-              memory: 100Mi
+              memory: 128Mi
               cpu: 10m
             limits:
-              memory: 100Mi
+              memory: 256Mi
         # Required to avoid dual-mode conflict
         backend: { replicas: 0 }
         read: { replicas: 0 }
@@ -60,10 +60,10 @@ spec:
           resources:
             requests:
               cpu: 100m
-              memory: 100Mi
+              memory: 128Mi
             limits:
               cpu: 200m
-              memory: 100Mi
+              memory: 256Mi
         loki:
           storage:
             type: filesystem
