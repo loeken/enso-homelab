@@ -156,7 +156,7 @@ spec:
                   client_secret:
                     path: /secrets/authelia/oidc.sharedsecret.grafana
                   public: false
-                  authorization_policy: two_factor
+                  authorization_policy: one_factor
                   redirect_uris:
                     - https://grafana.{{ .Values.domain }}/login/generic_oauth
                   scopes:
