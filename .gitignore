@@ -6,7 +6,4 @@ renovate.log
 k3sup
 .terraform
 data/credentials/**
-# Allow the examples sub-directory — plaintext templates, no real secrets
-!data/credentials/mysecrets_examples/
-!data/credentials/mysecrets_examples/**
 create_secrets.sh
