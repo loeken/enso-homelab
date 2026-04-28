@@ -27,6 +27,11 @@ spec:
         auth:
           tokenAuth:
             enabled: true
+        garbageCollector:
+          daemonPeriod: 21600
+          keepMaxActions: 1000
+          actions:
+            enabled: true
         gateway:
           service:
             externalPort: 80
