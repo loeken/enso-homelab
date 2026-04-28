@@ -27,6 +27,12 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+        configs:
+          files:
+            config.yaml:
+              watch:
+                namespaces:
+                  - the-machine
   syncPolicy:
     automated:
       prune: true
