@@ -208,7 +208,7 @@ uptimekuma:
   size: 5Gi
 
 clickhouseOperator:
-  enabled: false
+  enabled: true
 
 theMachine:
   enabled: false
