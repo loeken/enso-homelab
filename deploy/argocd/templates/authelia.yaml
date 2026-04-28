@@ -105,6 +105,7 @@ spec:
             cookies:
               - domain: {{ .Values.domain }}
                 name: authelia_sessions
+                authelia_url: https://auth.{{ .Values.domain }}
                 expiration: 24h
                 inactivity: 15m
           storage:
