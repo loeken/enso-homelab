@@ -29,6 +29,7 @@ spec:
               data:
                 storageClass: {{ .Values.theMachine.storageClass }}
           migrator:
+            nameOverride: migrator-{{ .Values.theMachine.images.migrate | replace "." "-" }}
             containers:
               main:
                 image:
