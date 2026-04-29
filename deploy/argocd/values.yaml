@@ -218,3 +218,11 @@ theMachine:
       size: 10Gi
   ingress:
     enabled: false
+  images:
+    migrate: v1.0.0
+    collector: v1.0.0
+    normalizer: v1.0.0
+    analyzer: v1.0.0
+    correlator: v1.0.0
+    alerter: v1.0.0
+    traderIngestion: v1.0.0

@@ -28,6 +28,71 @@ spec:
             persistence:
               data:
                 storageClass: {{ .Values.theMachine.storageClass }}
+          migrator:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.migrate }}
+          collector-forex-daily:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.collector }}
+          collector-forex-hourly:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.collector }}
+          collector-cryptocompare:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.collector }}
+          collector-twitter:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.collector }}
+          collector-reddit:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.collector }}
+          collector-binance:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.collector }}
+          normalizer:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.normalizer }}
+          analyzer-statistical:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.analyzer }}
+          analyzer-semantic:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.analyzer }}
+          correlator:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.correlator }}
+          alerter:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.alerter }}
+          trader-ingestion:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.traderIngestion }}
         {{- if .Values.theMachine.ingress.enabled }}
         ingress:
           trader-ingestion:
