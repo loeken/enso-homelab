@@ -29,11 +29,41 @@ spec:
               data:
                 storageClass: {{ .Values.theMachine.storageClass }}
           migrator:
-            nameOverride: migrator-{{ .Values.theMachine.images.migrate | replace "." "-" }}
+            enabled: false
+          migrator-{{ .Values.theMachine.images.migrate | replace "." "-" }}:
+            type: job
             containers:
               main:
                 image:
+                  repository: ghcr.io/loeken/the-machine-migrate
                   tag: {{ .Values.theMachine.images.migrate }}
+                  pullPolicy: IfNotPresent
+                args:
+                  - -addr
+                  - chi-the-machine-main-0-0:9000
+                  - -db
+                  - default
+                  - -user
+                  - $(CLICKHOUSE_USER)
+                  - -password
+                  - $(CLICKHOUSE_PASSWORD)
+                env:
+                  CLICKHOUSE_USER:
+                    valueFrom:
+                      secretKeyRef:
+                        name: the-machine
+                        key: CLICKHOUSE_USER
+                  CLICKHOUSE_PASSWORD:
+                    valueFrom:
+                      secretKeyRef:
+                        name: the-machine
+                        key: CLICKHOUSE_PASSWORD
+                resources:
+                  requests:
+                    cpu: 50m
+                    memory: 64Mi
+                  limits:
+                    memory: 128Mi
           collector-forex-daily:
             containers:
               main:
