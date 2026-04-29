@@ -220,9 +220,9 @@ theMachine:
     enabled: false
   images:
     migrate: v1.0.2
-    collector: v1.0.1
-    normalizer: v1.0.1
-    analyzer: v1.0.1
-    correlator: v1.0.1
-    alerter: v1.0.1
-    traderIngestion: v1.0.1
+    collector: v1.0.2
+    normalizer: v1.0.2
+    analyzer: v1.0.2
+    correlator: v1.0.2
+    alerter: v1.0.2
+    traderIngestion: v1.0.2
