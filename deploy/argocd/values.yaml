@@ -219,7 +219,7 @@ theMachine:
   ingress:
     enabled: false
   images:
-    migrate: v1.0.3
+    migrate: v1.0.4
     collector: v1.0.3
     normalizer: v1.0.3
     analyzer: v1.0.3
