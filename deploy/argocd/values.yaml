@@ -219,10 +219,10 @@ theMachine:
   ingress:
     enabled: false
   images:
-    migrate: v1.0.2
-    collector: v1.0.2
-    normalizer: v1.0.2
-    analyzer: v1.0.2
-    correlator: v1.0.2
-    alerter: v1.0.2
+    migrate: v1.0.3
+    collector: v1.0.3
+    normalizer: v1.0.3
+    analyzer: v1.0.3
+    correlator: v1.0.3
+    alerter: v1.0.3
     traderIngestion: v1.0.2
