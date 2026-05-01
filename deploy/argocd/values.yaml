@@ -223,8 +223,8 @@ theMachine:
   # collector, processor, api, migrate use semver tags like v1.0.3.
   # traderIngestion uses its own semver series.
   images:
-    migrate: latest         # update to e.g. v1.0.6 after first CI run
-    collector: latest       # update to e.g. v1.0.5 after first CI run
-    processor: latest       # new binary — update after first CI run
-    api: latest             # new binary — update after first CI run
-    traderIngestion: latest # update to e.g. v1.0.3 after first CI run
+    migrate: v1.0.9
+    collector: v1.0.8
+    processor: v0.0.4
+    api: v0.0.1
+    traderIngestion: v1.0.3
