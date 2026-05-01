@@ -36,7 +36,7 @@ dashy:
 externaldns:
   enabled: true
 heimdallr:
-  enabled: true
+  enabled: false
   ingress:
     enabled: true
   subnets: 192.168.1.0/24,192.168.178.0/24
@@ -74,7 +74,7 @@ k10:
   sidecar:
     enabled: false
 langgraph:
-  enabled: true
+  enabled: false
   image:
     repository: loeken/langgraph-agent
     tag: latest
@@ -88,7 +88,7 @@ litellm:
   enabled: true
 llmHostIP: "192.168.178.112"
 mcpservers:
-  enabled: true
+  enabled: false
   ingress:
     enabled: true
 nextcloud:
@@ -116,7 +116,7 @@ nextcloud:
 nginxingress:
   enabled: true
 nzbget:
-  enabled: true
+  enabled: false
   ingress:
     enabled: true
   config:
@@ -142,7 +142,7 @@ observability:
     size: 10Gi
   useAuthelia: false
 prowlarr:
-  enabled: true
+  enabled: false
   ingress:
     enabled: true
   config:
@@ -154,7 +154,7 @@ qdrant:
   storageSize: 50Gi
   storageClassName: rook-ceph-block
 radarr:
-  enabled: true
+  enabled: false
   ingress:
     enabled: true
   config:
@@ -181,7 +181,7 @@ sinusbot:
     size: 1Gi
   useAuthelia: true
 sonarr:
-  enabled: true
+  enabled: false
   ingress:
     enabled: true
   config:
@@ -198,7 +198,7 @@ vaultwarden:
     storageClassName: rook-ceph-block
     size: 1Gi
 wazuh:
-  enabled: true
+  enabled: false
   useAuthelia: true
 whoami:
   enabled: true
