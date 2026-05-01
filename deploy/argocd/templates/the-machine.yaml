@@ -24,10 +24,7 @@ spec:
             storageClass: {{ .Values.theMachine.storageClass }}
             size: {{ .Values.theMachine.clickhouse.storage.size }}
         controllers:
-          redis:
-            persistence:
-              data:
-                storageClass: {{ .Values.theMachine.storageClass }}
+          # ---- Migrator: versioned Job so k8s never tries to patch immutable spec ----
           migrator:
             enabled: false
           migrator-{{ .Values.theMachine.images.migrate | replace "." "-" }}:
@@ -39,13 +36,13 @@ spec:
                   tag: {{ .Values.theMachine.images.migrate }}
                   pullPolicy: IfNotPresent
                 args:
-                  - -addr
+                  - --addr
                   - chi-the-machine-main-0-0:9000
-                  - -db
+                  - --db
                   - default
-                  - -user
+                  - --user
                   - $(CLICKHOUSE_USER)
-                  - -password
+                  - --password
                   - $(CLICKHOUSE_PASSWORD)
                 env:
                   CLICKHOUSE_USER:
@@ -64,6 +61,7 @@ spec:
                     memory: 64Mi
                   limits:
                     memory: 128Mi
+          # ---- Collectors ----
           collector-forex-daily:
             containers:
               main:
@@ -74,51 +72,51 @@ spec:
               main:
                 image:
                   tag: {{ .Values.theMachine.images.collector }}
-          collector-cryptocompare:
+          collector-financial-binance:
+            enabled: {{ .Values.theMachine.enableBinance | default false }}
             containers:
               main:
                 image:
                   tag: {{ .Values.theMachine.images.collector }}
-          collector-twitter:
+          # ---- Spot pipeline processors ----
+          processor-spot-rates-stage-0:
             containers:
               main:
                 image:
-                  tag: {{ .Values.theMachine.images.collector }}
-          collector-reddit:
+                  tag: {{ .Values.theMachine.images.processor }}
+          processor-spot-rates-stage-1:
             containers:
               main:
                 image:
-                  tag: {{ .Values.theMachine.images.collector }}
-          collector-binance:
+                  tag: {{ .Values.theMachine.images.processor }}
+          processor-spot-signals-stage-0:
             containers:
               main:
                 image:
-                  tag: {{ .Values.theMachine.images.collector }}
-          normalizer:
+                  tag: {{ .Values.theMachine.images.processor }}
+          # ---- OHLCV pipeline processors ----
+          processor-ohlcv-prices-stage-0:
             containers:
               main:
                 image:
-                  tag: {{ .Values.theMachine.images.normalizer }}
-          analyzer-statistical:
+                  tag: {{ .Values.theMachine.images.processor }}
+          processor-ohlcv-prices-stage-1:
             containers:
               main:
                 image:
-                  tag: {{ .Values.theMachine.images.analyzer }}
-          analyzer-semantic:
+                  tag: {{ .Values.theMachine.images.processor }}
+          processor-ohlcv-signals-stage-0:
             containers:
               main:
                 image:
-                  tag: {{ .Values.theMachine.images.analyzer }}
-          correlator:
+                  tag: {{ .Values.theMachine.images.processor }}
+          # ---- API ----
+          api:
             containers:
               main:
                 image:
-                  tag: {{ .Values.theMachine.images.correlator }}
-          alerter:
-            containers:
-              main:
-                image:
-                  tag: {{ .Values.theMachine.images.alerter }}
+                  tag: {{ .Values.theMachine.images.api }}
+          # ---- Trader ingestion ----
           trader-ingestion:
             containers:
               main:
@@ -126,14 +124,32 @@ spec:
                   tag: {{ .Values.theMachine.images.traderIngestion }}
         {{- if .Values.theMachine.ingress.enabled }}
         ingress:
+          api:
+            enabled: true
+            annotations:
+              cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+              external-dns.alpha.kubernetes.io/hostname: "api.machine.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/ttl: "120"
+            hosts:
+              - host: api.machine.{{ .Values.domain }}
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    service:
+                      identifier: api
+                      port: http
+            tls:
+              - secretName: api-machine-tls
+                hosts:
+                  - api.machine.{{ .Values.domain }}
           trader-ingestion:
             enabled: true
             annotations:
               cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
-              external-dns.alpha.kubernetes.io/hostname: "the-machine.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/hostname: "ingestion.{{ .Values.domain }}."
               external-dns.alpha.kubernetes.io/ttl: "120"
             hosts:
-              - host: the-machine.{{ .Values.domain }}
+              - host: ingestion.{{ .Values.domain }}
                 paths:
                   - path: /
                     pathType: Prefix
@@ -141,9 +157,9 @@ spec:
                       identifier: trader-ingestion
                       port: http
             tls:
-              - secretName: the-machine-tls
+              - secretName: trader-ingestion-tls
                 hosts:
-                  - the-machine.{{ .Values.domain }}
+                  - ingestion.{{ .Values.domain }}
         {{- end }}
   syncPolicy:
     automated:

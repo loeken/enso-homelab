@@ -218,11 +218,13 @@ theMachine:
       size: 10Gi
   ingress:
     enabled: false
+  enableBinance: false   # set true + provide BINANCE_API_KEY/SECRET to enable
+  # Image tags — update these after each CI run.
+  # collector, processor, api, migrate use semver tags like v1.0.3.
+  # traderIngestion uses its own semver series.
   images:
-    migrate: v1.0.5
-    collector: v1.0.4
-    normalizer: v1.0.4
-    analyzer: v1.0.4
-    correlator: v1.0.4
-    alerter: v1.0.4
-    traderIngestion: v1.0.2
+    migrate: latest         # update to e.g. v1.0.6 after first CI run
+    collector: latest       # update to e.g. v1.0.5 after first CI run
+    processor: latest       # new binary — update after first CI run
+    api: latest             # new binary — update after first CI run
+    traderIngestion: latest # update to e.g. v1.0.3 after first CI run
