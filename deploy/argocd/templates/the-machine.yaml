@@ -116,6 +116,12 @@ spec:
               main:
                 image:
                   tag: {{ .Values.theMachine.images.api }}
+          # ---- Frontend ----
+          frontend:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.frontend }}
           # ---- Trader ingestion ----
           trader-ingestion:
             containers:
@@ -142,6 +148,24 @@ spec:
               - secretName: api-machine-tls
                 hosts:
                   - api.machine.{{ .Values.domain }}
+          frontend:
+            enabled: true
+            annotations:
+              cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+              external-dns.alpha.kubernetes.io/hostname: "the-machine.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/ttl: "120"
+            hosts:
+              - host: the-machine.{{ .Values.domain }}
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    service:
+                      identifier: frontend
+                      port: http
+            tls:
+              - secretName: frontend-machine-tls
+                hosts:
+                  - the-machine.{{ .Values.domain }}
           trader-ingestion:
             enabled: true
             annotations:

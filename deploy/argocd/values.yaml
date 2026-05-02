@@ -223,8 +223,9 @@ theMachine:
   # collector, processor, api, migrate use semver tags like v1.0.3.
   # traderIngestion uses its own semver series.
   images:
-    migrate: v1.0.9
-    collector: v1.0.8
-    processor: v0.0.4
-    api: v0.0.1
+    migrate: v1.0.15
+    collector: v1.0.12
+    processor: v0.0.8
+    api: v0.0.8
     traderIngestion: v1.0.3
+    frontend: v0.0.1
