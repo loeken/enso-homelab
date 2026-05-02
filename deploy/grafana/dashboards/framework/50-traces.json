@@ -26,7 +26,7 @@
         "allValue": ".*",
         "multi": false,
         "name": "service",
-        "label": "Pipeline Stage",
+        "label": "Collector",
         "datasource": { "type": "tempo", "uid": "tempo" },
         "definition": "resource.service.name",
         "query": { "label": "resource.service.name", "type": "labels", "stream": "" },
@@ -35,15 +35,6 @@
         "refresh": 1,
         "sort": 1,
         "type": "query"
-      },
-      {
-        "hide": 0,
-        "name": "span_name",
-        "label": "Span Name",
-        "query": ".*",
-        "current": { "text": ".*", "value": ".*" },
-        "options": [],
-        "type": "textbox"
       },
       {
         "hide": 0,
@@ -70,7 +61,7 @@
   "panels": [
     {
       "datasource": { "type": "tempo", "uid": "tempo" },
-      "description": "Each row is a root trace from the selected service. Collectors emit source.publish spans; processors emit processor.message spans as independent root traces linked back to their upstream stage. Click a Trace ID to follow the full chain.",
+      "description": "Each row is a root trace started by a collector. Processor stages appear as child spans within the same trace — click a Trace ID to see the full collector → normalizer → sink journey.",
       "fieldConfig": {
         "defaults": {},
         "overrides": [
@@ -97,12 +88,12 @@
         {
           "datasource": { "type": "tempo", "uid": "tempo" },
           "queryType": "traceql",
-          "query": "{resource.service.name=~\"${service}\" && name=~\"${span_name}\" && duration > ${min_duration}}",
+          "query": "{ rootService.name =~ \"${service}\" && duration > ${min_duration} }",
           "limit": 100,
           "refId": "A"
         }
       ],
-      "title": "Traces from: ${service}",
+      "title": "Traces — root collector: ${service}",
       "type": "table"
     }
   ],
@@ -113,5 +104,5 @@
   "timezone": "browser",
   "title": "Framework: Traces",
   "uid": "fw-traces",
-  "version": 2
+  "version": 3
 }
