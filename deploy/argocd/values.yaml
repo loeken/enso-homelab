@@ -218,7 +218,7 @@ theMachine:
       size: 10Gi
   ingress:
     enabled: false
-  enableBinance: false   # set true + provide BINANCE_API_KEY/SECRET to enable
+  enableBinance: true   # pod enabled; idles until BINANCE_API_KEY/SECRET are set
   # Image tags — update these after each CI run.
   # collector, processor, api, migrate use semver tags like v1.0.3.
   # traderIngestion uses its own semver series.
