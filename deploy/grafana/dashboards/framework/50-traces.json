@@ -27,12 +27,14 @@
         "multi": false,
         "name": "service",
         "label": "Pipeline Stage",
-        "query": "collector/forex/frankfurter,collector/forex/exchangerateapi,collector/financial/binance,processor/spot-rates/normalizer-spot,processor/spot-rates/clickhouse-sink-spot,processor/spot-signals/statistical-analyzer,processor/ohlcv-prices/normalizer-ohlcv,processor/ohlcv-prices/clickhouse-sink-ohlcv,processor/ohlcv-signals/statistical-analyzer",
+        "datasource": { "type": "tempo", "uid": "tempo" },
+        "definition": "label_values(resource.service.name)",
+        "query": "label_values(resource.service.name)",
         "options": [],
         "current": {},
-        "refresh": 0,
+        "refresh": 1,
         "sort": 1,
-        "type": "custom"
+        "type": "query"
       },
       {
         "hide": 0,

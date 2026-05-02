@@ -26,12 +26,14 @@
         "multi": true,
         "name": "source",
         "label": "Source",
-        "query": "financial/binance,forex/exchangerateapi,forex/frankfurter",
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+        "definition": "SELECT DISTINCT source FROM machine.source_cursors ORDER BY source",
+        "query": "SELECT DISTINCT source FROM machine.source_cursors ORDER BY source",
         "options": [],
         "current": {},
-        "refresh": 0,
+        "refresh": 2,
         "sort": 1,
-        "type": "custom"
+        "type": "query"
       }
     ]
   },
@@ -292,7 +294,7 @@
           "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
           "editorType": "sql",
           "format": 0,
-          "rawSql": "SELECT\n  known.src AS source,\n  multiIf(\n    sc.has_cursor = 0 OR sc.cadence_s = 0,             'IDLING',\n    sc.age_s > sc.cadence_s * 4,                       'STALE',\n    sc.age_s > sc.cadence_s * 2 OR q24.cnt > 0,       'DEGRADED',\n                                                        'HEALTHY'\n  ) AS health,\n  sc.last_fetch,\n  sc.age_s,\n  sc.cadence_s,\n  q24.cnt AS quarantine_24h,\n  ql.last_reason,\n  if(sc.has_cursor = 0 OR sc.cadence_s = 0, idle.idle_reason, left(ql.last_error, 200)) AS last_error\nFROM (\n  SELECT arrayJoin(['financial/binance','forex/exchangerateapi','forex/frankfurter']) AS src\n) known\nLEFT JOIN (\n  SELECT\n    source AS src,\n    toInt8(1) AS has_cursor,\n    formatDateTime(max(updated_at), '%Y-%m-%d %H:%i:%S') AS last_fetch,\n    toInt64(dateDiff('second', max(updated_at), now()))   AS age_s,\n    toInt64(argMax(cadence_seconds, updated_at))          AS cadence_s\n  FROM machine.source_cursors\n  GROUP BY src\n) sc ON known.src = sc.src\nLEFT JOIN (\n  SELECT source AS src, argMax(value, updated_at) AS idle_reason\n  FROM machine.source_cursors\n  WHERE key = '_idle'\n  GROUP BY src\n) idle ON known.src = idle.src\nLEFT JOIN (\n  SELECT component AS src, count() AS cnt\n  FROM machine.quarantine\n  WHERE quarantined_at >= now() - INTERVAL 24 HOUR\n    AND status = 'pending'\n  GROUP BY src\n) q24 ON known.src = q24.src\nLEFT JOIN (\n  SELECT component AS src,\n    argMax(reason, quarantined_at)        AS last_reason,\n    argMax(error_message, quarantined_at) AS last_error\n  FROM machine.quarantine\n  GROUP BY src\n) ql ON known.src = ql.src\nORDER BY multiIf(health = 'STALE', 0, health = 'DEGRADED', 1, health = 'IDLING', 2, 3) ASC, source ASC",
+          "rawSql": "SELECT\n  known.src AS source,\n  multiIf(\n    sc.has_cursor = 0 OR sc.cadence_s = 0,             'IDLING',\n    sc.age_s > sc.cadence_s * 4,                       'STALE',\n    sc.age_s > sc.cadence_s * 2 OR q24.cnt > 0,       'DEGRADED',\n                                                        'HEALTHY'\n  ) AS health,\n  sc.last_fetch,\n  sc.age_s,\n  sc.cadence_s,\n  q24.cnt AS quarantine_24h,\n  ql.last_reason,\n  if(sc.has_cursor = 0 OR sc.cadence_s = 0, idle.idle_reason, left(ql.last_error, 200)) AS last_error\nFROM (\n  SELECT DISTINCT source AS src FROM machine.source_cursors\n) known\nLEFT JOIN (\n  SELECT\n    source AS src,\n    toInt8(1) AS has_cursor,\n    formatDateTime(max(updated_at), '%Y-%m-%d %H:%i:%S') AS last_fetch,\n    toInt64(dateDiff('second', max(updated_at), now()))   AS age_s,\n    toInt64(argMax(cadence_seconds, updated_at))          AS cadence_s\n  FROM machine.source_cursors\n  GROUP BY src\n) sc ON known.src = sc.src\nLEFT JOIN (\n  SELECT source AS src, argMax(value, updated_at) AS idle_reason\n  FROM machine.source_cursors\n  WHERE key = '_idle'\n  GROUP BY src\n) idle ON known.src = idle.src\nLEFT JOIN (\n  SELECT component AS src, count() AS cnt\n  FROM machine.quarantine\n  WHERE quarantined_at >= now() - INTERVAL 24 HOUR\n    AND status = 'pending'\n  GROUP BY src\n) q24 ON known.src = q24.src\nLEFT JOIN (\n  SELECT component AS src,\n    argMax(reason, quarantined_at)        AS last_reason,\n    argMax(error_message, quarantined_at) AS last_error\n  FROM machine.quarantine\n  GROUP BY src\n) ql ON known.src = ql.src\nORDER BY multiIf(health = 'STALE', 0, health = 'DEGRADED', 1, health = 'IDLING', 2, 3) ASC, source ASC",
           "refId": "A"
         }
       ],

@@ -22,3 +22,11 @@ configMapGenerator:
       - dashboards/framework/70-forex.json
       - dashboards/framework/71-crypto.json
       - dashboards/framework/80-topology.json
+
+  - name: the-machine-grafana-tempo-datasource
+    options:
+      disableNameSuffixHash: true
+      labels:
+        grafana_datasource: "1"
+    files:
+      - datasources/tempo-datasource.yaml
