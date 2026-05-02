@@ -33,6 +33,8 @@ spec:
           server:
             root_url: https://grafana.{{ .Values.domain }}
             domain: {{ .Values.domain }}
+          database:
+            wal: true
           users:
             auto_assign_org_role: Editor
         envFromSecret: grafana-oauth-config
