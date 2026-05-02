@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -16,93 +19,151 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": null,
   "links": [],
-  "templating": {
-    "list": [
-      {
-        "hide": 0,
-        "includeAll": true,
-        "allValue": ".*",
-        "multi": false,
-        "name": "service",
-        "label": "Collector",
-        "datasource": { "type": "tempo", "uid": "tempo" },
-        "definition": "resource.service.name",
-        "query": { "label": "resource.service.name", "type": "labels", "stream": "" },
-        "options": [],
-        "current": {},
-        "refresh": 1,
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "hide": 0,
-        "name": "min_duration",
-        "label": "Min Duration",
-        "type": "custom",
-        "query": "Any : 0ms, > 10ms : 10ms, > 50ms : 50ms, > 100ms : 100ms, > 200ms : 200ms, > 500ms : 500ms",
-        "options": [
-          { "selected": true,  "text": "Any",    "value": "0ms"   },
-          { "selected": false, "text": "> 10ms",  "value": "10ms"  },
-          { "selected": false, "text": "> 50ms",  "value": "50ms"  },
-          { "selected": false, "text": "> 100ms", "value": "100ms" },
-          { "selected": false, "text": "> 200ms", "value": "200ms" },
-          { "selected": false, "text": "> 500ms", "value": "500ms" }
-        ],
-        "current": { "selected": true, "text": "Any", "value": "0ms" },
-        "multi": false,
-        "includeAll": false,
-        "refresh": 0,
-        "sort": 0
-      }
-    ]
-  },
   "panels": [
     {
-      "datasource": { "type": "tempo", "uid": "tempo" },
-      "description": "Each row is a root trace started by a collector. Processor stages appear as child spans within the same trace — click a Trace ID to see the full collector → normalizer → sink journey.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "description": "Root traces with linked spans. Collectors emit source.publish spans; processors emit processor.message spans as independent root traces linked back to upstream stages. Click Trace ID to view the full linked chain.",
       "fieldConfig": {
         "defaults": {},
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "duration" },
+            "matcher": {
+              "id": "byName",
+              "options": "duration"
+            },
             "properties": [
-              { "id": "unit", "value": "ms" },
-              { "id": "decimals", "value": 2 }
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
             ]
           }
         ]
       },
-      "gridPos": { "h": 20, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 20,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "id": 1,
       "options": {
         "footer": {
-          "enablePagination": true,
           "countRows": false,
-          "reducer": ["sum"],
+          "enablePagination": true,
+          "reducer": [
+            "sum"
+          ],
           "show": false
         }
       },
       "targets": [
         {
-          "datasource": { "type": "tempo", "uid": "tempo" },
-          "queryType": "traceql",
-          "query": "{ rootService.name =~ \"${service}\" && duration > ${min_duration} }",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
           "limit": 100,
+          "query": "{ (name=\"source.publish\" || name=\"processor.message\") && resource.service.name =~ \"${service}\" && duration > ${min_duration} }",
+          "queryType": "traceql",
           "refId": "A"
         }
       ],
-      "title": "Traces — root collector: ${service}",
+      "title": "Root Spans (Collectors & Processors): ${service}",
       "type": "table"
     }
   ],
-  "schemaVersion": 40,
-  "tags": ["framework"],
-  "time": { "from": "now-1h", "to": "now" },
+  "preload": false,
+  "schemaVersion": 42,
+  "tags": [
+    "framework"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {},
+        "datasource": {
+          "type": "tempo",
+          "uid": "tempo"
+        },
+        "definition": "",
+        "includeAll": true,
+        "label": "Collector",
+        "name": "service",
+        "options": [],
+        "query": {
+          "label": "rootServiceName",
+          "refId": "TempoDatasourceVariableQueryEditor-VariableQuery",
+          "type": 1
+        },
+        "refresh": 1,
+        "regexApplyTo": "value",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "Any",
+          "value": "0ms"
+        },
+        "includeAll": false,
+        "label": "Min Duration",
+        "name": "min_duration",
+        "options": [
+          {
+            "selected": true,
+            "text": "Any",
+            "value": "0ms"
+          },
+          {
+            "selected": false,
+            "text": "> 10ms",
+            "value": "10ms"
+          },
+          {
+            "selected": false,
+            "text": "> 50ms",
+            "value": "50ms"
+          },
+          {
+            "selected": false,
+            "text": "> 100ms",
+            "value": "100ms"
+          },
+          {
+            "selected": false,
+            "text": "> 200ms",
+            "value": "200ms"
+          },
+          {
+            "selected": false,
+            "text": "> 500ms",
+            "value": "500ms"
+          }
+        ],
+        "query": "Any : 0ms, > 10ms : 10ms, > 50ms : 50ms, > 100ms : 100ms, > 200ms : 200ms, > 500ms : 500ms",
+        "type": "custom",
+        "valuesFormat": "csv"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "timepicker": {},
   "timezone": "browser",
   "title": "Framework: Traces",
   "uid": "fw-traces",
-  "version": 3
+  "version": 9,
+  "weekStart": ""
 }
