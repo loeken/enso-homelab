@@ -44,6 +44,26 @@
         "current": { "text": ".*", "value": ".*" },
         "options": [],
         "type": "textbox"
+      },
+      {
+        "hide": 0,
+        "name": "min_duration",
+        "label": "Min Duration",
+        "type": "custom",
+        "query": "Any : 0ms, > 10ms : 10ms, > 50ms : 50ms, > 100ms : 100ms, > 200ms : 200ms, > 500ms : 500ms",
+        "options": [
+          { "selected": true,  "text": "Any",    "value": "0ms"   },
+          { "selected": false, "text": "> 10ms",  "value": "10ms"  },
+          { "selected": false, "text": "> 50ms",  "value": "50ms"  },
+          { "selected": false, "text": "> 100ms", "value": "100ms" },
+          { "selected": false, "text": "> 200ms", "value": "200ms" },
+          { "selected": false, "text": "> 500ms", "value": "500ms" }
+        ],
+        "current": { "selected": true, "text": "Any", "value": "0ms" },
+        "multi": false,
+        "includeAll": false,
+        "refresh": 0,
+        "sort": 0
       }
     ]
   },
@@ -51,16 +71,34 @@
     {
       "datasource": { "type": "tempo", "uid": "tempo" },
       "description": "Each row is a root trace from the selected service. Collectors emit source.publish spans; processors emit processor.message spans as independent root traces linked back to their upstream stage. Click a Trace ID to follow the full chain.",
-      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "duration" },
+            "properties": [
+              { "id": "unit", "value": "ms" },
+              { "id": "decimals", "value": 2 }
+            ]
+          }
+        ]
+      },
       "gridPos": { "h": 20, "w": 24, "x": 0, "y": 0 },
       "id": 1,
-      "options": {},
+      "options": {
+        "footer": {
+          "enablePagination": true,
+          "countRows": false,
+          "reducer": ["sum"],
+          "show": false
+        }
+      },
       "targets": [
         {
           "datasource": { "type": "tempo", "uid": "tempo" },
           "queryType": "traceql",
-          "query": "{resource.service.name=~\"${service}\" && name=~\"${span_name}\"}",
-          "limit": 50,
+          "query": "{resource.service.name=~\"${service}\" && name=~\"${span_name}\" && duration > ${min_duration}}",
+          "limit": 100,
           "refId": "A"
         }
       ],
@@ -75,5 +113,5 @@
   "timezone": "browser",
   "title": "Framework: Traces",
   "uid": "fw-traces",
-  "version": 1
+  "version": 2
 }
