@@ -1,0 +1,205 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Long-range throughput trends and ClickHouse storage growth",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT (SELECT count() FROM machine.events_spot) + (SELECT count() FROM machine.events_ohlcv) AS total_events",
+          "refId": "A"
+        }
+      ],
+      "title": "All-Time Total Events",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT count() AS spot_events FROM machine.events_spot",
+          "refId": "A"
+        }
+      ],
+      "title": "All-Time Spot Events",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT count() AS ohlcv_events FROM machine.events_ohlcv",
+          "refId": "A"
+        }
+      ],
+      "title": "All-Time OHLCV Events",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 4 },
+      "id": 4,
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n  $__timeInterval(measured_at) AS time,\n  count() AS events\nFROM (\n  SELECT measured_at FROM machine.events_spot\n  WHERE $__timeFilter(measured_at)\n  UNION ALL\n  SELECT measured_at FROM machine.events_ohlcv\n  WHERE $__timeFilter(measured_at)\n)\nGROUP BY time\nORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "Events Ingested per Hour",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
+      "id": 5,
+      "options": {
+        "barRadius": 0.0,
+        "barWidth": 0.97,
+        "groupWidth": 0.7,
+        "orientation": "auto",
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 150,
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n  toStartOfDay(measured_at) AS day,\n  source,\n  count() AS events\nFROM (\n  SELECT measured_at, source FROM machine.events_spot\n  WHERE $__timeFilter(measured_at)\n  UNION ALL\n  SELECT measured_at, source FROM machine.events_ohlcv\n  WHERE $__timeFilter(measured_at)\n)\nGROUP BY day, source\nORDER BY day, source",
+          "refId": "A"
+        }
+      ],
+      "title": "Events per Source per Day",
+      "type": "barchart"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 20 },
+      "id": 6,
+      "options": { "sortBy": [{ "displayName": "total_bytes", "desc": true }] },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n  name,\n  formatReadableQuantity(total_rows) AS rows,\n  formatReadableSize(total_bytes) AS size,\n  total_rows,\n  total_bytes\nFROM system.tables\nWHERE database = 'machine'\n  AND total_rows > 0\nORDER BY total_bytes DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "ClickHouse Table Sizes",
+      "type": "table"
+    }
+  ],
+  "schemaVersion": 40,
+  "tags": ["framework"],
+  "time": { "from": "now-7d", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Framework: Resource",
+  "uid": "fw-resource",
+  "version": 1
+}

@@ -1,0 +1,26 @@
+{{ if and .Values.observability.enabled .Values.theMachine.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "16"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  name: observability-grafana-the-machine-dashboards
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:{{ .Values.githubUser }}/{{ .Values.githubRepo }}
+    targetRevision: HEAD
+    path: deploy/grafana
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{ end }}

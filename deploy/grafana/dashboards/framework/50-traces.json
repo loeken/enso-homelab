@@ -1,0 +1,77 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Distributed trace search and service map powered by Tempo",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "templating": {
+    "list": [
+      {
+        "hide": 0,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "name": "service",
+        "label": "Pipeline Stage",
+        "query": "collector/forex/frankfurter,collector/forex/exchangerateapi,collector/financial/binance,processor/spot-rates/normalizer-spot,processor/spot-rates/clickhouse-sink-spot,processor/spot-signals/statistical-analyzer,processor/ohlcv-prices/normalizer-ohlcv,processor/ohlcv-prices/clickhouse-sink-ohlcv,processor/ohlcv-signals/statistical-analyzer",
+        "options": [],
+        "current": {},
+        "refresh": 0,
+        "sort": 1,
+        "type": "custom"
+      },
+      {
+        "hide": 0,
+        "name": "span_name",
+        "label": "Span Name",
+        "query": ".*",
+        "current": { "text": ".*", "value": ".*" },
+        "options": [],
+        "type": "textbox"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "datasource": { "type": "tempo", "uid": "tempo" },
+      "description": "Each row is a root trace from the selected service. Collectors emit source.publish spans; processors emit processor.message spans as independent root traces linked back to their upstream stage. Click a Trace ID to follow the full chain.",
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 20, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {},
+      "targets": [
+        {
+          "datasource": { "type": "tempo", "uid": "tempo" },
+          "queryType": "traceql",
+          "query": "{resource.service.name=~\"${service}\" && name=~\"${span_name}\"}",
+          "limit": 50,
+          "refId": "A"
+        }
+      ],
+      "title": "Traces from: ${service}",
+      "type": "table"
+    }
+  ],
+  "schemaVersion": 40,
+  "tags": ["framework"],
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Framework: Traces",
+  "uid": "fw-traces",
+  "version": 1
+}

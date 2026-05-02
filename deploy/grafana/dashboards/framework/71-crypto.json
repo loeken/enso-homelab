@@ -1,0 +1,241 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Crypto OHLCV from Binance — candlestick chart with embedded volume, and latest snapshot table",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed" },
+          "custom": {
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "open" },
+            "properties": [{ "id": "displayName", "value": "Open" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "high" },
+            "properties": [{ "id": "displayName", "value": "High" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "low" },
+            "properties": [{ "id": "displayName", "value": "Low" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "close" },
+            "properties": [{ "id": "displayName", "value": "Close" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "volume" },
+            "properties": [
+              { "id": "displayName", "value": "Volume" },
+              { "id": "custom.hidden", "value": false }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 18, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "candleStyle": "candles",
+        "colorStrategy": "open-close",
+        "colors": {
+          "down": "semi-dark-red",
+          "up": "dark-green"
+        },
+        "fields": {
+          "close": "close",
+          "high": "high",
+          "low": "low",
+          "open": "open",
+          "volume": "volume"
+        },
+        "includeAllFields": false,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mode": "candles+volume",
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "title": "OHLCV — $symbol/USDT",
+      "type": "candlestick",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n    $__timeInterval(measured_at) AS time,\n    argMin(open,  measured_at)   AS open,\n    max(high)                    AS high,\n    min(low)                     AS low,\n    argMax(price, measured_at)   AS close,\n    sum(volume)                  AS volume\nFROM machine.events_ohlcv\nWHERE $__timeFilter(measured_at)\n  AND symbol IN ($symbol)\nGROUP BY time\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": {
+            "align": "left",
+            "cellOptions": { "type": "auto" },
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "symbol" },
+            "properties": [
+              { "id": "displayName", "value": "Symbol" },
+              { "id": "custom.width", "value": 80 },
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } },
+              { "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "quote" },
+            "properties": [
+              { "id": "displayName", "value": "Quote" },
+              { "id": "custom.width", "value": 65 },
+              { "id": "custom.align", "value": "center" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "open" },
+            "properties": [
+              { "id": "displayName", "value": "Open" },
+              { "id": "custom.width", "value": 110 },
+              { "id": "custom.align", "value": "right" },
+              { "id": "decimals", "value": 2 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "high" },
+            "properties": [
+              { "id": "displayName", "value": "High" },
+              { "id": "custom.width", "value": 110 },
+              { "id": "custom.align", "value": "right" },
+              { "id": "decimals", "value": 2 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "low" },
+            "properties": [
+              { "id": "displayName", "value": "Low" },
+              { "id": "custom.width", "value": 110 },
+              { "id": "custom.align", "value": "right" },
+              { "id": "decimals", "value": 2 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "close" },
+            "properties": [
+              { "id": "displayName", "value": "Close" },
+              { "id": "custom.width", "value": 110 },
+              { "id": "custom.align", "value": "right" },
+              { "id": "decimals", "value": 2 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "volume" },
+            "properties": [
+              { "id": "displayName", "value": "Volume" },
+              { "id": "custom.width", "value": 120 },
+              { "id": "custom.align", "value": "right" },
+              { "id": "decimals", "value": 4 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "last_candle" },
+            "properties": [
+              { "id": "displayName", "value": "Last Candle (UTC)" },
+              { "id": "custom.width", "value": 180 }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 18 },
+      "id": 2,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+        "showHeader": true
+      },
+      "pluginVersion": "11.4.0",
+      "title": "Latest OHLCV Snapshot — all symbols",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n    symbol,\n    quote,\n    argMax(open,   measured_at) AS open,\n    argMax(high,   measured_at) AS high,\n    argMax(low,    measured_at) AS low,\n    argMax(price,  measured_at) AS close,\n    argMax(volume, measured_at) AS volume,\n    formatDateTime(max(measured_at), '%Y-%m-%d %H:%i:%S UTC') AS last_candle\nFROM machine.events_ohlcv\nGROUP BY symbol, quote\nORDER BY symbol",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 39,
+  "tags": ["data", "crypto"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": true, "text": "BTC", "value": "BTC" },
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+        "definition": "SELECT DISTINCT symbol FROM machine.events_ohlcv ORDER BY symbol",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Symbol",
+        "multi": true,
+        "name": "symbol",
+        "options": [],
+        "query": "SELECT DISTINCT symbol FROM machine.events_ohlcv ORDER BY symbol",
+        "refresh": 2,
+        "regex": "",
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Crypto OHLCV",
+  "uid": "crypto-ohlcv",
+  "version": 1
+}

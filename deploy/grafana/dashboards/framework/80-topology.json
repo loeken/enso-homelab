@@ -1,0 +1,495 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Holistic pipeline topology \u2014 sources, raw streams, pipeline-scoped processors, terminal sinks/analyzers and signals. Node mainStat / secondaryStat carry throughput and staleness; edges carry events-per-min and lag. Anomalies (stale sources, growing quarantine, signal spikes) surface visually.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse-main"
+      },
+      "description": "Nodes: sources (secondaryStat=age), streams (grey=passive), processors (secondaryStat=quarantine pending), signals terminals (mainStat=signals/h). Ring colour: green=HEALTHY, yellow=STALE/signal, grey=stream. Edges: lag messages (mainStat) and lag seconds (secondaryStat).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "mainStat"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "rate / signals"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "secondaryStat"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "age / lag / pending"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "arc__green"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Healthy"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "arc__yellow"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Warning"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "arc__red"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Error"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 20,
+      "options": {
+        "nodes": {
+          "mainStatUnit": "short",
+          "secondaryStatUnit": "short",
+          "arcs": [
+            {
+              "field": "arc__green",
+              "color": "green"
+            },
+            {
+              "field": "arc__yellow",
+              "color": "yellow"
+            },
+            {
+              "field": "arc__red",
+              "color": "red"
+            }
+          ]
+        },
+        "edges": {
+          "mainStatUnit": "short",
+          "secondaryStatUnit": "short"
+        }
+      },
+      "repeat": "active_family",
+      "repeatDirection": "v",
+      "maxPerRow": 1,
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse-main"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "rawSql": "WITH fam_count AS (   SELECT count() AS c FROM machine.events_spot   WHERE '$active_family' = 'spot' AND ingested_at BETWEEN $__fromTime AND $__toTime   UNION ALL   SELECT count() AS c FROM machine.events_ohlcv   WHERE '$active_family' = 'ohlcv' AND ingested_at BETWEEN $__fromTime AND $__toTime ), src_count AS (   SELECT source AS id, count() AS c FROM machine.events_spot   WHERE '$active_family' = 'spot' AND ingested_at BETWEEN $__fromTime AND $__toTime GROUP BY source   UNION ALL   SELECT source AS id, count() AS c FROM machine.events_ohlcv   WHERE '$active_family' = 'ohlcv' AND ingested_at BETWEEN $__fromTime AND $__toTime GROUP BY source ), sig_count AS (   SELECT concat('signals/', source_type) AS id, count() AS c   FROM machine.signals   WHERE measured_at BETWEEN $__fromTime AND $__toTime GROUP BY source_type ), fam_age AS (   SELECT dateDiff('second', max(ingested_at), now()) AS age FROM machine.events_spot   WHERE '$active_family' = 'spot'   HAVING count() > 0   UNION ALL   SELECT dateDiff('second', max(ingested_at), now()) AS age FROM machine.events_ohlcv   WHERE '$active_family' = 'ohlcv'   HAVING count() > 0 ) SELECT n.id AS id, n.title AS title, multiIf(n.subTitle = 'stream', '', n.subTitle) AS subTitle, multiIf(   n.interval_seconds > 0 AND '$display' = 'staleness',     concat(toString(toInt64(round(n.secondaryStat, 0))), '/', toString(n.interval_seconds), 's'),   n.interval_seconds > 0,     multiIf(n.interval_seconds >= 86400, concat(toString(intDiv(n.interval_seconds, 86400)), 'd'),             n.interval_seconds >= 3600,  concat(toString(intDiv(n.interval_seconds, 3600)), 'h'),             n.interval_seconds >= 60,    concat(toString(intDiv(n.interval_seconds, 60)), 'm'),                                           concat(toString(n.interval_seconds), 's')),   '$display' = 'staleness', concat(toString(coalesce((SELECT max(age) FROM fam_age), 0)), 's'),   n.id LIKE 'signals/%', toString(coalesce(sig.c, 0)),   '$display' = 'throughput' OR '$display' = 'all',     concat(toString(coalesce((SELECT sum(c) FROM fam_count), 0)), ' events'),   '' ) AS mainStat, multiIf(   n.interval_seconds > 0 AND ('$display' = 'throughput' OR '$display' = 'all'),     concat(toString(coalesce(src.c, 0)), ' events'),   n.interval_seconds > 0, '',   n.id LIKE 'raw.%' OR n.id LIKE '%.out', '',   n.subTitle = 'pending', 'pending',   n.id LIKE 'signals/%', n.subTitle,   '' ) AS secondaryStat, n.arc__green AS arc__green, n.arc__yellow AS arc__yellow, n.arc__red AS arc__red, multiIf(   n.interval_seconds > 0, toFloat64(0),   n.id LIKE 'raw.%', toFloat64(200),   n.id LIKE '%/normalizer', toFloat64(400),   n.id LIKE '%.out', toFloat64(560),   n.id LIKE '%/clickhouse-sink', toFloat64(700),   n.id LIKE '%/statistical-analyzer', toFloat64(780),   n.id LIKE 'signals/%', toFloat64(1000),   n.id = 'quarantine', toFloat64(1000),   toFloat64(700) ) AS x, multiIf(   n.interval_seconds > 0, toFloat64(toInt64(cityHash64(n.id) % 200)),   toFloat64(100) ) AS y FROM machine.v_topology_nodes n LEFT JOIN src_count src ON src.id = n.id LEFT JOIN sig_count sig ON sig.id = n.id WHERE n.family = '$active_family' AND (   '$source' = 'All'   OR n.id IN (SELECT '$source' AS id UNION ALL SELECT target FROM machine.v_topology_edges WHERE source = '$source' UNION ALL SELECT target FROM machine.v_topology_edges WHERE source IN (   SELECT target FROM machine.v_topology_edges WHERE source = '$source') UNION ALL SELECT target FROM machine.v_topology_edges WHERE source IN (   SELECT target FROM machine.v_topology_edges WHERE source IN (     SELECT target FROM machine.v_topology_edges WHERE source = '$source')) UNION ALL SELECT target FROM machine.v_topology_edges WHERE source IN (   SELECT target FROM machine.v_topology_edges WHERE source IN (     SELECT target FROM machine.v_topology_edges WHERE source IN (       SELECT target FROM machine.v_topology_edges WHERE source = '$source'))) UNION ALL SELECT target FROM machine.v_topology_edges WHERE source IN (   SELECT target FROM machine.v_topology_edges WHERE source IN (     SELECT target FROM machine.v_topology_edges WHERE source IN (       SELECT target FROM machine.v_topology_edges WHERE source IN (         SELECT target FROM machine.v_topology_edges WHERE source = '$source'))))) ) ORDER BY n.id",
+          "refId": "nodes"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse-main"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "rawSql": "SELECT e.id AS id, e.source AS source, e.target AS target, concat(toString(toInt64(round(e.secondaryStat * 1000, 0))), 'ms') AS mainStat, concat(toString(toInt64(round(e.mainStat, 0))), ' msg') AS secondaryStat FROM machine.v_topology_edges e WHERE e.source IN (SELECT id FROM machine.v_topology_nodes WHERE family = '$active_family') AND (   '$source' = 'All'   OR e.source IN (SELECT '$source' AS id UNION ALL SELECT target FROM machine.v_topology_edges WHERE source = '$source' UNION ALL SELECT target FROM machine.v_topology_edges WHERE source IN (   SELECT target FROM machine.v_topology_edges WHERE source = '$source') UNION ALL SELECT target FROM machine.v_topology_edges WHERE source IN (   SELECT target FROM machine.v_topology_edges WHERE source IN (     SELECT target FROM machine.v_topology_edges WHERE source = '$source')) UNION ALL SELECT target FROM machine.v_topology_edges WHERE source IN (   SELECT target FROM machine.v_topology_edges WHERE source IN (     SELECT target FROM machine.v_topology_edges WHERE source IN (       SELECT target FROM machine.v_topology_edges WHERE source = '$source'))) UNION ALL SELECT target FROM machine.v_topology_edges WHERE source IN (   SELECT target FROM machine.v_topology_edges WHERE source IN (     SELECT target FROM machine.v_topology_edges WHERE source IN (       SELECT target FROM machine.v_topology_edges WHERE source IN (         SELECT target FROM machine.v_topology_edges WHERE source = '$source'))))) )",
+          "refId": "edges"
+        }
+      ],
+      "title": "${active_family} Pipeline",
+      "type": "nodeGraph"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse-main"
+      },
+      "description": "Nodes whose subTitle is not HEALTHY/healthy/stream/active \u2014 i.e. stale sources, processors with errors, or pending quarantine.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "align": "left"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Status"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "STALE": {
+                        "color": "red",
+                        "index": 0,
+                        "text": "STALE"
+                      }
+                    }
+                  },
+                  {
+                    "type": "value",
+                    "options": {
+                      "ERRORS": {
+                        "color": "red",
+                        "index": 1,
+                        "text": "ERRORS"
+                      }
+                    }
+                  },
+                  {
+                    "type": "value",
+                    "options": {
+                      "LAGGING": {
+                        "color": "yellow",
+                        "index": 2,
+                        "text": "LAGGING"
+                      }
+                    }
+                  },
+                  {
+                    "type": "value",
+                    "options": {
+                      "pending": {
+                        "color": "yellow",
+                        "index": 3,
+                        "text": "pending"
+                      }
+                    }
+                  },
+                  {
+                    "type": "value",
+                    "options": {
+                      "IDLE": {
+                        "color": "yellow",
+                        "index": 4,
+                        "text": "IDLE"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 100
+      },
+      "id": 2,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Value"
+          }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse-main"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "rawSql": "SELECT id AS Component, subTitle AS Status, round(mainStat, 2) AS Value, round(secondaryStat, 0) AS \"Age/Pending\" FROM machine.v_topology_nodes WHERE subTitle NOT IN ('HEALTHY', 'healthy', 'stream', 'active') ORDER BY subTitle, mainStat DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Anomalies \u2014 non-healthy components",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse-main"
+      },
+      "description": "Per-detector signal volume in the last hour, grouped by source family. High counts under staleness usually indicate an upstream source has stopped feeding.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 100
+      },
+      "id": 3,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Count (1h)"
+          }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse-main"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "rawSql": "SELECT source_type AS Family, detector AS Detector, count() AS \"Count (1h)\", max(measured_at) AS \"Last\" FROM machine.signals WHERE measured_at > now() - INTERVAL 1 HOUR GROUP BY source_type, detector ORDER BY \"Count (1h)\" DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Signals \u2014 last hour by detector",
+      "type": "table"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": [
+    "framework",
+    "topology"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "display",
+        "label": "Node display",
+        "description": "What number to render inside each node",
+        "type": "custom",
+        "query": "staleness,throughput,all",
+        "current": {
+          "text": "staleness",
+          "value": "staleness",
+          "selected": true
+        },
+        "options": [
+          {
+            "text": "staleness",
+            "value": "staleness",
+            "selected": true
+          },
+          {
+            "text": "throughput",
+            "value": "throughput",
+            "selected": false
+          },
+          {
+            "text": "all",
+            "value": "all",
+            "selected": false
+          }
+        ],
+        "includeAll": false,
+        "multi": false,
+        "hide": 0
+      },
+      {
+        "allValue": "All",
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "clickhouse-main"
+        },
+        "definition": "SELECT DISTINCT family FROM machine.v_topology_nodes ORDER BY family",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Family",
+        "multi": true,
+        "name": "family",
+        "options": [],
+        "query": "SELECT DISTINCT family FROM machine.v_topology_nodes ORDER BY family",
+        "refresh": 2,
+        "regex": "",
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "allValue": "All",
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "All"
+        },
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "clickhouse-main"
+        },
+        "definition": "SELECT id FROM machine.v_topology_nodes WHERE interval_seconds > 0 AND ('${family:raw}' = 'All' OR family = '${family:raw}') ORDER BY id",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Source",
+        "multi": false,
+        "name": "source",
+        "options": [],
+        "query": "SELECT id FROM machine.v_topology_nodes WHERE interval_seconds > 0 AND ('${family:raw}' = 'All' OR family = '${family:raw}') ORDER BY id",
+        "refresh": 2,
+        "regex": "",
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "clickhouse-main"
+        },
+        "definition": "SELECT DISTINCT family FROM machine.v_topology_nodes WHERE ('${family:raw}' = 'All' OR family = '${family:raw}') AND ('${source:raw}' = 'All' OR id = '${source:raw}') ORDER BY family",
+        "hide": 2,
+        "includeAll": true,
+        "label": "Active Family",
+        "multi": true,
+        "name": "active_family",
+        "options": [],
+        "query": "SELECT DISTINCT family FROM machine.v_topology_nodes WHERE ('${family:raw}' = 'All' OR family = '${family:raw}') AND ('${source:raw}' = 'All' OR id = '${source:raw}') ORDER BY family",
+        "refresh": 2,
+        "regex": "",
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Framework: Topology",
+  "uid": "fw-topology",
+  "version": 18
+}

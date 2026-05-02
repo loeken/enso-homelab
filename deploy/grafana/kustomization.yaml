@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: observability
+
+configMapGenerator:
+  - name: the-machine-grafana-dashboards
+    options:
+      disableNameSuffixHash: true
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        grafana_folder: Framework
+    files:
+      - dashboards/framework/00-overview.json
+      - dashboards/framework/10-pipelines.json
+      - dashboards/framework/20-sources.json
+      - dashboards/framework/30-quarantine.json
+      - dashboards/framework/40-resource.json
+      - dashboards/framework/50-traces.json
+      - dashboards/framework/60-data.json
+      - dashboards/framework/70-forex.json
+      - dashboards/framework/71-crypto.json
+      - dashboards/framework/80-topology.json
