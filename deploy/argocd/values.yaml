@@ -217,7 +217,7 @@ theMachine:
     storage:
       size: 10Gi
   ingress:
-    enabled: false
+    enabled: true
   enableBinance: true   # pod enabled; idles until BINANCE_API_KEY/SECRET are set
   # Image tags — update these after each CI run.
   # collector, processor, api, migrate use semver tags like v1.0.3.
