@@ -189,7 +189,7 @@ sonarr:
     storageClass: rook-ceph-block
 vaultwarden:
   enabled: true
-  useAuthelia: false
+  useAuthelia: true
   ingress:
     enabled: true
   storageClassName: rook-ceph-block
