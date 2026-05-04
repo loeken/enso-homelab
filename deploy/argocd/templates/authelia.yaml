@@ -319,21 +319,15 @@ spec:
                 methods:
                   - GET
                   - POST
-              - domain: ['ingestion.loeken.xyz']
-                policy: bypass
-                resources:
-                  - ^/healthz$
-                  - ^/api/.*
-                  - ^/ingest$
-                  - ^/status/.*
-                  - ^/summaries/.*
-                methods:
-                  - GET
-                  - POST
-                  - PUT
-                  - DELETE
-                  - PATCH
-              - domain: ['jellyfin.{{ .Values.domain }}', 'requests.{{ .Values.domain }}', 'hub.{{ .Values.domain }}', 'status.{{ .Values.domain }}', 'ai.{{ .Values.domain }}', 'ingestion.loeken.xyz']
+              - domain: ['machine.loeken.xyz']
+                policy: one_factor
+                subject:
+                  - 'group:users'
+              - domain: ['api.machine.loeken.xyz']
+                policy: one_factor
+                subject:
+                  - 'group:users'
+              - domain: ['jellyfin.{{ .Values.domain }}', 'requests.{{ .Values.domain }}', 'hub.{{ .Values.domain }}', 'status.{{ .Values.domain }}', 'ai.{{ .Values.domain }}']
                 policy: one_factor
                 subject:
                   - 'group:users'
