@@ -226,4 +226,4 @@ theMachine:
     collector: v1.0.16
     processor: v0.0.12
     api: v0.0.12
-    frontend: v0.0.4
+    frontend: v0.0.5
