@@ -72,6 +72,11 @@
       "extractVersion": "^v(?<version>\\d+\\.\\d+\\.\\d+)\\+k3s\\d+$",
       "allowedVersions": "^1.32.0 <1.33.0",
       "versioning": "loose"
+    },
+    {
+      "matchPackageNames": ["vaultwarden"],
+      "matchManagers": ["argocd"],
+      "versioning": "loose"
     }
   ],
   "customManagers": [
