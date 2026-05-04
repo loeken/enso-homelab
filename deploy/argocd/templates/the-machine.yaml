@@ -79,33 +79,33 @@ spec:
                 image:
                   tag: {{ .Values.theMachine.images.collector }}
           # ---- Spot pipeline processors ----
-          processor-spot-rates-stage-0:
+          processor-spot-rates-normalizer:
             containers:
               main:
                 image:
                   tag: {{ .Values.theMachine.images.processor }}
-          processor-spot-rates-stage-1:
+          processor-spot-rates-clickhouse-sink:
             containers:
               main:
                 image:
                   tag: {{ .Values.theMachine.images.processor }}
-          processor-spot-signals-stage-0:
+          processor-spot-signals-statistical-analyzer:
             containers:
               main:
                 image:
                   tag: {{ .Values.theMachine.images.processor }}
           # ---- OHLCV pipeline processors ----
-          processor-ohlcv-prices-stage-0:
+          processor-ohlcv-prices-normalizer:
             containers:
               main:
                 image:
                   tag: {{ .Values.theMachine.images.processor }}
-          processor-ohlcv-prices-stage-1:
+          processor-ohlcv-prices-clickhouse-sink:
             containers:
               main:
                 image:
                   tag: {{ .Values.theMachine.images.processor }}
-          processor-ohlcv-signals-stage-0:
+          processor-ohlcv-signals-statistical-analyzer:
             containers:
               main:
                 image:
