@@ -221,11 +221,9 @@ theMachine:
   enableBinance: true   # pod enabled; idles until BINANCE_API_KEY/SECRET are set
   # Image tags — update these after each CI run.
   # collector, processor, api, migrate use semver tags like v1.0.3.
-  # traderIngestion uses its own semver series.
   images:
     migrate: v1.0.19
     collector: v1.0.16
     processor: v0.0.12
     api: v0.0.12
-    traderIngestion: v1.0.3
     frontend: v0.0.4
