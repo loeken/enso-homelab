@@ -278,10 +278,12 @@ spec:
               - domain: ['vaultwarden.{{ .Values.domain }}']
                 policy: bypass
                 resources:
-                  - ^/api.*
-                  - ^/identity/connect/token.*
-                  - ^/identity/accounts/prelogin.*
-                  - ^/notifications/hub.*
+                  - ^/api/.*
+                  - ^/identity/.*
+                  - ^/notifications/.*
+                  - ^/icons/.*
+                  - ^/attachments/.*
+                  - ^/events/.*
               - domain: 'rtorrent.{{ .Values.domain }}'
                 policy: bypass
                 resources:

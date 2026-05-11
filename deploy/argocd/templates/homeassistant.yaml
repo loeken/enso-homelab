@@ -59,9 +59,13 @@ spec:
                   - ha.{{ .Values.domain }}
         
         postgresql:
+          global:
+            security:
+              allowInsecureImages: true
           enabled: true
           image:
             repository: bitnami/postgresql
+            tag: latest
           auth:
             database: home-assistant
             existingSecret: home-assistant

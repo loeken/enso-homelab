@@ -33,6 +33,8 @@ spec:
           server:
             root_url: https://grafana.{{ .Values.domain }}
             domain: {{ .Values.domain }}
+          database:
+            wal: true
           users:
             auto_assign_org_role: Editor
         envFromSecret: grafana-oauth-config
@@ -61,7 +63,13 @@ spec:
 
         sidecar:
           dashboards:
-            enabled: false
+            enabled: true
+            label: grafana_dashboard
+            labelValue: "1"
+            folderAnnotation: grafana_folder
+            provider:
+              foldersFromFilesStructure: false
+              allowUiUpdates: false
           datasources:
             enabled: true
 
