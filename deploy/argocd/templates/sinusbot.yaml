@@ -1,4 +1,13 @@
 {{ if .Values.sinusbot.enabled }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: sinusbot-transport
+  namespace: sinusbot
+spec:
+  maxRequestBodyBytes: 134217728
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -42,9 +51,11 @@ spec:
               {{- if .Values.sinusbot.useAuthelia }}
               nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
               nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
+              traefik.ingress.kubernetes.io/router.middlewares: default-authelia-forwardauth@kubernetescrd
               {{end}}
               nginx.ingress.kubernetes.io/proxy-body-size: "128m"
-            className: "nginx"
+              traefik.ingress.kubernetes.io/services-sinusbot-8087-transport: sinusbot-transport
+            className: "traefik"
             hosts:
               - host: sinusbot.{{ .Values.domain }}
                 paths:
