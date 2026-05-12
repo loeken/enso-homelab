@@ -1,0 +1,20 @@
+{
+  "kind": "SealedSecret",
+  "apiVersion": "bitnami.com/v1alpha1",
+  "metadata": {
+    "name": "litellm",
+    "namespace": "llm"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "name": "litellm",
+        "namespace": "llm"
+      },
+      "type": "Opaque"
+    },
+    "encryptedData": {
+      "LITELLM_MASTER_KEY": "AgAlekJxJeRBYT1RE2aE5wvCEzKpI8Rcsw6DFzjUIVU1m2TYWbkoVYiKLR/qrehVsbAxEOYtpNdkiy09olQa0+9MPnsmULRW8UvhdUJm+GTw4t1+zjXCvW7Ryk4OGc3lEegKJ3KdtiaNY+wob6t7mnQh8oqHGIvmpdfOXITVLFfnS0CpdxwBuDGw2qKWcd6WIr8PEqILDchTqhu64bYsdQUi8zfJU/t2ctdlr2wbKWHVGjG8yuFFHpGvOtmKLUOi9U5q3HvdaFx+RcuYoH9QqaRcHAshoAekG6U64w8por7H/0mMt43lF8TLGoRCT8zhTfTNnNrEAjuEBq0S6cF8dj6gx+z4aPrKQkSxc3oToy81MlTUhfD1lb4PU94P7505r1P2vMLK2CJMXNzKIDsEMfJmlc/RQ7GqXuECU5t4N29ydta2LmJpFvg5J6/DS3d+GVvvbkA5W8Q+4lTY5gJzYrAqh6ZPQH52JqY30MnSxvTQlZ7kCJEODG59XtkuaJ985keo8wKuWPqtmXkkMozhXtLC+QMsS75ocZj44tv9jq3y6tfnsTVrVwv3uRN+lg3XFnOui8HlOHXIUe1YlM8n0VyDdnC4E1kGHxuARD7J5WZRXFZA6Y9I0qwpPmRMbUskd1yq1IEfyqL94DQSzHFz2LfezIrCAVuBx0CzTiRiH9wMgslsO49Zk1OOrgPEE+yQa35OF+vY0y1xvslJ/SQR9x1IISh3t1ORVl9qL820DO8="
+    }
+  }
+}

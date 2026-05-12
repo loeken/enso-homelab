@@ -1,0 +1,15 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: alertmanager-pagerduty
+  namespace: observability
+spec:
+  encryptedData:
+    service_key: AgCib5byZQ3k3CfCucAHZ8HIl8x6Mv/rVLNfSqtPDmI6zckncgAEy95sUqVW9z7EcQwSzRWtlS5Jrnunc81tkvPegcZNTvGVf/o1flAC43hX/Zd83As0ElSYs2h3YgO73LcOITQ2X9mx1yRDZT0k/67JuSLlzD6qPuQF0h9yjzyeEyUBMFa9VsrKPJgZYU28bdj/oI0PHd1ikfvkr+M2Arp+/6P6/vYrq5WArjB+0ZN0Bl4cNG4b1Psae0eDilCN3upzEQpClm/Z25quWV4lB/MbbtAhA52Tsl0KWJPo1iNTGeUGJHbbYJ7B2ADZP8Y4QJ2y/Jv1bNItq13WVch9FuJQS/U7oxVbrjfW/GuqiTugktuz3qbI2x7eKqJwjM86XSLeIDfqNPoWBFohW4UaQdlSM58Vubbn+RioALLl2qxdvq0Ipto/uIOxAppTjHlPdFXOohPckQJrfqgzLpqkLIycjHq+Kg6e7lHTKtRaYqHuTcfzwLKrmmIl8OPVsr58g7G1TAXrI9ndxbSB5+Y3QKnWUo9AM9f+8RA8AZGtobWuR67GHihklHIaW9MEVbXKf3cGXJrlnpim/6HKTw+eudmC4uNmHcxOUu8ywxeQh4IA6HaExmkb0yp5lQPCKJwvAatFXRPnnJHEegpVmbw7SAUwaZd2IvFBFJasam9HMrI8+CCJTZzYRYeOYEx1BjRhcqYLC2Gsztf+yFQg3nG1/5HkvflrRtNRZENvmVc5W2irrg==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: alertmanager-pagerduty
+      namespace: observability

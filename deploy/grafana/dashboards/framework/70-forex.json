@@ -1,0 +1,224 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Forex spot rates over time — filterable by source, base and quote currency",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": ["lastNotNull", "min", "max"],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "title": "Exchange Rate over Time",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n    $__timeInterval(measured_at) AS time,\n    concat(source, '  ', base, '/', quote) AS series,\n    avg(rate) AS rate\nFROM machine.events_spot\nWHERE $__timeFilter(measured_at)\n  AND source IN ($source)\n  AND base   IN ($base)\n  AND quote  IN ($quote)\nGROUP BY time, series\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": {
+            "align": "left",
+            "cellOptions": { "type": "auto" },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "source" },
+            "properties": [
+              { "id": "displayName", "value": "Source" },
+              { "id": "custom.width", "value": 200 },
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } },
+              { "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "base" },
+            "properties": [
+              { "id": "displayName", "value": "Base" },
+              { "id": "custom.width", "value": 80 },
+              { "id": "custom.align", "value": "center" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "quote" },
+            "properties": [
+              { "id": "displayName", "value": "Quote" },
+              { "id": "custom.width", "value": 80 },
+              { "id": "custom.align", "value": "center" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "rate" },
+            "properties": [
+              { "id": "displayName", "value": "Rate" },
+              { "id": "custom.width", "value": 130 },
+              { "id": "custom.align", "value": "right" },
+              { "id": "decimals", "value": 6 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "last_seen" },
+            "properties": [
+              { "id": "displayName", "value": "Measured At (UTC)" },
+              { "id": "custom.width", "value": 180 }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 12 },
+      "id": 2,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+        "showHeader": true,
+        "sortBy": [{ "desc": true, "displayName": "Measured At (UTC)" }]
+      },
+      "pluginVersion": "11.4.0",
+      "title": "Latest Rates",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n    source,\n    base,\n    quote,\n    argMax(rate, measured_at)                                  AS rate,\n    formatDateTime(max(measured_at), '%Y-%m-%d %H:%i:%S UTC') AS last_seen\nFROM machine.events_spot\nWHERE source IN ($source)\n  AND base   IN ($base)\n  AND quote  IN ($quote)\nGROUP BY source, base, quote\nORDER BY source, base, quote",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 39,
+  "tags": ["data", "forex"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": true, "text": ["All"], "value": ["$__all"] },
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+        "definition": "SELECT DISTINCT source FROM machine.events_spot ORDER BY source",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Source",
+        "multi": true,
+        "name": "source",
+        "options": [],
+        "query": "SELECT DISTINCT source FROM machine.events_spot ORDER BY source",
+        "refresh": 2,
+        "regex": "",
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": { "selected": true, "text": ["All"], "value": ["$__all"] },
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+        "definition": "SELECT DISTINCT base FROM machine.events_spot WHERE source IN ($source) ORDER BY base",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Base",
+        "multi": true,
+        "name": "base",
+        "options": [],
+        "query": "SELECT DISTINCT base FROM machine.events_spot WHERE source IN ($source) ORDER BY base",
+        "refresh": 2,
+        "regex": "",
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": { "selected": true, "text": ["All"], "value": ["$__all"] },
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+        "definition": "SELECT DISTINCT quote FROM machine.events_spot WHERE source IN ($source) AND base IN ($base) ORDER BY quote",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Quote",
+        "multi": true,
+        "name": "quote",
+        "options": [],
+        "query": "SELECT DISTINCT quote FROM machine.events_spot WHERE source IN ($source) AND base IN ($base) ORDER BY quote",
+        "refresh": 2,
+        "regex": "",
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-7d", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Forex Rates",
+  "uid": "forex-rates",
+  "version": 1
+}

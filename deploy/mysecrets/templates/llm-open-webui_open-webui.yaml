@@ -1,0 +1,20 @@
+{
+  "kind": "SealedSecret",
+  "apiVersion": "bitnami.com/v1alpha1",
+  "metadata": {
+    "name": "open-webui",
+    "namespace": "llm"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "name": "open-webui",
+        "namespace": "llm"
+      },
+      "type": "Opaque"
+    },
+    "encryptedData": {
+      "WEBUI_SECRET_KEY": "AgAg61t6CxyZJcYe2WwJsMG4yeYyZ1JqwcfQGJJFopLHAHkHXE60o/ooHVE5KrLPxvtNVnRJNrK0s5Q9GYBGzXCEhUJA+ySeslK3dDy5B47Q8pjaaHrrfoOxdPG4LgUcPe766igZLc2xR9m/92N1fkw5UIIugRnpsVSGYtaOEHmcL7TZpKxjeWc4W65hfFIl4ckRuxB2e9LtuEHKF/poebOxhcUoAvjhTK8FNva5AW+HfXrKe1ieU7FVCdDJW6TxR+qgmH3vZPxC+vQWheUfjWPSCImFOTkffg64XUNsdy0Xt8QSLgvXJc8J1RXB5wac7CkoVSNDr1vgZCLXZPw+LQcf9yjvXi3OrBCkBff4ob0v5U2gpze4ppN2m4dOEMKDObUjA8GjxldEURTCXGq/HQHSdGgUBwyqirAC1HexjEbbm34u4wsUjMWt3Mau5AU2b/bdIZFE8oNWR+vVsY0QY6uinS9Kl2aPEJ+ZiwrL/mX7fexBx7bf1zUGCru0vuYsM5drrS1yR6Fnp+uijIXDgab+T34sH98e9eRAqlpto5jUq/UUDQSPtHnN3CDCungUBZK8u4HU8Ww1D2cVLMpWXppgdkuTVrUOl4klttCpSzfZ9kFl/hzRDX5qBmitraotq0E6DffD95CxQKD/2rTUejTxXqV8DBXM5ALU9WnY1Xw1g7Q0Nrjo+1HJF8fsdoexAgp4FnVkvZZa4+LkDzXc+DGTJd413vkQVpbonX8VV2A="
+    }
+  }
+}

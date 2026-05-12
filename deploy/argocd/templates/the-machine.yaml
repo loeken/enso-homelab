@@ -1,0 +1,170 @@
+{{ if .Values.theMachine.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: the-machine
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "8"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: the-machine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: git@github.com:loeken/the-machine
+    path: deploy/helm/the-machine
+    targetRevision: HEAD
+    helm:
+      values: |
+        clickhouse:
+          storage:
+            storageClass: {{ .Values.theMachine.storageClass }}
+            size: {{ .Values.theMachine.clickhouse.storage.size }}
+        controllers:
+          # ---- Migrator: versioned Job so k8s never tries to patch immutable spec ----
+          migrator:
+            enabled: false
+          migrator-{{ .Values.theMachine.images.migrate | replace "." "-" }}:
+            type: job
+            containers:
+              main:
+                image:
+                  repository: ghcr.io/loeken/the-machine-migrate
+                  tag: {{ .Values.theMachine.images.migrate }}
+                  pullPolicy: IfNotPresent
+                args:
+                  - --addr
+                  - chi-the-machine-main-0-0:9000
+                  - --db
+                  - default
+                  - --user
+                  - $(CLICKHOUSE_USER)
+                  - --password
+                  - $(CLICKHOUSE_PASSWORD)
+                env:
+                  CLICKHOUSE_USER:
+                    valueFrom:
+                      secretKeyRef:
+                        name: the-machine
+                        key: CLICKHOUSE_USER
+                  CLICKHOUSE_PASSWORD:
+                    valueFrom:
+                      secretKeyRef:
+                        name: the-machine
+                        key: CLICKHOUSE_PASSWORD
+                resources:
+                  requests:
+                    cpu: 50m
+                    memory: 64Mi
+                  limits:
+                    memory: 128Mi
+          # ---- Collectors ----
+          collector-forex-daily:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.collector }}
+          collector-forex-hourly:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.collector }}
+          collector-financial-binance:
+            enabled: {{ .Values.theMachine.enableBinance | default false }}
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.collector }}
+          # ---- Spot pipeline processors ----
+          processor-spot-rates-normalizer:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.processor }}
+          processor-spot-rates-clickhouse-sink:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.processor }}
+          processor-spot-signals-statistical-analyzer:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.processor }}
+          # ---- OHLCV pipeline processors ----
+          processor-ohlcv-prices-normalizer:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.processor }}
+          processor-ohlcv-prices-clickhouse-sink:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.processor }}
+          processor-ohlcv-signals-statistical-analyzer:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.processor }}
+          # ---- API ----
+          api:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.api }}
+          # ---- Frontend ----
+          frontend:
+            containers:
+              main:
+                image:
+                  tag: {{ .Values.theMachine.images.frontend }}
+        {{- if .Values.theMachine.ingress.enabled }}
+        ingress:
+          api:
+            enabled: true
+            annotations:
+              cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+              external-dns.alpha.kubernetes.io/hostname: "api.machine.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/ttl: "120"
+            hosts:
+              - host: api.machine.{{ .Values.domain }}
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    service:
+                      identifier: api
+                      port: http
+            tls:
+              - secretName: api-machine-tls
+                hosts:
+                  - api.machine.{{ .Values.domain }}
+          frontend:
+            enabled: true
+            annotations:
+              cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+              external-dns.alpha.kubernetes.io/hostname: "machine.{{ .Values.domain }}."
+              external-dns.alpha.kubernetes.io/ttl: "120"
+            hosts:
+              - host: machine.{{ .Values.domain }}
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    service:
+                      identifier: frontend
+                      port: http
+            tls:
+              - secretName: frontend-machine-tls
+                hosts:
+                  - machine.{{ .Values.domain }}
+        {{- end }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{ end }}

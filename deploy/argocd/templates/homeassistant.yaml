@@ -56,7 +56,7 @@ spec:
               - secretName: ha-tls
                 hosts:
                   - ha.{{ .Values.domain }}
-        
+
         postgresql:
           global:
             security:
@@ -76,7 +76,7 @@ spec:
               storageClass: {{ .Values.homeassistant.storageClass }}
               accessModes:
                 - ReadWriteOnce
-        
+
         service:
           main:
             enabled: true

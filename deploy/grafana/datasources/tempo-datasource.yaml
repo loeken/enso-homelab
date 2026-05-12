@@ -1,0 +1,21 @@
+apiVersion: 1
+
+datasources:
+  - name: Tempo
+    type: tempo
+    access: proxy
+    url: http://the-machine-tempo.the-machine.svc.cluster.local:3200
+    uid: tempo
+    isDefault: false
+    editable: false
+    jsonData:
+      nodeGraph:
+        enabled: true
+      search:
+        hide: false
+      tracesToLogsV2:
+        datasourceUid: ""
+      serviceMap:
+        datasourceUid: ""
+      lokiSearch:
+        datasourceUid: ""

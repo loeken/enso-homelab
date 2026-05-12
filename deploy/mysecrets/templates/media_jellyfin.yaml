@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: jellyfin-oidc-config
+  namespace: media
+spec:
+  encryptedData:
+    JELLYFIN_OIDC_CLIENT_SECRET: AgASuIOQRDvl5z1yvzAJm2mKRGlIxzATZlMCM6WAPY1xYufVvjqgtV5OWonQBZ8zYNpTekJEX2cDnPF7r7iRl1j6gAt9m3PPn0pjgex6FO/ek/t9pxCteKdH+URZ4IZL2PbZ0fA8oytlIQXMX2gScJTHhObZ592RqFchrP4ZuOoCGYWbohqUHiwknMnewNKLumXv0EX0uWrKTdlDoRI/esfPNODTSYLcBUMGkW2syJaQ+ZCRnF2QuR3Otc49hiJz4hu5JPX4JjFmdRFClw7qmhw7MsdQZRrHdqTeUyEZ506Z/mASITGVgAce75ky6URQ5/OudQmm+qa+cw0r2V7LIlJwnKMrl9foRaWaTt4MOxUtN0QX1HMv6AcqborZcv4UGRAqmD8saHCwIVA1qfcelGWDgrTJeLEnSgVlzFEln5f553uAUSO2giUNgmOcAD7gpJN2vkOxqrj+L6A+pkcHwHQJuFzOdYUYOG/HQSxpCzrmZrvJJmBsnna9Opl3Sc+NrmUi4bfATRA/ek88TCsX35mG1O6vTCSd1eWNxlovqAAj8TArGAtX1BaTJjSvskEvrZ9uU4ZB0rdM6QQEDM4FW62HIT0/r45eXnxyPIDBSDTQ284FJ35qytXfJdwo2mX5LJRbmdF3cgFTxxIyG7LvVVPfHQl828k/4pf2L6kAnQtq57W/YEBJ6GfzJs1S7pXsxJrFh4r3jPFr0SDV1oVvBfI1d+Y=
+  template:
+    metadata:
+      creationTimestamp: null
+      name: jellyfin-oidc-config
+      namespace: media
+    type: Opaque

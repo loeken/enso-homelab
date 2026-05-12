@@ -1,0 +1,20 @@
+{
+  "kind": "SealedSecret",
+  "apiVersion": "bitnami.com/v1alpha1",
+  "metadata": {
+    "name": "mcp-grafana",
+    "namespace": "llm"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "name": "mcp-grafana",
+        "namespace": "llm"
+      },
+      "type": "Opaque"
+    },
+    "encryptedData": {
+      "GRAFANA_API_KEY": "AgC0+jJfa5w50eGvmabQAjTvJfR/mjwNLm/RYtH4rx01RPq+YmmQB/NNs7GYmsKMrWQMOVUuoUeJ8QTo0hJAO4iRC3GNyNYhGIszNlReNLIS96/mTyuIPZmiXO/BjGmDC8hNqFYg1nX18n7ePaN8pcoAlBwVAL1IZ1wdDiqI/5JnuNvCRJglzSCPfa31KWcMMtc8mzZ+zpcY3Q/VcHL+beLApswfMrFYTUPv0/RFy2u0SGQVvPPwvmO4zzxwfSYsfKd8lbCgJ11hqNjKkNoevhQwCQAioHI1fT4sJhfqcnZtfwS/50NCUuMuIz+retFrlwFs7e3MgIEgZLEpOgvXZOfSXsIT1zNtXXA0VxrRe0/8FbaVIwoxK02bWmtEnVpSSp0565SVtAS04UXBcCFoltShSJgC5pqN5ziK+m8+827J8qOcdqT/1WXg7tj3fIo9qdz1Xc0ga2NsP769VYUUl5b735k7XFGGooFt179jm4VKHc6WfiRHKziNyO1hfiRvKCiqh8nr3Nxj1kK80FMTxYt2nqeHL2SijLzniu+gY12z3gQwH6dRcy5ss+F90ItHIoHci4Hzb7mr3JkAU5L+JXF4Qp9QbU05TYjAQ+oG6t+PkkxMFSxpsE8PbwmuI4p+HTQOYJPfF9I+dit4nogiEHsRVWCjv4fLSrtI2/pD8VG5mdXQJC9Vkq3xiQjj7TdJKBQ9caNZfbsV17+sRuz/nTpE9BxWLbY1COzX5O4JQlUIhE07Q6joZOH4h6p11NCZ"
+    }
+  }
+}

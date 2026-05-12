@@ -1,0 +1,173 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Collected data — inventory of sources, formats, and pair coverage",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": {
+            "align": "left",
+            "cellOptions": { "type": "auto" },
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "source" },
+            "properties": [
+              { "id": "displayName", "value": "Source" },
+              { "id": "custom.width", "value": 220 },
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } },
+              { "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "table" },
+            "properties": [
+              { "id": "displayName", "value": "Table" },
+              { "id": "custom.width", "value": 100 },
+              { "id": "mappings", "value": [
+                { "options": { "ohlcv": { "color": "orange", "index": 0, "text": "ohlcv" }, "spot": { "color": "blue", "index": 1, "text": "spot" } }, "type": "value" }
+              ]},
+              { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "fixed" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "domain" },
+            "properties": [
+              { "id": "displayName", "value": "Domain" },
+              { "id": "custom.width", "value": 100 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "pairs" },
+            "properties": [
+              { "id": "displayName", "value": "Pairs" },
+              { "id": "custom.width", "value": 70 },
+              { "id": "custom.align", "value": "center" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "rows" },
+            "properties": [
+              { "id": "displayName", "value": "Rows" },
+              { "id": "custom.width", "value": 90 },
+              { "id": "custom.align", "value": "right" },
+              { "id": "unit", "value": "short" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "latest" },
+            "properties": [
+              { "id": "displayName", "value": "Latest measurement" },
+              { "id": "custom.width", "value": 180 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "price" },
+            "properties": [
+              { "id": "displayName", "value": "price" },
+              { "id": "custom.width", "value": 60 },
+              { "id": "custom.align", "value": "center" },
+              { "id": "mappings", "value": [
+                { "options": { "0": { "color": "red",   "index": 0, "text": "✗" }, "1": { "color": "green", "index": 1, "text": "✓" } }, "type": "value" }
+              ]},
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "open_high_low" },
+            "properties": [
+              { "id": "displayName", "value": "open/high/low" },
+              { "id": "custom.width", "value": 100 },
+              { "id": "custom.align", "value": "center" },
+              { "id": "mappings", "value": [
+                { "options": { "0": { "color": "red",   "index": 0, "text": "✗" }, "1": { "color": "green", "index": 1, "text": "✓" } }, "type": "value" }
+              ]},
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "volume" },
+            "properties": [
+              { "id": "displayName", "value": "volume" },
+              { "id": "custom.width", "value": 70 },
+              { "id": "custom.align", "value": "center" },
+              { "id": "mappings", "value": [
+                { "options": { "0": { "color": "red",   "index": 0, "text": "✗" }, "1": { "color": "green", "index": 1, "text": "✓" } }, "type": "value" }
+              ]},
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "base_currency" },
+            "properties": [
+              { "id": "displayName", "value": "Base" },
+              { "id": "custom.width", "value": 80 },
+              { "id": "custom.align", "value": "center" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "sample_quotes" },
+            "properties": [
+              { "id": "displayName", "value": "Quote currencies" },
+              { "id": "custom.width", "value": 400 }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+        "showHeader": true
+      },
+      "pluginVersion": "11.4.0",
+      "title": "Source inventory — what each source collects",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "rawSql": "SELECT\n    source,\n    'spot'   AS table,\n    domain,\n    countDistinct(base, quote) AS pairs,\n    count()                    AS rows,\n    formatDateTime(max(measured_at), '%Y-%m-%d %H:%i:%S') AS latest,\n    toUInt8(1) AS price,\n    toUInt8(0) AS open_high_low,\n    toUInt8(0) AS volume,\n    any(base)  AS base_currency,\n    arrayStringConcat(arraySort(groupUniqArray(quote)), ', ') AS sample_quotes\nFROM machine.events_spot\nGROUP BY source, domain\nUNION ALL\nSELECT\n    source,\n    'ohlcv'  AS table,\n    domain,\n    countDistinct(symbol, quote) AS pairs,\n    count()                      AS rows,\n    formatDateTime(max(measured_at), '%Y-%m-%d %H:%i:%S') AS latest,\n    toUInt8(1) AS price,\n    toUInt8(countIf(open != 0 OR high != 0 OR low != 0) > 0) AS open_high_low,\n    toUInt8(countIf(volume != 0) > 0) AS volume,\n    any(symbol) AS base_currency,\n    arrayStringConcat(arraySort(groupUniqArray(concat(symbol,'/', quote))), ', ') AS sample_quotes\nFROM machine.events_ohlcv\nGROUP BY source, domain\nORDER BY source",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 39,
+  "tags": ["data"],
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Data",
+  "uid": "data-inventory",
+  "version": 1
+}

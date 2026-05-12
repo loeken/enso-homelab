@@ -1,0 +1,169 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Distributed trace search and service map powered by Tempo",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "description": "Root traces with linked spans. Collectors emit source.publish spans; processors emit processor.message spans as independent root traces linked back to upstream stages. Click Trace ID to view the full linked chain.",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "duration"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 20,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "footer": {
+          "countRows": false,
+          "enablePagination": true,
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "limit": 100,
+          "query": "{ (name=\"source.publish\" || name=\"processor.message\") && resource.service.name =~ \"${service}\" && duration > ${min_duration} }",
+          "queryType": "traceql",
+          "refId": "A"
+        }
+      ],
+      "title": "Root Spans (Collectors & Processors): ${service}",
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 42,
+  "tags": [
+    "framework"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {},
+        "datasource": {
+          "type": "tempo",
+          "uid": "tempo"
+        },
+        "definition": "",
+        "includeAll": true,
+        "label": "Collector",
+        "name": "service",
+        "options": [],
+        "query": {
+          "label": "rootServiceName",
+          "refId": "TempoDatasourceVariableQueryEditor-VariableQuery",
+          "type": 1
+        },
+        "refresh": 1,
+        "regexApplyTo": "value",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "Any",
+          "value": "0ms"
+        },
+        "includeAll": false,
+        "label": "Min Duration",
+        "name": "min_duration",
+        "options": [
+          {
+            "selected": true,
+            "text": "Any",
+            "value": "0ms"
+          },
+          {
+            "selected": false,
+            "text": "> 10ms",
+            "value": "10ms"
+          },
+          {
+            "selected": false,
+            "text": "> 50ms",
+            "value": "50ms"
+          },
+          {
+            "selected": false,
+            "text": "> 100ms",
+            "value": "100ms"
+          },
+          {
+            "selected": false,
+            "text": "> 200ms",
+            "value": "200ms"
+          },
+          {
+            "selected": false,
+            "text": "> 500ms",
+            "value": "500ms"
+          }
+        ],
+        "query": "Any : 0ms, > 10ms : 10ms, > 50ms : 50ms, > 100ms : 100ms, > 200ms : 200ms, > 500ms : 500ms",
+        "type": "custom",
+        "valuesFormat": "csv"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Framework: Traces",
+  "uid": "fw-traces",
+  "version": 9,
+  "weekStart": ""
+}

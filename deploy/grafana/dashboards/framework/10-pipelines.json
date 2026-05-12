@@ -1,0 +1,178 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Pipeline lag by stage — Redis Streams consumer-group depth and age",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT max(lag_seconds) AS max_lag_s FROM machine.metrics_pipeline_lag WHERE measured_at >= now() - INTERVAL 5 MINUTE",
+          "refId": "A"
+        }
+      ],
+      "title": "Max Pipeline Lag",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT countDistinct(pipeline) AS pipelines FROM machine.metrics_pipeline_lag WHERE measured_at >= now() - INTERVAL 5 MINUTE",
+          "refId": "A"
+        }
+      ],
+      "title": "Active Pipelines",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 4 },
+      "id": 3,
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n  $__timeInterval(measured_at) AS time,\n  pipeline AS series,\n  max(lag_seconds) AS lag_s\nFROM machine.metrics_pipeline_lag\nWHERE $__timeFilter(measured_at)\nGROUP BY time, series\nORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "Lag (seconds) over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
+      "id": 4,
+      "options": { "sortBy": [] },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n  pipeline,\n  stage_index,\n  processor,\n  max(lag_messages) AS lag_messages,\n  round(max(lag_seconds), 3) AS lag_s,\n  max(measured_at) AS last_measured\nFROM machine.metrics_pipeline_lag\nWHERE measured_at >= now() - INTERVAL 5 MINUTE\nGROUP BY pipeline, stage_index, processor\nORDER BY pipeline, stage_index",
+          "refId": "A"
+        }
+      ],
+      "title": "Pipeline \u00d7 Stage Matrix",
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 20 },
+      "id": 5,
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n  $__timeInterval(measured_at) AS time,\n  detector AS series,\n  count() AS signals\nFROM machine.signals\nWHERE $__timeFilter(measured_at)\nGROUP BY time, series\nORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "Signals per Minute by Detector",
+      "type": "timeseries"
+    }
+  ],
+  "schemaVersion": 40,
+  "tags": ["framework"],
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Framework: Pipelines",
+  "uid": "fw-pipelines",
+  "version": 2
+}

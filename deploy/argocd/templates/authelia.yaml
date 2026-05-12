@@ -315,6 +315,14 @@ spec:
                 methods:
                   - GET
                   - POST
+              - domain: ['machine.loeken.xyz']
+                policy: one_factor
+                subject:
+                  - 'group:users'
+              - domain: ['api.machine.loeken.xyz']
+                policy: one_factor
+                subject:
+                  - 'group:users'
               - domain: ['jellyfin.{{ .Values.domain }}', 'requests.{{ .Values.domain }}', 'hub.{{ .Values.domain }}', 'status.{{ .Values.domain }}', 'ai.{{ .Values.domain }}']
                 policy: one_factor
                 subject:

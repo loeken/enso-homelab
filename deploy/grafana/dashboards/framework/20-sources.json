@@ -1,0 +1,422 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Per-source health — cursor freshness, quarantine errors, and failure details",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "templating": {
+    "list": [
+      {
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "source",
+        "label": "Source",
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+        "definition": "SELECT DISTINCT source FROM machine.source_cursors ORDER BY source",
+        "query": "SELECT DISTINCT source FROM machine.source_cursors ORDER BY source",
+        "options": [],
+        "current": {},
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT countIf(dateDiff('second', max_ua, now()) <= toInt64(max_cs) * 2) AS active\nFROM (\n  SELECT source AS src, max(updated_at) AS max_ua, argMax(cadence_seconds, updated_at) AS max_cs\n  FROM machine.source_cursors\n  GROUP BY src\n)",
+          "refId": "A"
+        }
+      ],
+      "title": "Active Sources",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 2 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT countIf(dateDiff('second', max_ua, now()) > toInt64(max_cs) * 2) AS stale\nFROM (\n  SELECT source AS src, max(updated_at) AS max_ua, argMax(cadence_seconds, updated_at) AS max_cs\n  FROM machine.source_cursors\n  GROUP BY src\n)",
+          "refId": "A"
+        }
+      ],
+      "title": "Stale Sources",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 10 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT count() AS quarantine_24h FROM machine.quarantine WHERE quarantined_at >= now() - INTERVAL 24 HOUR AND status = 'pending'",
+          "refId": "A"
+        }
+      ],
+      "title": "Quarantine Items (24h)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 2 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT countDistinct(component) AS sources_with_errors FROM machine.quarantine WHERE quarantined_at >= now() - INTERVAL 24 HOUR AND status = 'pending'",
+          "refId": "A"
+        }
+      ],
+      "title": "Sources with Errors (24h)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "description": "One row per source. health = STALE if cursor > 4×cadence; DEGRADED if cursor > 2×cadence OR any pending quarantine in last 24 h; HEALTHY otherwise. quarantine_24h = pending quarantine entries in the last 24 h.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "left",
+            "cellOptions": { "type": "auto" },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "health" },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "HEALTHY":  { "color": "green",  "index": 0, "text": "HEALTHY" },
+                      "DEGRADED": { "color": "yellow", "index": 1, "text": "DEGRADED" },
+                      "STALE":    { "color": "red",    "index": 2, "text": "STALE" },
+                      "IDLING":   { "color": "blue",   "index": 3, "text": "IDLING" }
+                    }
+                  }
+                ]
+              },
+              { "id": "custom.cellOptions", "value": { "type": "color-background" } },
+              { "id": "custom.width", "value": 110 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "quarantine_24h" },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    { "color": "green",  "value": null },
+                    { "color": "yellow", "value": 1 },
+                    { "color": "red",    "value": 10 }
+                  ]
+                }
+              },
+              { "id": "custom.cellOptions", "value": { "type": "color-background" } },
+              { "id": "custom.width", "value": 140 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "age_s" },
+            "properties": [
+              { "id": "unit", "value": "s" },
+              { "id": "displayName", "value": "cursor_age" },
+              { "id": "custom.width", "value": 110 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "cadence_s" },
+            "properties": [
+              { "id": "unit", "value": "s" },
+              { "id": "displayName", "value": "cadence" },
+              { "id": "custom.width", "value": 90 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "last_fetch" },
+            "properties": [
+              { "id": "custom.width", "value": 160 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "last_error_at" },
+            "properties": [
+              { "id": "custom.width", "value": 160 }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 4 },
+      "id": 5,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "show": false },
+        "showHeader": true,
+        "sortBy": [{ "displayName": "health", "desc": true }]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n  known.src AS source,\n  multiIf(\n    sc.has_cursor = 0 OR sc.cadence_s = 0,             'IDLING',\n    sc.age_s > sc.cadence_s * 4,                       'STALE',\n    sc.age_s > sc.cadence_s * 2 OR q24.cnt > 0,       'DEGRADED',\n                                                        'HEALTHY'\n  ) AS health,\n  sc.last_fetch,\n  sc.age_s,\n  sc.cadence_s,\n  q24.cnt AS quarantine_24h,\n  ql.last_reason,\n  if(sc.has_cursor = 0 OR sc.cadence_s = 0, idle.idle_reason, left(ql.last_error, 200)) AS last_error\nFROM (\n  SELECT DISTINCT source AS src FROM machine.source_cursors\n) known\nLEFT JOIN (\n  SELECT\n    source AS src,\n    toInt8(1) AS has_cursor,\n    formatDateTime(max(updated_at), '%Y-%m-%d %H:%i:%S') AS last_fetch,\n    toInt64(dateDiff('second', max(updated_at), now()))   AS age_s,\n    toInt64(argMax(cadence_seconds, updated_at))          AS cadence_s\n  FROM machine.source_cursors\n  GROUP BY src\n) sc ON known.src = sc.src\nLEFT JOIN (\n  SELECT source AS src, argMax(value, updated_at) AS idle_reason\n  FROM machine.source_cursors\n  WHERE key = '_idle'\n  GROUP BY src\n) idle ON known.src = idle.src\nLEFT JOIN (\n  SELECT component AS src, count() AS cnt\n  FROM machine.quarantine\n  WHERE quarantined_at >= now() - INTERVAL 24 HOUR\n    AND status = 'pending'\n  GROUP BY src\n) q24 ON known.src = q24.src\nLEFT JOIN (\n  SELECT component AS src,\n    argMax(reason, quarantined_at)        AS last_reason,\n    argMax(error_message, quarantined_at) AS last_error\n  FROM machine.quarantine\n  GROUP BY src\n) ql ON known.src = ql.src\nORDER BY multiIf(health = 'STALE', 0, health = 'DEGRADED', 1, health = 'IDLING', 2, 3) ASC, source ASC",
+          "refId": "A"
+        }
+      ],
+      "title": "Source Health (all sources)",
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "description": "All pending quarantine entries for the selected source(s), newest first. Use the Source filter above to drill into one source.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "left",
+            "cellOptions": { "type": "auto" },
+            "filterable": true,
+            "inspect": true
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "reason" },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "api_error":    { "color": "red",    "index": 0 },
+                      "decode_error": { "color": "orange", "index": 1 },
+                      "bad_date":     { "color": "orange", "index": 2 },
+                      "unknown_field":{ "color": "yellow", "index": 3 }
+                    }
+                  }
+                ]
+              },
+              { "id": "custom.cellOptions", "value": { "type": "color-background" } },
+              { "id": "custom.width", "value": 130 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "quarantined_at" },
+            "properties": [
+              { "id": "custom.width", "value": 160 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "status" },
+            "properties": [
+              { "id": "custom.width", "value": 90 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "retry_count" },
+            "properties": [
+              { "id": "custom.width", "value": 90 }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 16 },
+      "id": 6,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "show": false },
+        "showHeader": true,
+        "sortBy": [{ "displayName": "quarantined_at", "desc": true }]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n  formatDateTime(quarantined_at, '%Y-%m-%d %H:%i:%S') AS quarantined_at,\n  component AS source,\n  layer,\n  reason,\n  error_message,\n  status,\n  retry_count\nFROM machine.quarantine\nWHERE component IN (${source:singlequote})\nORDER BY quarantined_at DESC\nLIMIT 100",
+          "refId": "A"
+        }
+      ],
+      "title": "Quarantine Error Detail — $source",
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "description": "Total events ingested per source within the selected time range, filtered on ingested_at (when the row arrived in ClickHouse) rather than measured_at (the semantic rate date).",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 80, "lineWidth": 0 },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 26 },
+      "id": 7,
+      "options": {
+        "xField": "source",
+        "orientation": "auto",
+        "groupWidth": 0.7,
+        "barWidth": 0.97,
+        "tooltip": { "mode": "single", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n  source,\n  count() AS events\nFROM (\n  SELECT source FROM machine.events_spot\n  WHERE ingested_at >= toDateTime($__from/1000)\n    AND ingested_at <= toDateTime($__to/1000)\n    AND source IN (${source:singlequote})\n  UNION ALL\n  SELECT source FROM machine.events_ohlcv\n  WHERE ingested_at >= toDateTime($__from/1000)\n    AND ingested_at <= toDateTime($__to/1000)\n    AND source IN (${source:singlequote})\n)\nGROUP BY source\nORDER BY events DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Events per Source — $source",
+      "type": "barchart"
+    }
+  ],
+  "schemaVersion": 40,
+  "tags": ["framework"],
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Framework: Sources",
+  "uid": "fw-sources",
+  "version": 7
+}

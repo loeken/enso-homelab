@@ -1,0 +1,173 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Quarantine queue depth, error breakdown, and per-component distribution",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 10 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT count() AS pending FROM machine.quarantine WHERE status = 'pending'",
+          "refId": "A"
+        }
+      ],
+      "title": "Pending Items",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 4 },
+      "id": 2,
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n  $__timeInterval(measured_at) AS time,\n  concat(component, '/', status) AS series,\n  sum(count) AS items\nFROM machine.metrics_quarantine\nWHERE $__timeFilter(measured_at)\nGROUP BY time, series\nORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "Quarantine Metrics Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
+      "id": 3,
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT\n  $__timeInterval(quarantined_at) AS time,\n  count() AS new_items\nFROM machine.quarantine\nWHERE $__timeFilter(quarantined_at)\nGROUP BY time\nORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "New Quarantine Items per Hour",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "id": 4,
+      "options": { "sortBy": [] },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT error_message, count() AS n FROM machine.quarantine GROUP BY error_message ORDER BY n DESC LIMIT 20",
+          "refId": "A"
+        }
+      ],
+      "title": "Top Error Messages",
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "id": 5,
+      "options": {
+        "barRadius": 0.0,
+        "barWidth": 0.97,
+        "groupWidth": 0.7,
+        "orientation": "auto",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 150,
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-main" },
+          "editorType": "sql",
+          "format": 0,
+          "rawSql": "SELECT component, count() AS items FROM machine.quarantine WHERE status = 'pending' GROUP BY component ORDER BY items DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Pending Items by Component",
+      "type": "barchart"
+    }
+  ],
+  "schemaVersion": 40,
+  "tags": ["framework"],
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Framework: Quarantine",
+  "uid": "fw-quarantine",
+  "version": 1
+}
