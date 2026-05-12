@@ -1,0 +1,6 @@
+apiVersion: v2
+name: traefik-middlewares
+description: Shared Traefik Middleware CRDs for authelia ForwardAuth and CORS
+type: application
+version: 1.0.0
+appVersion: "1.0"
