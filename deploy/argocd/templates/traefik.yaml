@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  name: traefik
+  namespace: argocd
+spec:
+  destination:
+    namespace: traefik
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://traefik.github.io/charts
+    chart: traefik
+    targetRevision: 35.0.0
+    helm:
+      values: |
+        ingressRoute:
+          dashboard:
+            enabled: false
+
+        providers:
+          kubernetesIngress:
+            enabled: true
+            ingressClass: traefik
+            allowExternalNameServices: true
+            allowCrossNamespace: true
+
+        ingressClass:
+          enabled: true
+          isDefaultClass: false
+          name: traefik
+
+        ports:
+          web:
+            exposed: true
+            port: 8000
+            nodePort: 30080
+            protocol: TCP
+          websecure:
+            exposed: true
+            port: 8443
+            nodePort: 30443
+            protocol: TCP
+            tls:
+              enabled: true
+
+        service:
+          enabled: true
+          type: NodePort
+
+        logs:
+          general:
+            level: INFO
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
