@@ -136,7 +136,8 @@ spec:
               <?php
               $CONFIG = [
                 'trusted_proxies' => array('0.0.0.0/0'),
-                'forwarded_for_headers' => ['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP']
+                'forwarded_for_headers' => ['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP'],
+                'allow_local_remote_servers' => true,
               ];
             {{- if .Values.nextcloud.useAuthelia }}
             oidc.config.php: |-
