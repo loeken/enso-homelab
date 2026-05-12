@@ -1,0 +1,1 @@
+kubectl -n rook-ceph exec deploy/rook-ceph-tools -- ceph health detail
