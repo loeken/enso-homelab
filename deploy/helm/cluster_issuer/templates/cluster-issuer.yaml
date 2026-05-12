@@ -4,18 +4,16 @@ metadata:
   name: letsencrypt-staging
 spec:
   acme:
-    # The ACME server URL
     server: https://acme-staging-v02.api.letsencrypt.org/directory
-    # Email address used for ACME registration
     email: admin@{{ .Values.domain }}
-    # Name of a secret used to store the ACME account private key
     privateKeySecretRef:
       name: letsencrypt-staging
-    # Enable the HTTP-01 challenge provider
     solvers:
-    - http01:
-        ingress:
-          class: nginx
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cert-manager-cloudflare
+              key: CloudflareApiToken
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -23,15 +21,13 @@ metadata:
   name: letsencrypt-prod
 spec:
   acme:
-    # The ACME server URL
     server: https://acme-v02.api.letsencrypt.org/directory
-    # Email address used for ACME registration
     email: admin@{{ .Values.domain }}
-    # Name of a secret used to store the ACME account private key
     privateKeySecretRef:
       name: letsencrypt-prod
-    # Enable the HTTP-01 challenge provider
     solvers:
-    - http01:
-        ingress:
-          class: nginx
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cert-manager-cloudflare
+              key: CloudflareApiToken
