@@ -83,25 +83,12 @@ spec:
             smtpHostKey: smtp_host
             smtpPortKey: smtp_port
           {{- if .Values.nextcloud.useAuthelia }}
-          extraInitContainers:
-            - name: replace-oidc-secret
-              image: busybox:1.35
-              command:
-                - sh
-                - -c
-                - |
-                  if [ -f /var/www/html/config/oidc.config.php ]; then
-                    sed -i "s/NEXTCLOUD_OIDC_SECRET/$OIDC_CLIENT_SECRET/g" /var/www/html/config/oidc.config.php
-                  fi
-              env:
-                - name: OIDC_CLIENT_SECRET
-                  valueFrom:
-                    secretKeyRef:
-                      name: nextcloud
-                      key: oidc_client_secret
-              volumeMounts:
-                - name: nextcloud-main
-                  mountPath: /var/www/html/config
+          extraEnv:
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud
+                  key: oidc_client_secret
           {{- end }}
           host: nextcloud.{{ .Values.domain }}
           mail:
@@ -119,7 +106,8 @@ spec:
               $CONFIG = [
                 'user_oidc_provider_url' => 'https://auth.{{ .Values.domain }}',
                 'user_oidc_client_id' => 'nextcloud',
-                'user_oidc_client_secret' => 'NEXTCLOUD_OIDC_SECRET',
+                'user_oidc_client_secret' => getenv('OIDC_CLIENT_SECRET'),
+                'allow_local_remote_servers' => true,
                 'user_oidc_scope' => 'openid profile email groups',
                 'user_oidc_default_group' => 'users',
                 'user_oidc_login_attributes' => [
@@ -138,6 +126,9 @@ spec:
                 'trusted_proxies' => array('0.0.0.0/0'),
                 'forwarded_for_headers' => ['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP'],
                 'allow_local_remote_servers' => true,
+                'overwritehost' => 'nextcloud.{{ .Values.domain }}',
+                'overwriteprotocol' => 'https',
+                'overwrite.cli.url' => 'https://nextcloud.{{ .Values.domain }}',
               ];
             {{- if .Values.nextcloud.useAuthelia }}
             oidc.config.php: |-
@@ -145,7 +136,7 @@ spec:
               $CONFIG = [
                 'oidc_login_provider_url' => 'https://auth.{{ .Values.domain }}',
                 'oidc_login_client_id' => 'nextcloud',
-                'oidc_login_client_secret' => 'NEXTCLOUD_OIDC_SECRET',
+                'oidc_login_client_secret' => getenv('OIDC_CLIENT_SECRET'),
                 'oidc_login_auto_redirect' => false,
                 'oidc_login_end_session_redirect' => false,
                 'oidc_login_button_text' => 'Log in with Authelia',
