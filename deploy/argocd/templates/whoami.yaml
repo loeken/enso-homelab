@@ -26,7 +26,7 @@ spec:
             external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
             external-dns.alpha.kubernetes.io/ttl: "120"
           enabled: true
-          ingressClassName: nginx
+          ingressClassName: traefik
           pathType: ImplementationSpecific
           hosts:
             - host: whoami.{{ .Values.domain }}

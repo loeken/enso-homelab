@@ -43,8 +43,9 @@ spec:
               {{- if .Values.homeassistant.useAuthelia }}
               nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
               nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.domain }}"
+              traefik.ingress.kubernetes.io/router.middlewares: default-authelia-forwardauth@kubernetescrd
               {{- end }}
-            className: "nginx"
+            className: "traefik"
             hosts:
               - host: ha.{{ .Values.domain }}
                 paths:
