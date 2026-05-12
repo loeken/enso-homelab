@@ -1,9 +1,0 @@
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: nextcloud-buffering
-  namespace: default
-spec:
-  buffering:
-    maxRequestBodyBytes: 4294967296
-    memoryRequestBodySize: 5368709120

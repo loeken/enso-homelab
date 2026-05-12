@@ -1,12 +1,4 @@
 {{ if .Values.nextcloud.enabled }}
----
-apiVersion: traefik.io/v1alpha1
-kind: ServersTransport
-metadata:
-  name: nextcloud-transport
-  namespace: nextcloud
-spec: {}
----
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -182,12 +174,8 @@ spec:
             external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
             external-dns.alpha.kubernetes.io/ttl: "120"
             {{- if .Values.nextcloud.useAuthelia }}
-            traefik.ingress.kubernetes.io/router.middlewares: default-nextcloud-buffering@kubernetescrd,default-authelia-forwardauth@kubernetescrd
+            traefik.ingress.kubernetes.io/router.middlewares: default-authelia-forwardauth@kubernetescrd
             {{- end }}
-            {{- if not .Values.nextcloud.useAuthelia }}
-            traefik.ingress.kubernetes.io/router.middlewares: default-nextcloud-buffering@kubernetescrd
-            {{- end }}
-            traefik.ingress.kubernetes.io/services-nextcloud-8080-transport: nextcloud-transport
           className: traefik
           enabled: {{ .Values.nextcloud.ingress.enabled }}
           hosts:
