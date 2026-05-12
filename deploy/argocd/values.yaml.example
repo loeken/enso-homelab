@@ -179,27 +179,3 @@ uptimekuma:
 wazuh:
   enabled: true
   useAuthelia: false
-llmHostIP: "192.168.178.112"
-litellm:
-  enabled: false
-langgraph:
-  enabled: false
-  image:
-    repository: loeken/langgraph-agent
-    tag: latest
-  ingress:
-    enabled: false
-    useAuthelia: false
-  studio:
-    ingress:
-      enabled: false
-qdrant:
-  enabled: false
-  storageSize: 50Gi
-  storageClassName: local-path
-cnpg:
-  enabled: false
-  storageSize: 20Gi
-  storageClassName: local-path
-mcpservers:
-  enabed: true
