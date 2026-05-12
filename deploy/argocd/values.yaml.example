@@ -1,4 +1,4 @@
-domain: loeken.xyz
+domain: example.com
 localDomain: ime.lan
 clusterIssuer: letsencrypt-prod
 clusterName: enso-homelab
