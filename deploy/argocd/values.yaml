@@ -1,11 +1,10 @@
-domain: loeken.xyz
+domain: example.com
 localDomain: ime.lan
 clusterIssuer: letsencrypt-prod
 clusterName: enso-homelab-prod
 githubUser: loeken
 githubRepo: enso-homelab-prod
 globalReplicaCount: 0
-kumatoken: PLoHdjtkxR7KqeaVxz9z6HaRvZSNCsDZ
 
 # app specific
 authelia:
@@ -73,24 +72,6 @@ k10:
   storageClassName: rook-ceph-block
   sidecar:
     enabled: false
-langgraph:
-  enabled: false
-  image:
-    repository: loeken/langgraph-agent
-    tag: latest
-  ingress:
-    enabled: true
-    useAuthelia: false
-  studio:
-    ingress:
-      enabled: false
-litellm:
-  enabled: true
-llmHostIP: "192.168.178.112"
-mcpservers:
-  enabled: false
-  ingress:
-    enabled: true
 nextcloud:
   enabled: true
   size: 10Gi
@@ -148,10 +129,6 @@ prowlarr:
     size: 1Gi
     storageClass: rook-ceph-block
   useAuthelia: true
-qdrant:
-  enabled: true
-  storageSize: 50Gi
-  storageClassName: rook-ceph-block
 radarr:
   enabled: false
   ingress:
@@ -196,9 +173,6 @@ vaultwarden:
   pg:
     storageClassName: rook-ceph-block
     size: 1Gi
-wazuh:
-  enabled: false
-  useAuthelia: true
 whoami:
   enabled: true
 uptimekuma:
@@ -206,24 +180,3 @@ uptimekuma:
   storageClassName: rook-ceph-block
   size: 5Gi
 
-clickhouseOperator:
-  enabled: true
-
-theMachine:
-  enabled: true
-  storageClass: local-path
-  clickhouse:
-    storage:
-      size: 10Gi
-  ingress:
-    enabled: true
-  # pod enabled; idles until BINANCE_API_KEY/SECRET are set
-  enableBinance: true
-  # Image tags — update these after each CI run.
-  # collector, processor, api, migrate use semver tags like v1.0.3.
-  images:
-    migrate: v1.0.19
-    collector: v1.0.16
-    processor: v0.0.12
-    api: v0.0.12
-    frontend: v0.0.5
