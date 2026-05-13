@@ -111,7 +111,6 @@ nextcloud:
     port: 587
     sender: nextcloud@internetz.me
     username: nextcloud@internetz.me
-  storageClass: rook-ceph-block
   useAuthelia: true
 nginxingress:
   enabled: true
@@ -212,13 +211,14 @@ clickhouseOperator:
 
 theMachine:
   enabled: true
-  storageClass: rook-ceph-block
+  storageClass: local-path
   clickhouse:
     storage:
       size: 10Gi
   ingress:
     enabled: true
-  enableBinance: true   # pod enabled; idles until BINANCE_API_KEY/SECRET are set
+  # pod enabled; idles until BINANCE_API_KEY/SECRET are set
+  enableBinance: true
   # Image tags — update these after each CI run.
   # collector, processor, api, migrate use semver tags like v1.0.3.
   images:
