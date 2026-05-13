@@ -75,10 +75,16 @@ spec:
 
             osd:
               limits:
-                memory: "2Gi"
+                # Headroom above osd_memory_target for OSD process overhead,
+                # write buffers and RocksDB compaction working set.
+                memory: "6Gi"
               requests:
                 cpu: "500m"
-                memory: "1Gi"
+                # Rook reads this value and sets osd_memory_target via env var,
+                # which is what actually controls the BlueStore cache size.
+                # RocksDB metadata is currently 1.6 GiB on the 4 TB OSD;
+                # 4 GiB gives the cache room to hold it all plus data objects.
+                memory: "4Gi"
 
             prepareosd:
               requests:
