@@ -37,7 +37,7 @@ spec:
             wal: true
           users:
             auto_assign_org_role: Editor
-        env:
+        extraEnv:
           - name: GF_AUTH_GENERIC_OAUTH_ENABLED
             value: "true"
           - name: GF_AUTH_GENERIC_OAUTH_NAME
