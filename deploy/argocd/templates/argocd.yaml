@@ -23,6 +23,17 @@ spec:
     - repoURL: git@github.com:loeken/{{ .Values.githubRepo  | default "enso-homelab" }}
       targetRevision: HEAD
       ref: values
+      helm:
+        values: |
+          server:
+            ingress:
+              enabled: true
+              ingressClassName: traefik
+              annotations:
+                cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
+              hosts:
+                - argocd.{{ .Values.domain }}
+              tls: true
 
   syncPolicy:
     automated:
