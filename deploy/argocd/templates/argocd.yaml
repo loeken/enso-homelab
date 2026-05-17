@@ -28,6 +28,7 @@ spec:
                 cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
               hostname: argocd.{{ .Values.domain }}
               tls: false
+              servicePort: http
     # renovate: ignore
     - repoURL: git@github.com:loeken/{{ .Values.githubRepo  | default "enso-homelab" }}
       targetRevision: HEAD
