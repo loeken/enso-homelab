@@ -20,6 +20,9 @@ spec:
         valueFiles:
           - $values/deploy/terraform/argocd/argocd-values.yaml
         values: |
+          configs:
+            params:
+              server.insecure: true
           server:
             ingress:
               enabled: true
@@ -27,8 +30,7 @@ spec:
               annotations:
                 cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
               hostname: argocd.{{ .Values.domain }}
-              tls: false
-              servicePort: http
+              tls: true
     # renovate: ignore
     - repoURL: git@github.com:loeken/{{ .Values.githubRepo  | default "enso-homelab" }}
       targetRevision: HEAD
