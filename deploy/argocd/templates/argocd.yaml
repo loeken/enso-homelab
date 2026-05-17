@@ -19,11 +19,6 @@ spec:
       helm:
         valueFiles:
           - $values/deploy/terraform/argocd/argocd-values.yaml
-    # renovate: ignore
-    - repoURL: git@github.com:loeken/{{ .Values.githubRepo  | default "enso-homelab" }}
-      targetRevision: HEAD
-      ref: values
-      helm:
         values: |
           server:
             ingress:
@@ -34,6 +29,10 @@ spec:
               hosts:
                 - argocd.{{ .Values.domain }}
               tls: true
+    # renovate: ignore
+    - repoURL: git@github.com:loeken/{{ .Values.githubRepo  | default "enso-homelab" }}
+      targetRevision: HEAD
+      ref: values
 
   syncPolicy:
     automated:
