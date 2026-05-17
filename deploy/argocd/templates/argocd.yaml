@@ -26,8 +26,7 @@ spec:
               ingressClassName: traefik
               annotations:
                 cert-manager.io/cluster-issuer: "{{ .Values.clusterIssuer }}"
-              hosts:
-                - argocd.{{ .Values.domain }}
+              hostname: argocd.{{ .Values.domain }}
               tls: true
     # renovate: ignore
     - repoURL: git@github.com:loeken/{{ .Values.githubRepo  | default "enso-homelab" }}
