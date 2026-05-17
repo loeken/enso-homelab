@@ -37,7 +37,36 @@ spec:
             wal: true
           users:
             auto_assign_org_role: Editor
-        envFromSecret: grafana-oauth-config
+        env:
+          - name: GF_AUTH_GENERIC_OAUTH_ENABLED
+            value: "true"
+          - name: GF_AUTH_GENERIC_OAUTH_NAME
+            value: "Authelia"
+          - name: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+            value: "grafana"
+          - name: GF_AUTH_GENERIC_OAUTH_AUTH_URL
+            value: "https://auth.{{ .Values.domain }}/api/oidc/authorization"
+          - name: GF_AUTH_GENERIC_OAUTH_TOKEN_URL
+            value: "https://auth.{{ .Values.domain }}/api/oidc/token"
+          - name: GF_AUTH_GENERIC_OAUTH_API_URL
+            value: "https://auth.{{ .Values.domain }}/api/oidc/userinfo"
+          - name: GF_AUTH_GENERIC_OAUTH_SCOPES
+            value: "openid profile email groups"
+          - name: GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH
+            value: "preferred_username"
+          - name: GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH
+            value: "name"
+          - name: GF_AUTH_GENERIC_OAUTH_GROUPS_ATTRIBUTE_PATH
+            value: "groups"
+          - name: GF_AUTH_GENERIC_OAUTH_USE_PKCE
+            value: "true"
+          - name: GF_AUTH_GENERIC_OAUTH_TLS_SKIP_VERIFY_INSECURE
+            value: "true"
+          - name: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: grafana-oauth-config
+                key: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
         plugins:
           - ae3e-plotly-panel
           - grafana-clickhouse-datasource
