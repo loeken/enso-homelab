@@ -28,7 +28,7 @@ jobs:
       - name: Create k3d cluster (pinned K3s version, no Traefik)
         run: |
           k3d cluster create ensotest \
-            --image rancher/k3s:v1.36.3-k3s1 \
+            --image rancher/k3s:v1.36.4-k3s1 \
             --k3s-arg "--disable=traefik@server:0" \
             --wait
           kubectl get nodes
