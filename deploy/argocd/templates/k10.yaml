@@ -43,7 +43,7 @@ spec:
               memory: 1Gi
 
     repoURL: https://charts.kasten.io/
-    targetRevision: 9.0.5
+    targetRevision: 9.0.6
   syncPolicy:
     automated:
       prune: true
