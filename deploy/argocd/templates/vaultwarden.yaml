@@ -107,7 +107,7 @@ spec:
                 - ReadWriteOnce
         
     repoURL: https://loeken.github.io/helm-charts
-    targetRevision: 1.37.3-alpine
+    targetRevision: 1.37.5-alpine
   syncPolicy:
     automated:
       prune: true
